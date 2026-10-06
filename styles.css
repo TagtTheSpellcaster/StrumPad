@@ -8,7 +8,7 @@ body {
     touch-action: manipulation;
 }
 
-/* Custom Scrollbar for matrix overflow on small screens */
+/* Scrollbar personalizzata per overflow matrice */
 ::-webkit-scrollbar {
     height: 8px;
 }
@@ -21,7 +21,7 @@ body {
     border-radius: 4px;
 }
 
-/* Gold metallic plate container styling */
+/* Stile Piastra Metallica Dorata */
 .gold-plate-container {
     background: linear-gradient(
         135deg, 
@@ -41,7 +41,7 @@ body {
     position: relative;
 }
 
-/* Metallic fine horizontal grooves overlay */
+/* Trame e zigrinature metalliche orizzontali */
 .gold-plate-container::before {
     content: "";
     position: absolute;
@@ -57,7 +57,7 @@ body {
     z-index: 1;
 }
 
-/* 3D Compact Square Matrix Button */
+/* Pulsanti Quadrati Matrice 3D */
 .matrix-btn {
     position: relative;
     width: 42px;
@@ -82,28 +82,28 @@ body {
     box-shadow: 0 1px 0 rgba(0,0,0,0.3), 0 2px 3px rgba(0,0,0,0.2) !important;
 }
 
-/* Row Color Themes (Pastel Tones) */
-/* Row 1 - Maggiore (Pastel Peach/Amber) */
+/* Temi Colore Pastello per Fila */
+/* Row 1 - Maggiore */
 .row-maj { background-color: #fce3b8; border-color: #d1a566; }
 .row-maj:hover { background-color: #ffecc9; }
 
-/* Row 2 - Minore (Pastel Sky Blue) */
+/* Row 2 - Minore */
 .row-min { background-color: #c0e3f7; border-color: #79a8c7; }
 .row-min:hover { background-color: #d4eefc; }
 
-/* Row 3 - Settima Dominante (Soft Coral/Rose) */
+/* Row 3 - Settima Dominante */
 .row-7 { background-color: #f7c6c6; border-color: #c98888; }
 .row-7:hover { background-color: #fcd7d7; }
 
-/* Row 4 - Settima Maggiore (Pastel Sage Green) */
+/* Row 4 - Settima Maggiore */
 .row-maj7 { background-color: #c4ecd0; border-color: #7fba8f; }
 .row-maj7:hover { background-color: #d6f5df; }
 
-/* Row 5 - Settima Minore (Pastel Soft Lavender) */
+/* Row 5 - Settima Minore */
 .row-m7 { background-color: #e0cced; border-color: #a485b8; }
 .row-m7:hover { background-color: #ebdcf5; }
 
-/* Rectangular Green LED centered at bottom of button */
+/* LED Verde rettangolare centrato in basso */
 .btn-led {
     width: 12px;
     height: 4px;
@@ -115,7 +115,7 @@ body {
     display: block;
 }
 
-/* Active glowing state for LED */
+/* Stato attivo LED illuminato verde neon */
 .matrix-btn.active .btn-led,
 .matrix-btn:active .btn-led {
     background-color: #00ff66 !important;
