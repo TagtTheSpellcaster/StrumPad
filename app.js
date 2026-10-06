@@ -1,5 +1,5 @@
 /**
- * Web Audio API Engine Class for StrumPad Synth with Full ADSR Envelopes
+ * Web Audio API Engine Class for StrumPad Synth with Waveform Selector & ADSR Envelopes
  */
 class WebAudioEngine {
     constructor() {
@@ -8,10 +8,13 @@ class WebAudioEngine {
         this.volume = 0.8;
         this.cutoffFreq = 2200;
         this.initialized = false;
-        this.audioActive = false; // Tassativamente OFF all'avvio
+        this.audioActive = false; // Off by default
         this.droneMode = false;
         this.activeDroneNodes = [];
         this.scheduledTimeouts = [];
+
+        // Waveform Selector ('square', 'sawtooth', 'triangle', 'sine')
+        this.waveform = 'sawtooth';
 
         // ADSR Envelope Parameters
         this.attackTime = 0.10;
@@ -80,6 +83,12 @@ class WebAudioEngine {
         this.cutoffFreq = val;
     }
 
+    setWaveform(type) {
+        if (['square', 'sawtooth', 'triangle', 'sine'].includes(type)) {
+            this.waveform = type;
+        }
+    }
+
     setDroneMode(enabled) {
         this.droneMode = enabled;
         if (!enabled) {
@@ -121,7 +130,7 @@ class WebAudioEngine {
             const oscList = [];
             pipeHarmonics.forEach(h => {
                 const osc = this.ctx.createOscillator();
-                osc.type = (h.mult === 1.0 || h.mult === 0.5) ? 'sine' : 'triangle';
+                osc.type = (h.mult === 1.0 || h.mult === 0.5) ? this.waveform : 'sine';
                 osc.frequency.setValueAtTime(freq * h.mult, now);
 
                 const hGain = this.ctx.createGain();
@@ -141,12 +150,13 @@ class WebAudioEngine {
                 gain: voiceGain
             });
         } else {
-            // RETRO SYNTH VOICE WITH ADSR ENVELOPE
+            // RETRO SYNTH VOICE WITH SELECTED WAVEFORM & ADSR ENVELOPE
             const osc1 = this.ctx.createOscillator();
             const osc2 = this.ctx.createOscillator();
 
-            osc1.type = 'sawtooth';
-            osc2.type = 'triangle';
+            osc1.type = this.waveform;
+            // Slightly detune secondary oscillator for rich vintage texture
+            osc2.type = this.waveform === 'sine' ? 'triangle' : this.waveform;
 
             osc1.frequency.setValueAtTime(freq, now);
             osc2.frequency.setValueAtTime(freq * 1.002, now);
@@ -233,7 +243,7 @@ class AdsrCanvasRenderer {
         const height = this.canvas.height;
         const ctx = this.ctx;
 
-        // 1. Sfondo Nero Profondo MonitorCRT
+        // 1. Sfondo Nero Profondo Monitor CRT
         ctx.fillStyle = '#020803';
         ctx.fillRect(0, 0, width, height);
 
@@ -258,7 +268,7 @@ class AdsrCanvasRenderer {
         }
 
         // Calcolo Punti Curva ADSR
-        const padding = 16;
+        const padding = 14;
         const drawW = width - (padding * 2);
         const drawH = height - (padding * 2);
 
@@ -352,7 +362,7 @@ const MATRIX_ROWS = [
     { id: 'm7',   label: 'Minor 7th',         intervals: [0, 3, 7, 10], suffix: 'm7',   btnClass: 'row-m7',   badgeStyle: 'bg-purple-200 text-purple-950 border-purple-300' }
 ];
 
-// Translated Genres, Styles & Progressions Table
+// Genres, Styles & Progressions Table
 const GENRES_DATA = {
     "Classical & Traditional": {
         "Circle of C (Major)": "I - vi (I / IV) - ii (IV) - V (bVII / viio)",
@@ -732,6 +742,16 @@ window.addEventListener('DOMContentLoaded', () => {
     const audioStateLbl = document.getElementById('lbl-audio-state');
     const powerLed = document.getElementById('power-led');
     const droneToggle = document.getElementById('toggle-drone');
+
+    // Waveform Radio Buttons Listener
+    const waveRadios = document.querySelectorAll('input[name="waveform"]');
+    waveRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                audio.setWaveform(e.target.value);
+            }
+        });
+    });
 
     // ADSR Sliders Elements
     const slAttack = document.getElementById('slider-attack');
