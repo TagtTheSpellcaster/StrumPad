@@ -3,152 +3,651 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Retro Omni-Strum Matrix Synthesizer</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Retro Synth Chord & Strumplate Simulator</title>
+    <!-- Tailwind CSS for Responsive Layout Utilities -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        chassis: '#e6ded0',
-                        chassisDark: '#cfc4b0',
-                        accentDark: '#38322c',
-                        panelBeige: '#f0e6d2',
-                        vintageRed: '#d9534f',
-                        vintageBlue: '#4a90e2',
-                        vintageGreen: '#5cb85c',
-                        vintageAmber: '#f0ad4e',
-                        goldPlate: '#d4af37',
+                        chassis: '#e5dec9',
+                        chassisDark: '#c2b8a3',
+                        panelBg: '#eddcc4',
+                        amberGold: '#d4af37',
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
-                        display: ['Courier New', 'monospace']
+                        mono: ['Courier New', 'monospace']
                     }
                 }
             }
         }
     </script>
-    <!-- External Custom Retro Hardware CSS -->
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-color: #1e1b18;
+            background-image: radial-gradient(#332d27 1px, transparent 0);
+            background-size: 16px 16px;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        /* Custom Scrollbar for matrix overflow on small screens */
+        ::-webkit-scrollbar {
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #c2b8a3;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8e836f;
+            border-radius: 4px;
+        }
+
+        .gold-plate-container {
+            background: linear-gradient(
+                135deg, 
+                #b8860b 0%, 
+                #ffd700 20%, 
+                #d4af37 40%, 
+                #fff8dc 50%, 
+                #aa771c 65%, 
+                #f0e68c 85%, 
+                #8b6508 100%
+            );
+            border: 4px solid #5a4413;
+            box-shadow: 
+                inset 0 2px 10px rgba(255,255,255,0.8),
+                inset 0 -4px 12px rgba(0,0,0,0.6),
+                0 6px 12px rgba(0,0,0,0.4);
+            position: relative;
+        }
+
+        /* Metallic fine horizontal grooves overlay */
+        .gold-plate-container::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.08),
+                rgba(0, 0, 0, 0.08) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* 3D Compact Square Matrix Button */
+        .matrix-btn {
+            position: relative;
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            min-height: 42px;
+            border-radius: 6px;
+            border-width: 2px;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.25), 0 5px 6px rgba(0,0,0,0.2);
+            outline: none;
+            cursor: pointer;
+            transition: transform 0.05s ease, box-shadow 0.05s ease, filter 0.1s ease;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 4px;
+            flex-shrink: 0;
+        }
+
+        .matrix-btn:active, .matrix-btn.active {
+            transform: translateY(3px) !important;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.3), 0 2px 3px rgba(0,0,0,0.2) !important;
+        }
+
+        /* Row Color Themes (Pastel Tones) */
+        /* Row 1 - Maggiore (Pastel Peach/Amber) */
+        .row-maj { background-color: #fce3b8; border-color: #d1a566; }
+        .row-maj:hover { background-color: #ffecc9; }
+
+        /* Row 2 - Minore (Pastel Sky Blue) */
+        .row-min { background-color: #c0e3f7; border-color: #79a8c7; }
+        .row-min:hover { background-color: #d4eefc; }
+
+        /* Row 3 - Settima Dominante (Soft Coral/Rose) */
+        .row-7 { background-color: #f7c6c6; border-color: #c98888; }
+        .row-7:hover { background-color: #fcd7d7; }
+
+        /* Row 4 - Settima Maggiore (Pastel Sage Green) */
+        .row-maj7 { background-color: #c4ecd0; border-color: #7fba8f; }
+        .row-maj7:hover { background-color: #d6f5df; }
+
+        /* Row 5 - Settima Minore (Pastel Soft Lavender) */
+        .row-m7 { background-color: #e0cced; border-color: #a485b8; }
+        .row-m7:hover { background-color: #ebdcf5; }
+
+        /* Rectangular Green LED centered at bottom of button */
+        .led-rect {
+            width: 12px;
+            height: 4px;
+            background-color: #233326;
+            border: 1px solid #142116;
+            border-radius: 1px;
+            transition: background-color 0.05s ease, box-shadow 0.05s ease;
+            pointer-events: none;
+            display: block;
+        }
+
+        /* Active glowing state for LED */
+        .matrix-btn.active .led-rect,
+        .matrix-btn:active .led-rect {
+            background-color: #00ff66 !important;
+            box-shadow: 0 0 6px #00ff66, 0 0 12px #00ff66, 0 0 16px #00ff66 !important;
+            border-color: #88ffb3 !important;
+        }
+
+        /* General Hardware Controls Styling */
+        .retro-knob {
+            accent-color: #8b5cf6;
+        }
+    </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 text-slate-800 antialiased selection:bg-none">
+<body class="min-h-screen flex items-center justify-center p-2 sm:p-5 text-slate-800">
 
     <!-- Main Instrument Chassis -->
-    <div id="synth-chassis" class="w-full max-w-7xl bg-chassis rounded-3xl p-3 sm:p-6 shadow-2xl border-4 border-chassisDark relative overflow-hidden flex flex-col gap-5">
+    <div class="w-full max-w-6xl bg-chassis rounded-3xl p-4 sm:p-7 shadow-2xl border-4 border-chassisDark flex flex-col gap-6 relative">
         
-        <!-- Header / Brand Section -->
-        <header class="flex flex-wrap justify-between items-center border-b-2 border-chassisDark pb-3 gap-3">
+        <!-- Chassis Header & Logo -->
+        <header class="flex flex-wrap justify-between items-center border-b-2 border-chassisDark pb-3 gap-4">
             <div class="flex items-center gap-3">
-                <div class="w-4 h-4 rounded-full bg-red-600 led-indicator text-red-500" id="power-led"></div>
-                <h1 class="font-bold text-xl sm:text-2xl tracking-wider text-accentDark uppercase font-display">
-                    OMNI-STRUM <span class="text-xs font-normal text-amber-800 tracking-normal border border-amber-800 px-2 py-0.5 rounded">CLASSIC MATRIX</span>
+                <div id="power-led" class="w-4 h-4 rounded-full bg-red-600 shadow-[0_0_8px_#dc2626]"></div>
+                <h1 class="font-extrabold text-xl sm:text-2xl tracking-wider text-slate-800 uppercase font-mono">
+                    OMNI-STRUM <span class="text-xs font-sans font-semibold text-amber-900 border border-amber-800 px-2 py-0.5 rounded ml-2">MATRIX VINTAGE</span>
                 </h1>
             </div>
-            
-            <div class="flex items-center gap-4 text-xs font-semibold text-accentDark">
-                <button id="btn-start-audio" class="bg-vintageAmber text-slate-900 px-4 py-2 rounded-lg shadow-md font-bold hover:brightness-110 active:scale-95 transition">
-                    🔊 Abilita Audio
+
+            <div class="flex items-center gap-4">
+                <button id="btn-power" class="bg-amber-600 text-white font-bold px-4 py-2 rounded-xl shadow-md hover:bg-amber-700 active:scale-95 transition text-sm">
+                    🔊 Attiva Audio
                 </button>
-                <div class="hidden md:block text-right">
-                    <span class="block opacity-75">Tasti o Strumplate Touch</span>
-                    <span class="text-amber-900 font-mono">Circolo delle Quinte (5 File)</span>
-                </div>
             </div>
         </header>
 
-        <!-- Top Section: Master Controls + Sonic Strumplate -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- Upper Section: Master Controls & Metallic Strumplate -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- Master Controls Panel -->
-            <div class="lg:col-span-4 bg-panelBeige p-4 rounded-2xl border-2 border-chassisDark flex flex-col justify-between gap-3">
-                <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600 border-b border-slate-300 pb-1">Controlli Generali</h2>
+            <!-- Master Control Panel -->
+            <div class="lg:col-span-4 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col justify-between gap-4">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600 border-b border-slate-300 pb-1">Controlli Modulazione</h2>
                 
-                <div class="grid grid-cols-3 lg:grid-cols-1 gap-3">
-                    <!-- Volume Knob -->
-                    <div class="flex flex-col gap-1">
-                        <div class="flex justify-between text-xs font-semibold">
-                            <label for="knob-volume">Volume Master</label>
-                            <span id="val-volume" class="font-mono text-slate-600">80%</span>
+                <div class="flex flex-col gap-3">
+                    <!-- Master Volume -->
+                    <div>
+                        <div class="flex justify-between text-xs font-semibold mb-1">
+                            <span>Volume Master</span>
+                            <span id="lbl-volume" class="font-mono text-slate-700">80%</span>
                         </div>
-                        <input type="range" id="knob-volume" min="0" max="100" value="80" class="accent-amber-700 h-2 bg-chassisDark rounded-lg cursor-pointer">
+                        <input type="range" id="slider-volume" min="0" max="100" value="80" class="w-full h-2 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                     </div>
 
-                    <!-- Sustain / Decay Knob -->
-                    <div class="flex flex-col gap-1">
-                        <div class="flex justify-between text-xs font-semibold">
-                            <label for="knob-sustain">Sustain / Decay</label>
-                            <span id="val-sustain" class="font-mono text-slate-600">1.2s</span>
+                    <!-- Sustain / Decay Time -->
+                    <div>
+                        <div class="flex justify-between text-xs font-semibold mb-1">
+                            <span>Sustain / Decay</span>
+                            <span id="lbl-sustain" class="font-mono text-slate-700">1.2s</span>
                         </div>
-                        <input type="range" id="knob-sustain" min="2" max="30" value="12" class="accent-amber-700 h-2 bg-chassisDark rounded-lg cursor-pointer">
+                        <input type="range" id="slider-sustain" min="2" max="30" value="12" class="w-full h-2 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                     </div>
 
                     <!-- Filter Tone Cutoff -->
-                    <div class="flex flex-col gap-1">
-                        <div class="flex justify-between text-xs font-semibold">
-                            <label for="knob-cutoff">Tone / Cutoff</label>
-                            <span id="val-cutoff" class="font-mono text-slate-600">2200 Hz</span>
+                    <div>
+                        <div class="flex justify-between text-xs font-semibold mb-1">
+                            <span>Timbro / Cutoff</span>
+                            <span id="lbl-cutoff" class="font-mono text-slate-700">2200 Hz</span>
                         </div>
-                        <input type="range" id="knob-cutoff" min="300" max="8000" value="2200" class="accent-amber-700 h-2 bg-chassisDark rounded-lg cursor-pointer">
+                        <input type="range" id="slider-cutoff" min="300" max="8000" value="2200" class="w-full h-2 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                     </div>
                 </div>
 
-                <!-- Active Chord Display -->
-                <div class="flex items-center justify-between border-t border-slate-300 pt-2 mt-1">
-                    <span class="text-xs font-bold text-slate-700">Accordo Attivo:</span>
-                    <span id="current-chord-display" class="font-display font-bold text-lg text-amber-900 bg-amber-100/80 px-3 py-0.5 rounded border border-amber-300 shadow-sm">
-                        C
-                    </span>
+                <!-- Active Chord Monitor Box -->
+                <div class="bg-amber-100/90 border border-amber-300 rounded-xl p-3 flex justify-between items-center shadow-inner mt-1">
+                    <span class="text-xs font-bold text-amber-900 uppercase">Accordo Selezionato:</span>
+                    <span id="lbl-active-chord" class="font-mono font-bold text-2xl text-amber-950">C</span>
                 </div>
             </div>
 
-            <!-- Touch Strumplate Panel -->
-            <div class="lg:col-span-8 bg-panelBeige p-4 rounded-2xl border-2 border-chassisDark flex flex-col gap-2">
+            <!-- Metallic Strumplate Touch Pad -->
+            <div class="lg:col-span-8 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col gap-2">
                 <div class="flex justify-between items-center border-b border-slate-300 pb-1">
-                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Sonic String Strumplate</h2>
-                    <span class="text-[11px] text-amber-800 font-medium">Trascina il dito o cursore per arpeggiare</span>
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Sonic Strumplate (Piastra Metallica)</h2>
+                    <span class="text-xs text-amber-900 font-medium hidden sm:inline">Sfiora o trascina il dito/mouse</span>
                 </div>
-                
-                <div class="relative w-full h-36 sm:h-40 rounded-xl border-4 border-amber-900/40 overflow-hidden strumplate-gradient cursor-crosshair shadow-inner">
-                    <canvas id="strumplate-canvas" class="w-full h-full block"></canvas>
-                    
-                    <!-- Strumplate Vertical Guide Lines Overlay -->
-                    <div class="absolute inset-0 pointer-events-none flex justify-between px-2 opacity-20">
-                        <div class="w-0.5 h-full bg-slate-900"></div>
-                        <div class="w-0.5 h-full bg-slate-900"></div>
-                        <div class="w-0.5 h-full bg-slate-900"></div>
-                        <div class="w-0.5 h-full bg-slate-900"></div>
-                        <div class="w-0.5 h-full bg-slate-900"></div>
-                        <div class="w-0.5 h-full bg-slate-900"></div>
-                        <div class="w-0.5 h-full bg-slate-900"></div>
-                        <div class="w-0.5 h-full bg-slate-900"></div>
-                    </div>
+
+                <!-- Gold Metal Surface Container -->
+                <div class="gold-plate-container w-full h-44 rounded-xl overflow-hidden cursor-crosshair">
+                    <canvas id="strum-canvas" class="w-full h-full block relative z-10"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- 5-Row Accordion Matrix Grid Container -->
-        <div class="bg-panelBeige p-3 sm:p-5 rounded-2xl border-2 border-chassisDark flex flex-col gap-3">
+        <!-- 5-Row Circle of Fifths Button Matrix -->
+        <div class="bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col gap-3">
             <div class="flex justify-between items-center border-b border-slate-300 pb-1">
-                <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Matrice Accordi - Circolo delle Quinte</h2>
-                <span class="text-[11px] text-slate-500 hidden sm:inline">Premi un bottone per attivare l'accordo</span>
+                <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Matrice Accordi — Circolo delle Quinte</h2>
+                <span class="text-xs text-slate-500 hidden sm:inline">Premi un pulsante per attivare l'accordo</span>
             </div>
 
-            <div class="overflow-x-auto pb-2 flex justify-center sm:justify-start">
-                <div class="inline-flex flex-col gap-3 min-w-max" id="matrix-container">
-                    <!-- Populated dynamically via JavaScript -->
+            <!-- Scrollable Button Rows Container -->
+            <div class="overflow-x-auto pb-2">
+                <div id="matrix-grid" class="inline-flex flex-col gap-3 min-w-max p-1">
+                    <!-- Generated dynamically by JS -->
                 </div>
             </div>
         </div>
 
         <!-- Footer -->
         <footer class="text-center text-xs text-slate-500 border-t border-chassisDark pt-2 flex justify-between items-center">
-            <span>Sintesi Web Audio API Diretta</span>
-            <span>Omni-Strum Matrix Simulator</span>
+            <span>Sintesi Web Audio API Pure</span>
+            <span>Simulatore Synth Accordi</span>
         </footer>
     </div>
 
-    <!-- External Audio Logic and Interactivity JS Script -->
-    <script src="app.js"></script>
+    <script>
+        /**
+         * Web Audio API Engine Class for Synth Pluck Voices
+         */
+        class WebAudioEngine {
+            constructor() {
+                this.ctx = null;
+                this.masterGain = null;
+                this.volume = 0.8;
+                this.sustainTime = 1.2;
+                this.cutoffFreq = 2200;
+                this.initialized = false;
+            }
+
+            init() {
+                if (this.initialized) return;
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                this.ctx = new AudioCtx();
+
+                this.masterGain = this.ctx.createGain();
+                this.masterGain.gain.setValueAtTime(this.volume, this.ctx.currentTime);
+                this.masterGain.connect(this.ctx.destination);
+
+                this.initialized = true;
+            }
+
+            setVolume(val) {
+                this.volume = val;
+                if (this.masterGain && this.ctx) {
+                    this.masterGain.gain.linearRampToValueAtTime(this.volume, this.ctx.currentTime + 0.05);
+                }
+            }
+
+            setSustain(val) {
+                this.sustainTime = val;
+            }
+
+            setCutoff(val) {
+                this.cutoffFreq = val;
+            }
+
+            // Synthesize single pluck voice
+            playNote(midiNote) {
+                if (!this.initialized || !this.ctx) return;
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+
+                const now = this.ctx.currentTime;
+                const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
+
+                // Twin oscillators (sawtooth + triangle) for rich retro timbre
+                const osc1 = this.ctx.createOscillator();
+                const osc2 = this.ctx.createOscillator();
+
+                osc1.type = 'sawtooth';
+                osc2.type = 'triangle';
+
+                osc1.frequency.setValueAtTime(freq, now);
+                osc2.frequency.setValueAtTime(freq * 1.002, now); // Warm detune
+
+                // Lowpass filter envelope
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(this.cutoffFreq, now);
+                filter.frequency.exponentialRampToValueAtTime(100, now + this.sustainTime);
+
+                // Gain envelope (Pluck decay)
+                const voiceGain = this.ctx.createGain();
+                voiceGain.gain.setValueAtTime(0.35, now);
+                voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + this.sustainTime);
+
+                // Connections
+                osc1.connect(filter);
+                osc2.connect(filter);
+                filter.connect(voiceGain);
+                voiceGain.connect(this.masterGain);
+
+                osc1.start(now);
+                osc2.start(now);
+                osc1.stop(now + this.sustainTime);
+                osc2.stop(now + this.sustainTime);
+            }
+
+            // Arpeggiate chord instantly on button press
+            strumChord(midiNotes) {
+                if (!this.initialized || !this.ctx) return;
+                const notes = midiNotes.slice(0, 5);
+                notes.forEach((note, idx) => {
+                    setTimeout(() => {
+                        this.playNote(note);
+                    }, idx * 35);
+                });
+            }
+        }
+
+        // Circle of Fifths order starting from Eb
+        const CIRCLE_OF_FIFTHS = [
+            { name: 'Eb', midi: 63 },
+            { name: 'Bb', midi: 70 },
+            { name: 'F',  midi: 65 },
+            { name: 'C',  midi: 60 },
+            { name: 'G',  midi: 67 },
+            { name: 'D',  midi: 62 },
+            { name: 'A',  midi: 69 },
+            { name: 'E',  midi: 64 },
+            { name: 'B',  midi: 71 },
+            { name: 'F#', midi: 66 },
+            { name: 'Db', midi: 61 },
+            { name: 'Ab', midi: 68 }
+        ];
+
+        // 5 Matrix Row Configurations
+        const MATRIX_ROWS = [
+            { 
+                id: 'maj', 
+                label: 'Maggiore', 
+                intervals: [0, 4, 7], 
+                suffix: '', 
+                btnClass: 'row-maj',
+                badgeStyle: 'bg-amber-200 text-amber-950 border-amber-300' 
+            },
+            { 
+                id: 'min', 
+                label: 'Minore', 
+                intervals: [0, 3, 7], 
+                suffix: 'm', 
+                btnClass: 'row-min',
+                badgeStyle: 'bg-sky-200 text-sky-950 border-sky-300' 
+            },
+            { 
+                id: '7', 
+                label: 'Settima Dominante', 
+                intervals: [0, 4, 7, 10], 
+                suffix: '7', 
+                btnClass: 'row-7',
+                badgeStyle: 'bg-rose-200 text-rose-950 border-rose-300' 
+            },
+            { 
+                id: 'maj7', 
+                label: 'Settima Maggiore', 
+                intervals: [0, 4, 7, 11], 
+                suffix: 'maj7', 
+                btnClass: 'row-maj7',
+                badgeStyle: 'bg-emerald-200 text-emerald-950 border-emerald-300' 
+            },
+            { 
+                id: 'm7', 
+                label: 'Settima Minore', 
+                intervals: [0, 3, 7, 10], 
+                suffix: 'm7', 
+                btnClass: 'row-m7',
+                badgeStyle: 'bg-purple-200 text-purple-950 border-purple-300' 
+            }
+        ];
+
+        // Global State Variables
+        const audio = new WebAudioEngine();
+        let selectedChordName = 'C';
+        let currentStrumNotes = [];
+
+        // Calculate note ranges across multiple octaves for Strumplate
+        function calculateNotes(rootMidi, intervals) {
+            const notes = [];
+            for (let octave = -1; octave <= 2; octave++) {
+                for (let interval of intervals) {
+                    notes.push(rootMidi + interval + (octave * 12));
+                }
+            }
+            return notes.sort((a, b) => a - b);
+        }
+
+        // Select active chord & update matrix highlighting
+        function selectChord(rootObj, rowObj) {
+            selectedChordName = `${rootObj.name}${rowObj.suffix}`;
+            currentStrumNotes = calculateNotes(rootObj.midi, rowObj.intervals);
+
+            // Update screen label
+            document.getElementById('lbl-active-chord').textContent = selectedChordName;
+
+            // Highlight active button in matrix
+            const allBtns = document.querySelectorAll('.matrix-btn');
+            allBtns.forEach(btn => {
+                if (btn.dataset.chord === selectedChordName) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // Build Matrix UI
+        function createMatrixUI() {
+            const container = document.getElementById('matrix-grid');
+            if (!container) return;
+            container.innerHTML = '';
+
+            MATRIX_ROWS.forEach(row => {
+                const rowWrapper = document.createElement('div');
+                rowWrapper.className = 'flex items-center gap-3';
+
+                // Left row label badge
+                const labelBox = document.createElement('div');
+                labelBox.className = 'w-36 text-right shrink-0 pr-2';
+                labelBox.innerHTML = `<span class="px-2.5 py-1 rounded-md text-xs font-bold border shadow-sm inline-block w-full ${row.badgeStyle}">${row.label}</span>`;
+                rowWrapper.appendChild(labelBox);
+
+                // Row button grid
+                const btnGrid = document.createElement('div');
+                btnGrid.className = 'flex items-center gap-2';
+
+                CIRCLE_OF_FIFTHS.forEach(root => {
+                    const chordFullName = `${root.name}${row.suffix}`;
+                    const btn = document.createElement('button');
+                    
+                    // Compact square button
+                    btn.className = `matrix-btn ${row.btnClass}`;
+                    btn.dataset.chord = chordFullName;
+
+                    // Bottom-centered green LED rectangle
+                    const led = document.createElement('span');
+                    led.className = 'led-rect';
+                    btn.appendChild(led);
+
+                    // Immediate press handler (pointerdown/mousedown)
+                    const handlePress = (e) => {
+                        e.preventDefault();
+                        audio.init();
+                        selectChord(root, row);
+                        audio.strumChord(currentStrumNotes);
+                    };
+
+                    btn.addEventListener('pointerdown', handlePress);
+                    btnGrid.appendChild(btn);
+                });
+
+                rowWrapper.appendChild(btnGrid);
+                container.appendChild(rowWrapper);
+            });
+
+            // Set default chord to C Major (Root index 3 in Circle starting at Eb)
+            selectChord(CIRCLE_OF_FIFTHS[3], MATRIX_ROWS[0]);
+        }
+
+        /**
+         * Interactive Canvas Strumplate Controller
+         */
+        class StrumplateController {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.lastIndex = -1;
+                this.isInteracting = false;
+                this.ripples = [];
+
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                this.bindEvents();
+                this.animate();
+            }
+
+            resize() {
+                const rect = this.canvas.parentElement.getBoundingClientRect();
+                this.canvas.width = rect.width;
+                this.canvas.height = rect.height;
+            }
+
+            bindEvents() {
+                const getPos = (e) => {
+                    const rect = this.canvas.getBoundingClientRect();
+                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                    return {
+                        x: clientX - rect.left,
+                        y: clientY - rect.top
+                    };
+                };
+
+                const start = (e) => {
+                    e.preventDefault();
+                    audio.init();
+                    this.isInteracting = true;
+                    this.triggerAt(getPos(e));
+                };
+
+                const move = (e) => {
+                    if (!this.isInteracting) return;
+                    e.preventDefault();
+                    this.triggerAt(getPos(e));
+                };
+
+                const stop = () => {
+                    this.isInteracting = false;
+                    this.lastIndex = -1;
+                };
+
+                this.canvas.addEventListener('mousedown', start);
+                this.canvas.addEventListener('mousemove', move);
+                window.addEventListener('mouseup', stop);
+
+                this.canvas.addEventListener('touchstart', start, { passive: false });
+                this.canvas.addEventListener('touchmove', move, { passive: false });
+                window.addEventListener('touchend', stop);
+            }
+
+            triggerAt(pos) {
+                if (!currentStrumNotes.length) return;
+
+                const width = this.canvas.width;
+                const normalizedX = Math.max(0, Math.min(1, pos.x / width));
+                const index = Math.floor(normalizedX * currentStrumNotes.length);
+
+                if (index !== this.lastIndex && index < currentStrumNotes.length) {
+                    this.lastIndex = index;
+                    const note = currentStrumNotes[index];
+                    audio.playNote(note);
+                    this.addLightEffect(pos.x, pos.y);
+                }
+            }
+
+            addLightEffect(x, y) {
+                this.ripples.push({
+                    x: x,
+                    y: y,
+                    radius: 4,
+                    alpha: 1.0
+                });
+            }
+
+            animate() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                for (let i = this.ripples.length - 1; i >= 0; i--) {
+                    const r = this.ripples[i];
+                    
+                    // Light beam ripple effect over golden surface
+                    const grad = this.ctx.createRadialGradient(r.x, r.y, 0, r.x, r.y, r.radius);
+                    grad.addColorStop(0, `rgba(255, 255, 255, ${r.alpha})`);
+                    grad.addColorStop(0.5, `rgba(255, 215, 0, ${r.alpha * 0.7})`);
+                    grad.addColorStop(1, `rgba(255, 215, 0, 0)`);
+
+                    this.ctx.beginPath();
+                    this.ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+                    this.ctx.fillStyle = grad;
+                    this.ctx.fill();
+
+                    r.radius += 3;
+                    r.alpha -= 0.035;
+
+                    if (r.alpha <= 0) {
+                        this.ripples.splice(i, 1);
+                    }
+                }
+
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // Initialization on DOM Ready
+        window.addEventListener('DOMContentLoaded', () => {
+            createMatrixUI();
+            const strumplate = new StrumplateController(document.getElementById('strum-canvas'));
+
+            // Audio Power button setup
+            const btnPower = document.getElementById('btn-power');
+            const powerLed = document.getElementById('power-led');
+            
+            btnPower.addEventListener('click', () => {
+                audio.init();
+                btnPower.textContent = "🔊 Audio Attivo";
+                btnPower.classList.replace('bg-amber-600', 'bg-emerald-600');
+                powerLed.classList.replace('bg-red-600', 'bg-emerald-500');
+                powerLed.classList.replace('shadow-[0_0_8px_#dc2626]', 'shadow-[0_0_10px_#10b981]');
+            });
+
+            // Sliders bindings
+            document.getElementById('slider-volume').addEventListener('input', (e) => {
+                audio.setVolume(parseFloat(e.target.value) / 100);
+                document.getElementById('lbl-volume').textContent = `${e.target.value}%`;
+            });
+
+            document.getElementById('slider-sustain').addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value) / 10;
+                audio.setSustain(val);
+                document.getElementById('lbl-sustain').textContent = `${val.toFixed(1)}s`;
+            });
+
+            document.getElementById('slider-cutoff').addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                audio.setCutoff(val);
+                document.getElementById('lbl-cutoff').textContent = `${val} Hz`;
+            });
+        });
+    </script>
 </body>
 </html>
