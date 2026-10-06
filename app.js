@@ -394,32 +394,32 @@ class AdsrCanvasRenderer {
     }
 }
 
-// 8 Complete Sound Presets Definitions
+// 8 Sound Presets Definitions mapped to UI/Synth Engine ranges
 const SYNTH_PRESETS = {
     PIANO: {
         waveform: 'triangle',
         filterType: 'lowpass',
-        cutoff: 3500,
-        resonance: 1.0,
-        attack: 0.02,
-        decay: 0.80,
-        sustain: 0.25,
-        release: 0.60,
-        lfoRate: 4.0,
-        lfoDepth: 0,
+        cutoff: 6025,      // 75% Cutoff range (100 - 8000 Hz)
+        resonance: 1.2,     // 8% Resonance range (0.1 - 15.0 Q)
+        attack: 0.01,       // 0% Attack
+        decay: 1.05,        // 35% Decay range (0.05 - 3.0s)
+        sustain: 0.20,      // 20% Sustain
+        release: 1.00,      // 20% Release range (0.05 - 5.0s)
+        lfoRate: 0.5,       // 0% Rate
+        lfoDepth: 0,        // 0% Depth
         vibrato: false,
         tremolo: false
     },
     GUITAR: {
         waveform: 'sawtooth',
         filterType: 'lowpass',
-        cutoff: 2800,
-        resonance: 1.5,
-        attack: 0.01,
-        decay: 0.60,
-        sustain: 0.15,
-        release: 0.45,
-        lfoRate: 5.0,
+        cutoff: 5235,      // 65% Cutoff range
+        resonance: 1.2,     // 8% Resonance range
+        attack: 0.01,       // 0% Attack
+        decay: 0.75,        // 25% Decay range
+        sustain: 0.15,      // 15% Sustain
+        release: 1.00,      // 20% Release range
+        lfoRate: 0.5,
         lfoDepth: 0,
         vibrato: false,
         tremolo: false
@@ -427,13 +427,13 @@ const SYNTH_PRESETS = {
     BASS: {
         waveform: 'sawtooth',
         filterType: 'lowpass',
-        cutoff: 800,
-        resonance: 3.5,
-        attack: 0.01,
-        decay: 0.40,
-        sustain: 0.50,
-        release: 0.20,
-        lfoRate: 3.0,
+        cutoff: 2628,      // 32% Cutoff range
+        resonance: 2.7,     // 18% Resonance range
+        attack: 0.01,       // 0% Attack
+        decay: 0.90,        // 30% Decay range
+        sustain: 0.70,      // 70% Sustain
+        release: 0.75,      // 15% Release range
+        lfoRate: 0.5,
         lfoDepth: 0,
         vibrato: false,
         tremolo: false
@@ -441,70 +441,70 @@ const SYNTH_PRESETS = {
     ORGAN: {
         waveform: 'square',
         filterType: 'lowpass',
-        cutoff: 5000,
-        resonance: 0.8,
-        attack: 0.01,
-        decay: 0.10,
-        sustain: 1.00,
-        release: 0.10,
-        lfoRate: 6.0,
-        lfoDepth: 25,
+        cutoff: 4445,      // 55% Cutoff range
+        resonance: 0.8,     // 5% Resonance range
+        attack: 0.01,       // 0% Attack
+        decay: 0.05,        // 0% Decay range
+        sustain: 1.00,      // 100% Sustain
+        release: 0.75,      // 15% Release range
+        lfoRate: 0.5,
+        lfoDepth: 0,
         vibrato: false,
-        tremolo: true
+        tremolo: false
     },
     STRINGS: {
         waveform: 'sawtooth',
         filterType: 'lowpass',
-        cutoff: 2200,
-        resonance: 1.2,
-        attack: 0.60,
-        decay: 0.80,
-        sustain: 0.85,
-        release: 2.00,
-        lfoRate: 5.0,
-        lfoDepth: 15,
+        cutoff: 3892,      // 48% Cutoff range
+        resonance: 0.8,     // 5% Resonance range
+        attack: 1.10,       // 55% Attack range (0.01 - 2.0s)
+        decay: 0.60,        // 20% Decay range
+        sustain: 0.90,      // 90% Sustain
+        release: 3.75,      // 75% Release range
+        lfoRate: 5.0,       // 5 Hz LFO Rate
+        lfoDepth: 12,       // 12% Depth
         vibrato: true,
         tremolo: false
     },
     BRASS: {
         waveform: 'sawtooth',
         filterType: 'lowpass',
-        cutoff: 4000,
-        resonance: 2.5,
-        attack: 0.12,
-        decay: 0.50,
-        sustain: 0.70,
-        release: 0.50,
-        lfoRate: 4.5,
-        lfoDepth: 10,
+        cutoff: 5472,      // 68% Cutoff range
+        resonance: 2.3,     // 15% Resonance range
+        attack: 0.24,       // 12% Attack range
+        decay: 0.75,        // 25% Decay range
+        sustain: 0.82,      // 82% Sustain
+        release: 1.25,      // 25% Release range
+        lfoRate: 5.0,       // 5 Hz LFO Rate
+        lfoDepth: 8,        // 8% Depth
         vibrato: true,
         tremolo: false
     },
     PAD: {
         waveform: 'triangle',
         filterType: 'lowpass',
-        cutoff: 1800,
-        resonance: 1.0,
-        attack: 1.20,
-        decay: 1.50,
-        sustain: 0.90,
-        release: 3.00,
-        lfoRate: 2.5,
-        lfoDepth: 30,
+        cutoff: 3260,      // 40% Cutoff range
+        resonance: 0.5,     // 3% Resonance range
+        attack: 1.40,       // 70% Attack range
+        decay: 0.75,        // 25% Decay range
+        sustain: 0.88,      // 88% Sustain
+        release: 4.50,      // 90% Release range
+        lfoRate: 2.0,       // 2 Hz LFO Rate
+        lfoDepth: 10,       // 10% Depth
         vibrato: true,
-        tremolo: true
+        tremolo: false
     },
     LEAD: {
-        waveform: 'square',
+        waveform: 'sawtooth',
         filterType: 'lowpass',
-        cutoff: 3200,
-        resonance: 4.0,
-        attack: 0.03,
-        decay: 0.30,
-        sustain: 0.80,
-        release: 0.40,
-        lfoRate: 6.5,
-        lfoDepth: 35,
+        cutoff: 6262,      // 78% Cutoff range
+        resonance: 4.2,     // 28% Resonance range
+        attack: 0.06,       // 3% Attack range
+        decay: 0.60,        // 20% Decay range
+        sustain: 0.78,      // 78% Sustain
+        release: 1.25,      // 25% Release range
+        lfoRate: 5.0,       // 5 Hz LFO Rate
+        lfoDepth: 15,       // 15% Depth
         vibrato: true,
         tremolo: false
     }
@@ -805,7 +805,7 @@ function resetProgressionState() {
     activeProgressionSteps = [];
     clearHighlights();
     const chordsLabel = document.getElementById('lbl-progression-chords');
-    if (chordsLabel) chordsLabel.classList.add('hidden');
+    if (chordsLabel) chordsLabel.classList.hidden = true;
 }
 
 function createMatrixUI() {
