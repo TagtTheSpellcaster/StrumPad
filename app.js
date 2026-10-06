@@ -16,7 +16,7 @@ class WebAudioEngine {
         this.droneMode = false;
         this.strumMode = false;
         this.arpMode = false;
-        this.speedDelayMs = 35; // Default strum delay
+        this.speedDelayMs = 35;
 
         this.waveform = 'sawtooth';
         this.activeDroneNodes = [];
@@ -192,7 +192,7 @@ class WebAudioEngine {
                 gain: voiceGain
             });
         } else {
-            // RETRO SYNTH VOICE WITH FULL FILTERS, LFO & ADSR
+            // RETRO SYNTH VOICE WITH FILTERS, LFO & ADSR
             const osc1 = this.ctx.createOscillator();
             const osc2 = this.ctx.createOscillator();
 
@@ -202,7 +202,6 @@ class WebAudioEngine {
             osc1.frequency.setValueAtTime(freq, now);
             osc2.frequency.setValueAtTime(freq * 1.002, now);
 
-            // Biquad Filter (Low-pass or High-pass with Cutoff & Resonance)
             const filter = this.ctx.createBiquadFilter();
             filter.type = this.filterType;
             filter.Q.setValueAtTime(this.resonanceQ, now);
@@ -214,11 +213,10 @@ class WebAudioEngine {
                     Math.max(50, this.cutoffFreq * this.sustainLevel), 
                     now + this.attackTime + this.decayTime
                 );
-            } else { // High-pass
+            } else {
                 filter.frequency.setValueAtTime(this.cutoffFreq, now);
             }
 
-            // Gain ADSR Envelope
             const voiceGain = this.ctx.createGain();
             const peakGain = 0.4;
             const sustainGain = Math.max(0.0001, peakGain * this.sustainLevel);
@@ -231,14 +229,13 @@ class WebAudioEngine {
             voiceGain.gain.setValueAtTime(sustainGain, now + noteDuration);
             voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + noteDuration + this.releaseTime);
 
-            // LFO MODULATION (Vibrato / Tremolo)
             if (this.lfoDepth > 0 && (this.vibratoEnabled || this.tremoloEnabled)) {
                 const lfo = this.ctx.createOscillator();
                 lfo.frequency.setValueAtTime(this.lfoRate, now);
 
                 if (this.vibratoEnabled) {
                     const vibratoGain = this.ctx.createGain();
-                    vibratoGain.gain.setValueAtTime(this.lfoDepth * 12.0, now); // Pitch modulation range
+                    vibratoGain.gain.setValueAtTime(this.lfoDepth * 12.0, now);
                     lfo.connect(vibratoGain);
                     vibratoGain.connect(osc1.frequency);
                     vibratoGain.connect(osc2.frequency);
@@ -246,7 +243,7 @@ class WebAudioEngine {
 
                 if (this.tremoloEnabled) {
                     const tremoloGain = this.ctx.createGain();
-                    tremoloGain.gain.setValueAtTime((this.lfoDepth / 100) * 0.3, now); // Amplitude modulation
+                    tremoloGain.gain.setValueAtTime((this.lfoDepth / 100) * 0.3, now);
                     lfo.connect(tremoloGain);
                     tremoloGain.connect(voiceGain.gain);
                 }
@@ -286,7 +283,6 @@ class WebAudioEngine {
                 this.scheduledTimeouts.push(t);
             });
         } else {
-            // Simultaneous Chord Play
             const notes = midiNotes.slice(0, 4);
             notes.forEach(note => this.playNote(note));
         }
@@ -815,7 +811,6 @@ window.addEventListener('DOMContentLoaded', () => {
     const sliderSpeed = document.getElementById('slider-speed');
     const lblSpeed = document.getElementById('lbl-speed');
 
-    // Update Speed Range according to active mode (Strum vs Arp)
     function updateSpeedLimits() {
         if (arpToggle.checked) {
             sliderSpeed.min = "100";
