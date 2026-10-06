@@ -162,10 +162,10 @@
 
     transform: translateX(-50%);
 
-    width: 5px;
-    height: 5px;
+    width: 8px;
+    height: 3px;
 
-    border-radius: 50%;
+    border-radius: 1px;
 
     background-color: rgba(0, 0, 0, 0.18);
 
