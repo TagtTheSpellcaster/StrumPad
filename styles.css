@@ -80,7 +80,7 @@ body {
 
 /* Slider Verticale Allungato Specifico per Master Volume */
 .vertical-slider-wrapper-master {
-    height: 120px; /* Wrapper ad altezza estesa */
+    height: 120px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -91,12 +91,24 @@ body {
     direction: rtl;
     -webkit-appearance: slider-vertical;
     width: 16px;
-    height: 120px; /* Slider ad altezza estesa */
+    height: 120px;
     background: #c2b8a3;
     border-radius: 6px;
     outline: none;
     cursor: pointer;
     accent-color: #b45309;
+}
+
+/* Preset Button Active & Hover Styles */
+.preset-btn {
+    transition: all 0.1s ease;
+}
+
+.preset-btn.active-preset {
+    background-color: #fef3c7 !important;
+    border-color: #92400e !important;
+    color: #451a03 !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.2), 0 0 6px rgba(180,83,9,0.3) !important;
 }
 
 /* 3D Compact Square Matrix Button */
