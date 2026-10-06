@@ -1,107 +1,99 @@
-/* STREAMING_CHUNK:Configuring custom styles and CRT monitor themes... */
 body {
-background-color: #1e1b18;
-background-image: radial-gradient(#332d27 1px, transparent 0);
-background-size: 16px 16px;
-font-family: 'Inter', system-ui, -apple-system, sans-serif;
-user-select: none;
--webkit-user-select: none;
-touch-action: manipulation;
+    background-color: #1e1b18;
+    background-image: radial-gradient(#332d27 1px, transparent 0);
+    background-size: 16px 16px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
 }
 
 /* Custom Scrollbar for matrix overflow on small screens */
 ::-webkit-scrollbar {
-height: 8px;
+    height: 8px;
 }
 ::-webkit-scrollbar-track {
-background: #c2b8a3;
-border-radius: 4px;
+    background: #c2b8a3;
+    border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb {
-background: #8e836f;
-border-radius: 4px;
+    background: #8e836f;
+    border-radius: 4px;
 }
 
-/* 1970s Green Phosphor CRT Display Frame (Pitch Black Monitor Background) /
+/* 1970s Green Phosphor CRT Display Frame (ONLY monitor is pitch black) */
 .crt-container {
-background-color: #020803; / Pitch black CRT monitor background */
-border: 4px solid #1a2e1d;
-border-radius: 18px;
-box-shadow:
-inset 0 0 12px rgba(0, 255, 102, 0.2),
-inset 0 0 25px rgba(0, 0, 0, 0.95),
-0 4px 10px rgba(0, 0, 0, 0.5);
-position: relative;
-overflow: hidden;
+    background-color: #020803; /* Nero profondo oscilloscopio */
+    border: 4px solid #1a2e1d;
+    border-radius: 18px;
+    box-shadow: 
+        inset 0 0 12px rgba(0, 255, 102, 0.2),
+        inset 0 0 25px rgba(0, 0, 0, 0.95),
+        0 4px 10px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
 }
 
-/* CRT scanlines effect for 70s monitor */
+/* Linee di scansione CRT anni '70 per il monitor */
 .crt-container::before {
-content: "";
-position: absolute;
-inset: 0;
-background: linear-gradient(
-rgba(18, 16, 16, 0) 50%,
-rgba(0, 0, 0, 0.4) 50%
-);
-background-size: 100% 4px;
-pointer-events: none;
-z-index: 5;
-border-radius: 14px;
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.4) 50%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 5;
+    border-radius: 14px;
 }
 
-/* Compact Vertical Sliders (Placed under monitor) */
+/* Slider Verticali Compatti */
 .slider-vertical-container {
-display: flex;
-flex-direction: column;
-align-items: center;
-gap: 4px;
-height: 100%;
-justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    height: 100%;
+    justify-content: center;
 }
 
 .range-vertical-compact {
-writing-mode: bt-lr; /* IE/Edge /
--webkit-appearance: slider-vertical; / WebKit /
-width: 14px;
-height: 70px; / Compact height under screen */
-background: #c2b8a3;
-border-radius: 6px;
-outline: none;
-cursor: pointer;
-accent-color: #b45309;
-}
-
-/* Waveform Radio Option Styling */
-.wave-option:has(input:checked) {
-border-color: #b45309 !important;
-background-color: #fef3c7 !important;
-box-shadow: 0 1px 3px rgba(180, 83, 9, 0.2);
+    writing-mode: bt-lr; /* IE/Edge */
+    -webkit-appearance: slider-vertical; /* WebKit */
+    width: 14px;
+    height: 65px; /* Altezza ridotta per stare sotto il monitor */
+    background: #c2b8a3;
+    border-radius: 6px;
+    outline: none;
+    cursor: pointer;
+    accent-color: #b45309;
 }
 
 /* 3D Compact Square Matrix Button */
 .matrix-btn {
-position: relative;
-width: 42px;
-height: 42px;
-min-width: 42px;
-min-height: 42px;
-border-radius: 6px;
-border-width: 2px;
-box-shadow: 0 4px 0 rgba(0,0,0,0.25), 0 5px 6px rgba(0,0,0,0.2);
-outline: none;
-cursor: pointer;
-transition: transform 0.05s ease, box-shadow 0.05s ease, filter 0.1s ease;
-display: flex;
-align-items: flex-end;
-justify-content: center;
-padding-bottom: 4px;
-flex-shrink: 0;
+    position: relative;
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+    border-radius: 6px;
+    border-width: 2px;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.25), 0 5px 6px rgba(0,0,0,0.2);
+    outline: none;
+    cursor: pointer;
+    transition: transform 0.05s ease, box-shadow 0.05s ease, filter 0.1s ease;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 4px;
+    flex-shrink: 0;
 }
 
 .matrix-btn:active, .matrix-btn.active {
-transform: translateY(3px) !important;
-box-shadow: 0 1px 0 rgba(0,0,0,0.3), 0 2px 3px rgba(0,0,0,0.2) !important;
+    transform: translateY(3px) !important;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.3), 0 2px 3px rgba(0,0,0,0.2) !important;
 }
 
 /* Pastel Row Color Themes */
@@ -122,45 +114,45 @@ box-shadow: 0 1px 0 rgba(0,0,0,0.3), 0 2px 3px rgba(0,0,0,0.2) !important;
 
 /* Rectangular Green LED centered at bottom */
 .btn-led {
-width: 12px;
-height: 4px;
-background-color: #233326;
-border: 1px solid #142116;
-border-radius: 1px;
-transition: background-color 0.05s ease, box-shadow 0.05s ease;
-pointer-events: none;
-display: block;
+    width: 12px;
+    height: 4px;
+    background-color: #233326;
+    border: 1px solid #142116;
+    border-radius: 1px;
+    transition: background-color 0.05s ease, box-shadow 0.05s ease;
+    pointer-events: none;
+    display: block;
 }
 
 .matrix-btn.active .btn-led,
 .matrix-btn:active .btn-led {
-background-color: #00ff66 !important;
-box-shadow: 0 0 6px #00ff66, 0 0 12px #00ff66, 0 0 16px #00ff66 !important;
-border-color: #88ffb3 !important;
+    background-color: #00ff66 !important;
+    box-shadow: 0 0 6px #00ff66, 0 0 12px #00ff66, 0 0 16px #00ff66 !important;
+    border-color: #88ffb3 !important;
 }
 
 /* Harmonic Progression Highlights */
 .highlight-main {
-outline: 3px solid #06b6d4 !important;
-outline-offset: 2px;
-box-shadow: 0 0 12px #06b6d4, 0 0 20px rgba(6, 182, 212, 0.6) !important;
-animation: pulse-main 1.2s infinite ease-in-out;
-z-index: 20;
+    outline: 3px solid #06b6d4 !important;
+    outline-offset: 2px;
+    box-shadow: 0 0 12px #06b6d4, 0 0 20px rgba(6, 182, 212, 0.6) !important;
+    animation: pulse-main 1.2s infinite ease-in-out;
+    z-index: 20;
 }
 
 .highlight-sub {
-outline: 2px dashed #a855f7 !important;
-outline-offset: 2px;
-opacity: 0.82;
-box-shadow: 0 0 8px rgba(168, 85, 247, 0.5) !important;
-z-index: 10;
+    outline: 2px dashed #a855f7 !important;
+    outline-offset: 2px;
+    opacity: 0.82;
+    box-shadow: 0 0 8px rgba(168, 85, 247, 0.5) !important;
+    z-index: 10;
 }
 
 @keyframes pulse-main {
-0%, 100% {
-box-shadow: 0 0 8px #06b6d4, 0 0 16px rgba(6, 182, 212, 0.5);
-}
-50% {
-box-shadow: 0 0 16px #0891b2, 0 0 28px rgba(8, 145, 178, 0.8);
-}
+    0%, 100% {
+        box-shadow: 0 0 8px #06b6d4, 0 0 16px rgba(6, 182, 212, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 16px #0891b2, 0 0 28px rgba(8, 145, 178, 0.8);
+    }
 }
