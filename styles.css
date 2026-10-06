@@ -8,7 +8,7 @@ body {
     touch-action: manipulation;
 }
 
-/* Custom Scrollbar for matrix overflow on small screens */
+/* Scrollbar personalizzata per la matrice di bottoni */
 ::-webkit-scrollbar {
     height: 8px;
 }
@@ -21,43 +21,53 @@ body {
     border-radius: 4px;
 }
 
-/* Gold Metallic Strumplate Container */
-.gold-plate-container {
-    background: linear-gradient(
-        135deg, 
-        #b8860b 0%, 
-        #ffd700 20%, 
-        #d4af37 40%, 
-        #fff8dc 50%, 
-        #aa771c 65%, 
-        #f0e68c 85%, 
-        #8b6508 100%
-    );
-    border: 4px solid #5a4413;
+/* Contenitore Display CRT a Fosfori Verdi */
+.crt-container {
+    background-color: #051408;
+    border: 3px solid #1c3b22;
     box-shadow: 
-        inset 0 2px 10px rgba(255,255,255,0.8),
-        inset 0 -4px 12px rgba(0,0,0,0.6),
-        0 6px 12px rgba(0,0,0,0.4);
+        inset 0 0 15px rgba(0, 255, 102, 0.15),
+        inset 0 0 30px rgba(0, 0, 0, 0.8),
+        0 4px 8px rgba(0, 0, 0, 0.3);
     position: relative;
 }
 
-/* Metallic Fine Horizontal Grooves */
-.gold-plate-container::before {
+/* Rigature e scansione CRT */
+.crt-container::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: repeating-linear-gradient(
-        0deg,
-        rgba(0, 0, 0, 0.08),
-        rgba(0, 0, 0, 0.08) 1px,
-        transparent 1px,
-        transparent 3px
+    background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.25) 50%
     );
+    background-size: 100% 4px;
     pointer-events: none;
-    z-index: 1;
+    z-index: 5;
 }
 
-/* 3D Compact Square Matrix Button */
+/* Slider Verticali Personalizzati */
+.slider-vertical-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    height: 100%;
+}
+
+.range-vertical {
+    writing-mode: bt-lr; /* IE/Edge */
+    -webkit-appearance: slider-vertical; /* WebKit */
+    width: 16px;
+    height: 120px;
+    background: #c2b8a3;
+    border-radius: 8px;
+    outline: none;
+    cursor: pointer;
+    accent-color: #d97706;
+}
+
+/* Bottoni Matrice 3D Quadrati */
 .matrix-btn {
     position: relative;
     width: 42px;
@@ -82,7 +92,7 @@ body {
     box-shadow: 0 1px 0 rgba(0,0,0,0.3), 0 2px 3px rgba(0,0,0,0.2) !important;
 }
 
-/* Pastel Row Color Themes */
+/* Colori Pastello per Fila */
 .row-maj { background-color: #fce3b8; border-color: #d1a566; }
 .row-maj:hover { background-color: #ffecc9; }
 
@@ -98,7 +108,7 @@ body {
 .row-m7 { background-color: #e0cced; border-color: #a485b8; }
 .row-m7:hover { background-color: #ebdcf5; }
 
-/* Rectangular Green LED centered at bottom */
+/* Rettangolino LED Verde centrato in basso */
 .btn-led {
     width: 12px;
     height: 4px;
@@ -117,7 +127,7 @@ body {
     border-color: #88ffb3 !important;
 }
 
-/* Harmonic Progression Highlights */
+/* Evidenziazione Progressioni Armoniche */
 .highlight-main {
     outline: 3px solid #06b6d4 !important;
     outline-offset: 2px;
