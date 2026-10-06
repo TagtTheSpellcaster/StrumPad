@@ -151,7 +151,6 @@ class WebAudioEngine {
         const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
 
         if (this.droneMode) {
-            // ORGAN DRONE SYNTHESIS
             const pipeHarmonics = [
                 { mult: 0.5, vol: 0.25 },
                 { mult: 1.0, vol: 0.35 },
@@ -192,7 +191,6 @@ class WebAudioEngine {
                 gain: voiceGain
             });
         } else {
-            // RETRO SYNTH VOICE WITH FILTERS, LFO & ADSR
             const osc1 = this.ctx.createOscillator();
             const osc2 = this.ctx.createOscillator();
 
@@ -395,6 +393,122 @@ class AdsrCanvasRenderer {
         });
     }
 }
+
+// 8 Complete Sound Presets Definitions
+const SYNTH_PRESETS = {
+    PIANO: {
+        waveform: 'triangle',
+        filterType: 'lowpass',
+        cutoff: 3500,
+        resonance: 1.0,
+        attack: 0.02,
+        decay: 0.80,
+        sustain: 0.25,
+        release: 0.60,
+        lfoRate: 4.0,
+        lfoDepth: 0,
+        vibrato: false,
+        tremolo: false
+    },
+    GUITAR: {
+        waveform: 'sawtooth',
+        filterType: 'lowpass',
+        cutoff: 2800,
+        resonance: 1.5,
+        attack: 0.01,
+        decay: 0.60,
+        sustain: 0.15,
+        release: 0.45,
+        lfoRate: 5.0,
+        lfoDepth: 0,
+        vibrato: false,
+        tremolo: false
+    },
+    BASS: {
+        waveform: 'sawtooth',
+        filterType: 'lowpass',
+        cutoff: 800,
+        resonance: 3.5,
+        attack: 0.01,
+        decay: 0.40,
+        sustain: 0.50,
+        release: 0.20,
+        lfoRate: 3.0,
+        lfoDepth: 0,
+        vibrato: false,
+        tremolo: false
+    },
+    ORGAN: {
+        waveform: 'square',
+        filterType: 'lowpass',
+        cutoff: 5000,
+        resonance: 0.8,
+        attack: 0.01,
+        decay: 0.10,
+        sustain: 1.00,
+        release: 0.10,
+        lfoRate: 6.0,
+        lfoDepth: 25,
+        vibrato: false,
+        tremolo: true
+    },
+    STRINGS: {
+        waveform: 'sawtooth',
+        filterType: 'lowpass',
+        cutoff: 2200,
+        resonance: 1.2,
+        attack: 0.60,
+        decay: 0.80,
+        sustain: 0.85,
+        release: 2.00,
+        lfoRate: 5.0,
+        lfoDepth: 15,
+        vibrato: true,
+        tremolo: false
+    },
+    BRASS: {
+        waveform: 'sawtooth',
+        filterType: 'lowpass',
+        cutoff: 4000,
+        resonance: 2.5,
+        attack: 0.12,
+        decay: 0.50,
+        sustain: 0.70,
+        release: 0.50,
+        lfoRate: 4.5,
+        lfoDepth: 10,
+        vibrato: true,
+        tremolo: false
+    },
+    PAD: {
+        waveform: 'triangle',
+        filterType: 'lowpass',
+        cutoff: 1800,
+        resonance: 1.0,
+        attack: 1.20,
+        decay: 1.50,
+        sustain: 0.90,
+        release: 3.00,
+        lfoRate: 2.5,
+        lfoDepth: 30,
+        vibrato: true,
+        tremolo: true
+    },
+    LEAD: {
+        waveform: 'square',
+        filterType: 'lowpass',
+        cutoff: 3200,
+        resonance: 4.0,
+        attack: 0.03,
+        decay: 0.30,
+        sustain: 0.80,
+        release: 0.40,
+        lfoRate: 6.5,
+        lfoDepth: 35,
+        vibrato: true,
+        tremolo: false
+    }
+};
 
 // Circle of Fifths order starting strictly from C (Do)
 const CIRCLE_OF_FIFTHS = [
@@ -863,7 +977,7 @@ window.addEventListener('DOMContentLoaded', () => {
         audio.setSpeedDelay(val);
     });
 
-    // ADSR Sliders
+    // ADSR Sliders Elements
     const slAttack = document.getElementById('slider-attack');
     const slDecay = document.getElementById('slider-decay');
     const slSustain = document.getElementById('slider-sustain');
@@ -894,8 +1008,6 @@ window.addEventListener('DOMContentLoaded', () => {
     slSustain.addEventListener('input', updateAdsr);
     slRelease.addEventListener('input', updateAdsr);
 
-    updateAdsr();
-
     // Waveform Radio Buttons
     document.querySelectorAll('input[name="waveform"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
@@ -910,7 +1022,8 @@ window.addEventListener('DOMContentLoaded', () => {
     const lblResonance = document.getElementById('lbl-resonance');
 
     function updateFilters() {
-        const filterType = document.querySelector('input[name="filter-type"]:checked').value;
+        const checkedRadio = document.querySelector('input[name="filter-type"]:checked');
+        const filterType = checkedRadio ? checkedRadio.value : 'lowpass';
         const cutoff = parseFloat(sliderCutoff.value);
         const resonance = parseFloat(sliderResonance.value);
 
@@ -948,6 +1061,59 @@ window.addEventListener('DOMContentLoaded', () => {
     sliderLfoDepth.addEventListener('input', updateLfo);
     toggleVibrato.addEventListener('change', updateLfo);
     toggleTremolo.addEventListener('change', updateLfo);
+
+    // Function to load a Preset and sync all Controls & Audio Engine
+    function loadPreset(presetKey) {
+        const preset = SYNTH_PRESETS[presetKey];
+        if (!preset) return;
+
+        // Waveform
+        const waveRadio = document.querySelector(`input[name="waveform"][value="${preset.waveform}"]`);
+        if (waveRadio) waveRadio.checked = true;
+        audio.setWaveform(preset.waveform);
+
+        // Filter
+        const filterRadio = document.querySelector(`input[name="filter-type"][value="${preset.filterType}"]`);
+        if (filterRadio) filterRadio.checked = true;
+        sliderCutoff.value = preset.cutoff;
+        sliderResonance.value = preset.resonance;
+        updateFilters();
+
+        // ADSR
+        slAttack.value = preset.attack;
+        slDecay.value = preset.decay;
+        slSustain.value = preset.sustain;
+        slRelease.value = preset.release;
+        updateAdsr();
+
+        // LFO
+        sliderLfoRate.value = preset.lfoRate;
+        sliderLfoDepth.value = preset.lfoDepth;
+        toggleVibrato.checked = preset.vibrato;
+        toggleTremolo.checked = preset.tremolo;
+        updateLfo();
+
+        // Visual Selection Highlight
+        const presetButtons = document.querySelectorAll('.preset-btn');
+        presetButtons.forEach(btn => {
+            if (btn.dataset.preset === presetKey) {
+                btn.classList.add('active-preset');
+            } else {
+                btn.classList.remove('active-preset');
+            }
+        });
+    }
+
+    // Attach click events to Preset buttons
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const key = btn.dataset.preset;
+            loadPreset(key);
+        });
+    });
+
+    // Default Load PIANO Preset on Startup
+    loadPreset('PIANO');
 
     // Audio Power Switch
     audioToggle.checked = false;
