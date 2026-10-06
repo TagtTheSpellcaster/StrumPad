@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Retro Synth Chord & Strumplate Simulator</title>
-    <!-- Tailwind CSS per utilità di layout -->
+    <title>StrumPad - Retro Synth Chord & Strumplate Simulator</title>
+    <!-- Tailwind CSS for Responsive Layout Utilities -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -28,43 +28,43 @@
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 sm:p-5 text-slate-800">
 
-    <!-- Chassis Principale dello Strumento -->
+    <!-- Main Instrument Chassis -->
     <div class="w-full max-w-7xl bg-chassis rounded-3xl p-4 sm:p-7 shadow-2xl border-4 border-chassisDark flex flex-col gap-6 relative">
         
-        <!-- Header & Logo -->
+        <!-- Chassis Header & Logo -->
         <header class="flex flex-wrap justify-between items-center border-b-2 border-chassisDark pb-3 gap-4">
             <div class="flex items-center gap-3">
                 <div id="power-led" class="w-4 h-4 rounded-full bg-red-600 shadow-[0_0_8px_#dc2626]"></div>
                 <h1 class="font-extrabold text-xl sm:text-2xl tracking-wider text-slate-800 uppercase font-mono">
-                    OMNI-STRUM <span class="text-xs font-sans font-semibold text-amber-900 border border-amber-800 px-2 py-0.5 rounded ml-2">MATRIX VINTAGE</span>
+                    StrumPad <span class="text-xs font-sans font-semibold text-amber-900 border border-amber-800 px-2 py-0.5 rounded ml-2">VINTAGE SYNTH</span>
                 </h1>
             </div>
 
             <div class="flex items-center gap-4">
                 <button id="btn-power" class="bg-amber-600 text-white font-bold px-4 py-2 rounded-xl shadow-md hover:bg-amber-700 active:scale-95 transition text-sm">
-                    🔊 Attiva Audio
+                    🔈 Enable Audio
                 </button>
             </div>
         </header>
 
-        <!-- Sezione Superiore: Controlli Master & Strumplate Metallico -->
+        <!-- Upper Section: Master Controls & Metallic Strumplate -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- Pannello Controlli Modulazione -->
+            <!-- Master Control Panel -->
             <div class="lg:col-span-4 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col justify-between gap-4">
-                <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600 border-b border-slate-300 pb-1">Controlli Modulazione</h2>
+                <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600 border-b border-slate-300 pb-1">Modulation Controls</h2>
                 
                 <div class="flex flex-col gap-3">
-                    <!-- Volume Master -->
+                    <!-- Master Volume -->
                     <div>
                         <div class="flex justify-between text-xs font-semibold mb-1">
-                            <span>Volume Master</span>
+                            <span>Master Volume</span>
                             <span id="lbl-volume" class="font-mono text-slate-700">80%</span>
                         </div>
                         <input type="range" id="slider-volume" min="0" max="100" value="80" class="w-full h-2 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                     </div>
 
-                    <!-- Sustain / Decay -->
+                    <!-- Sustain / Decay Time -->
                     <div>
                         <div class="flex justify-between text-xs font-semibold mb-1">
                             <span>Sustain / Decay</span>
@@ -73,28 +73,40 @@
                         <input type="range" id="slider-sustain" min="2" max="30" value="12" class="w-full h-2 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                     </div>
 
-                    <!-- Cutoff Timbro -->
+                    <!-- Filter Tone Cutoff -->
                     <div>
                         <div class="flex justify-between text-xs font-semibold mb-1">
-                            <span>Timbro / Cutoff</span>
+                            <span>Tone / Cutoff</span>
                             <span id="lbl-cutoff" class="font-mono text-slate-700">2200 Hz</span>
                         </div>
                         <input type="range" id="slider-cutoff" min="300" max="8000" value="2200" class="w-full h-2 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                     </div>
+
+                    <!-- Drone Mode Toggle Switch -->
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-300">
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold text-slate-700">Drone Mode</span>
+                            <span class="text-[10px] text-slate-500">Sustained Organ Sound</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggle-drone" class="sr-only peer">
+                            <div class="w-11 h-6 bg-chassisDark peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-700"></div>
+                        </label>
+                    </div>
                 </div>
 
-                <!-- Display Accordo Selezionato -->
+                <!-- Active Chord Monitor Box -->
                 <div class="bg-amber-100/90 border border-amber-300 rounded-xl p-3 flex justify-between items-center shadow-inner mt-1">
-                    <span class="text-xs font-bold text-amber-900 uppercase">Accordo Selezionato:</span>
-                    <span id="lbl-active-chord" class="font-mono font-bold text-2xl text-amber-950">Nessuno</span>
+                    <span class="text-xs font-bold text-amber-900 uppercase">Selected Chord:</span>
+                    <span id="lbl-active-chord" class="font-mono font-bold text-2xl text-amber-950">None</span>
                 </div>
             </div>
 
-            <!-- Strumplate Touch Pad Metallico -->
+            <!-- Metallic Strumplate Touch Pad -->
             <div class="lg:col-span-8 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col gap-2">
                 <div class="flex justify-between items-center border-b border-slate-300 pb-1">
-                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Sonic Strumplate (Piastra Metallica)</h2>
-                    <span class="text-xs text-amber-900 font-medium hidden sm:inline">Sfiora o trascina il dito/mouse</span>
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Sonic Strumplate (Metallic Plate)</h2>
+                    <span class="text-xs text-amber-900 font-medium hidden sm:inline">Swipe or drag finger/mouse</span>
                 </div>
 
                 <div class="gold-plate-container w-full h-44 rounded-xl overflow-hidden cursor-crosshair">
@@ -103,55 +115,55 @@
             </div>
         </div>
 
-        <!-- Sezione Inferiore: Matrice Accordi a Sinistra e Sezione Generi/Stili a Destra -->
+        <!-- Lower Section: Chord Matrix (Left) & Progression Assistant (Right) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- Matrice Accordi (8 Colonne) -->
+            <!-- Chord Matrix (8 Columns) -->
             <div class="lg:col-span-8 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col gap-3">
                 <div class="flex justify-between items-center border-b border-slate-300 pb-1">
-                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Matrice Accordi — Circolo delle Quinte</h2>
-                    <span class="text-xs text-slate-500 hidden sm:inline">Premi un pulsante per attivare l'accordo</span>
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Chord Matrix — Circle of Fifths</h2>
+                    <span class="text-xs text-slate-500 hidden sm:inline">Press a button to trigger chord</span>
                 </div>
 
                 <div class="overflow-x-auto pb-2">
                     <div id="matrix-grid" class="inline-flex flex-col gap-3 min-w-max p-1">
-                        <!-- Generato dinamicamente da app.js -->
+                        <!-- Generated dynamically by app.js -->
                     </div>
                 </div>
             </div>
 
-            <!-- Sezione Generi, Stili e Progressioni Armoniche sulla Destra (4 Colonne) -->
+            <!-- Genres, Styles & Harmonic Progression Assistant (4 Columns) -->
             <div class="lg:col-span-4 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col justify-between gap-4">
                 <div>
-                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600 border-b border-slate-300 pb-2 mb-3">Assistente Progressioni</h2>
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600 border-b border-slate-300 pb-2 mb-3">Progression Assistant</h2>
                     
                     <div class="flex flex-col gap-3">
-                        <!-- Selettore Genere -->
+                        <!-- Genre Select -->
                         <div>
-                            <label for="select-genre" class="block text-xs font-semibold text-slate-700 mb-1">Genere Musicale</label>
+                            <label for="select-genre" class="block text-xs font-semibold text-slate-700 mb-1">Musical Genre</label>
                             <select id="select-genre" class="w-full p-2 bg-amber-50 border border-chassisDark rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-600">
-                                <option value="">-- Seleziona Genere --</option>
+                                <option value="">-- Select Genre --</option>
                             </select>
                         </div>
 
-                        <!-- Selettore Stile -->
+                        <!-- Style Select -->
                         <div>
-                            <label for="select-style" class="block text-xs font-semibold text-slate-700 mb-1">Stile</label>
+                            <label for="select-style" class="block text-xs font-semibold text-slate-700 mb-1">Style</label>
                             <select id="select-style" disabled class="w-full p-2 bg-amber-50 border border-chassisDark rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-600 disabled:opacity-50 cursor-pointer">
-                                <option value="">-- Seleziona Prima un Genere --</option>
+                                <option value="">-- Select a Genre First --</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
-                <!-- Box Display Progressione Armonica -->
+                <!-- Progression Display Box -->
                 <div class="bg-amber-100/90 border border-amber-300 rounded-xl p-3 shadow-inner flex flex-col gap-1 min-h-[90px] justify-center">
-                    <span class="text-[10px] font-bold text-amber-900 uppercase tracking-wider">Progressione Armonica:</span>
+                    <span class="text-[10px] font-bold text-amber-900 uppercase tracking-wider">Harmonic Progression:</span>
                     <div id="lbl-progression" class="font-mono text-sm font-bold text-amber-950 leading-relaxed break-words">
-                        Seleziona un genere e uno stile
+                        Select a genre and style
                     </div>
                     <div id="lbl-progression-chords" class="font-mono text-xs text-amber-800 mt-1 font-semibold border-t border-amber-200 pt-1 hidden">
-                        <!-- Mostra la progressione calcolata nelle note reali -->
+                        <!-- Shows actual progression chords -->
                     </div>
                 </div>
             </div>
@@ -160,8 +172,8 @@
 
         <!-- Footer -->
         <footer class="text-center text-xs text-slate-500 border-t border-chassisDark pt-2 flex justify-between items-center">
-            <span>Sintesi Web Audio API Pure</span>
-            <span>Simulatore Synth Accordi</span>
+            <span>Pure Web Audio API Synthesis</span>
+            <span>StrumPad Simulator</span>
         </footer>
     </div>
 
