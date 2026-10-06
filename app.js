@@ -565,7 +565,8 @@ const GENRES_DATA = {
     "Classical & Traditional": {
         "Circle Progression": "I - vi (I / IV) - ii (IV) - V (bVII)",
         "Simple Cadence": "I - IV (ii) - V (bVII) - I (vi)",
-        "Pachelbel": "I - V (iii) - vi (I) - iii (V) - IV (ii) - I (vi) - IV (ii) - V (bVII)"
+        "Pachelbel": "I - V (iii) - vi (I) - iii (V) - IV (ii) - I (vi) - IV (ii) - V (bVII)",
+        "Diminished Cadence": "I - vii° (V) - I"
     },
 
     "Jazz & Dixieland": {
