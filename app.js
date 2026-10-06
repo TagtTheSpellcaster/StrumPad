@@ -255,7 +255,7 @@ class AdsrCanvasRenderer {
             ctx.stroke();
         }
 
-        const padding = 14;
+        const padding = 12;
         const drawW = width - (padding * 2);
         const drawH = height - (padding * 2);
 
