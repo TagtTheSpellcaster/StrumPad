@@ -34,7 +34,6 @@ body {
     overflow: hidden;
 }
 
-/* Linee di scansione CRT per il monitor */
 .crt-container::before {
     content: "";
     position: absolute;
@@ -49,7 +48,7 @@ body {
     border-radius: 10px;
 }
 
-/* Contenitore e Regole per Slider Veramente Verticali Cross-Browser */
+/* Slider Verticali Cross-Browser */
 .slider-vertical-container {
     display: flex;
     flex-direction: column;
