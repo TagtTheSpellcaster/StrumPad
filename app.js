@@ -6,13 +6,18 @@ class WebAudioEngine {
         this.ctx = null;
         this.masterGain = null;
         this.volume = 0.8;
-        this.sustainTime = 1.2;
         this.cutoffFreq = 2200;
         this.initialized = false;
-        this.audioActive = false; // Tassativamente OFF all'avvio
+        this.audioActive = false; // OFF by default
         this.droneMode = false;
         this.activeDroneNodes = [];
-        this.scheduledTimeouts = []; // Registro dei timeout arpeggiati per cancellazione immediata
+        this.scheduledTimeouts = [];
+
+        // ADSR Envelope Parameters
+        this.attackTime = 0.10;  // Seconds
+        this.decayTime = 0.40;   // Seconds
+        this.sustainLevel = 0.70; // 0.0 to 1.0 ratio
+        this.releaseTime = 1.20;  // Seconds
     }
 
     init() {
@@ -48,11 +53,9 @@ class WebAudioEngine {
     }
 
     stopAll() {
-        // Cancella tutti i timeout per note arpeggiate in coda
         this.scheduledTimeouts.forEach(t => clearTimeout(t));
         this.scheduledTimeouts = [];
 
-        // Interrompe e scollega immediatamente tutti i nodi organo/drone attivi
         this.activeDroneNodes.forEach(item => {
             try {
                 if (item.gain) {
@@ -73,12 +76,15 @@ class WebAudioEngine {
         }
     }
 
-    setSustain(val) {
-        this.sustainTime = val;
-    }
-
     setCutoff(val) {
         this.cutoffFreq = val;
+    }
+
+    setAdsr(attack, decay, sustain, release) {
+        this.attackTime = attack;
+        this.decayTime = decay;
+        this.sustainLevel = sustain;
+        this.releaseTime = release;
     }
 
     setDroneMode(enabled) {
@@ -89,7 +95,6 @@ class WebAudioEngine {
     }
 
     playNote(midiNote) {
-        // TASSATIVO: Se l'audio è OFF, nessun suono viene riprodotto
         if (!this.audioActive || !this.ctx) return;
 
         const now = this.ctx.currentTime;
@@ -136,7 +141,7 @@ class WebAudioEngine {
                 gain: voiceGain
             });
         } else {
-            // RETRO SYNTH PLUCK VOICE
+            // RETRO SYNTH VOICE WITH DYNAMIC ADSR ENVELOPE
             const osc1 = this.ctx.createOscillator();
             const osc2 = this.ctx.createOscillator();
 
@@ -146,29 +151,42 @@ class WebAudioEngine {
             osc1.frequency.setValueAtTime(freq, now);
             osc2.frequency.setValueAtTime(freq * 1.002, now);
 
+            // Filter Envelope
             const filter = this.ctx.createBiquadFilter();
             filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(this.cutoffFreq, now);
-            filter.frequency.exponentialRampToValueAtTime(100, now + this.sustainTime);
+            filter.frequency.setValueAtTime(100, now);
+            filter.frequency.linearRampToValueAtTime(this.cutoffFreq, now + this.attackTime);
+            filter.frequency.linearRampToValueAtTime(100 + (this.cutoffFreq - 100) * this.sustainLevel, now + this.attackTime + this.decayTime);
 
+            // Gain ADSR Envelope
             const voiceGain = this.ctx.createGain();
-            voiceGain.gain.setValueAtTime(0.35, now);
-            voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + this.sustainTime);
+            const peakGain = 0.4;
+            const sustainGain = peakGain * this.sustainLevel;
+
+            voiceGain.gain.setValueAtTime(0.0001, now);
+            // Attack phase
+            voiceGain.gain.linearRampToValueAtTime(peakGain, now + this.attackTime);
+            // Decay phase
+            voiceGain.gain.linearRampToValueAtTime(Math.max(0.0001, sustainGain), now + this.attackTime + this.decayTime);
+            // Release phase (auto-released after decay for plucks)
+            const releaseStart = now + this.attackTime + this.decayTime + 0.1;
+            voiceGain.gain.setValueAtTime(Math.max(0.0001, sustainGain), releaseStart);
+            voiceGain.gain.exponentialRampToValueAtTime(0.0001, releaseStart + this.releaseTime);
 
             osc1.connect(filter);
             osc2.connect(filter);
             filter.connect(voiceGain);
             voiceGain.connect(this.masterGain);
 
+            const noteDuration = this.attackTime + this.decayTime + 0.1 + this.releaseTime;
             osc1.start(now);
             osc2.start(now);
-            osc1.stop(now + this.sustainTime);
-            osc2.stop(now + this.sustainTime);
+            osc1.stop(now + noteDuration);
+            osc2.stop(now + noteDuration);
         }
     }
 
     strumChord(midiNotes) {
-        // TASSATIVO: Se l'audio è OFF, nessun suono viene riprodotto
         if (!this.audioActive || !this.ctx) return;
 
         if (this.droneMode) {
@@ -205,10 +223,8 @@ const CIRCLE_OF_FIFTHS = [
     { name: 'F',  midi: 65 }
 ];
 
-// Chromatic Scale for intervals
 const CHROMATIC_SCALE = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 
-// 5 Matrix Rows
 const MATRIX_ROWS = [
     { id: 'maj',  label: 'Major',             intervals: [0, 4, 7],     suffix: '',     btnClass: 'row-maj',  badgeStyle: 'bg-amber-200 text-amber-950 border-amber-300' },
     { id: 'min',  label: 'Minor',             intervals: [0, 3, 7],     suffix: 'm',    btnClass: 'row-min',  badgeStyle: 'bg-sky-200 text-sky-950 border-sky-300' },
@@ -217,7 +233,6 @@ const MATRIX_ROWS = [
     { id: 'm7',   label: 'Minor 7th',         intervals: [0, 3, 7, 10], suffix: 'm7',   btnClass: 'row-m7',   badgeStyle: 'bg-purple-200 text-purple-950 border-purple-300' }
 ];
 
-// Translated Genres, Styles & Progressions Table
 const GENRES_DATA = {
     "Classical & Traditional": {
         "Circle of C (Major)": "I - vi (I / IV) - ii (IV) - V (bVII / viio)",
@@ -517,7 +532,6 @@ function createMatrixUI() {
 
             const handlePress = (e) => {
                 e.preventDefault();
-                // Tassativo: audio.init() viene chiamato ma le note suonano solo se audioActive è vero
                 if (audio.audioActive) {
                     audio.init();
                 }
@@ -587,115 +601,122 @@ function initGenresAndStylesUI() {
     });
 }
 
-class StrumplateController {
-    constructor(canvas) {
+/**
+ * Green Phosphor Real-time ADSR Canvas Renderer
+ */
+class AdsrCanvasRenderer {
+    constructor(canvas, audioEngine) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
-        this.lastIndex = -1;
-        this.isInteracting = false;
-        this.ripples = [];
+        this.audioEngine = audioEngine;
 
         this.resize();
         window.addEventListener('resize', () => this.resize());
-        this.bindEvents();
-        this.animate();
+        this.draw();
     }
 
     resize() {
         const rect = this.canvas.parentElement.getBoundingClientRect();
         this.canvas.width = rect.width;
         this.canvas.height = rect.height;
+        this.draw();
     }
 
-    bindEvents() {
-        const getPos = (e) => {
-            const rect = this.canvas.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            return {
-                x: clientX - rect.left,
-                y: clientY - rect.top
-            };
-        };
+    draw() {
+        const w = this.canvas.width;
+        const h = this.canvas.height;
+        const ctx = this.ctx;
 
-        const start = (e) => {
-            e.preventDefault();
-            if (audio.audioActive) {
-                audio.init();
-            }
-            this.isInteracting = true;
-            this.triggerAt(getPos(e));
-        };
+        ctx.clearRect(0, 0, w, h);
 
-        const move = (e) => {
-            if (!this.isInteracting) return;
-            e.preventDefault();
-            this.triggerAt(getPos(e));
-        };
+        const margin = 20;
+        const plotW = w - (margin * 2);
+        const plotH = h - (margin * 2);
+        const baseline = h - margin;
 
-        const stop = () => {
-            this.isInteracting = false;
-            this.lastIndex = -1;
-        };
-
-        this.canvas.addEventListener('mousedown', start);
-        this.canvas.addEventListener('mousemove', move);
-        window.addEventListener('mouseup', stop);
-
-        this.canvas.addEventListener('touchstart', start, { passive: false });
-        this.canvas.addEventListener('touchmove', move, { passive: false });
-        window.addEventListener('touchend', stop);
-    }
-
-    triggerAt(pos) {
-        if (!currentStrumNotes.length) return;
-
-        const width = this.canvas.width;
-        const normalizedX = Math.max(0, Math.min(1, pos.x / width));
-        const index = Math.floor(normalizedX * currentStrumNotes.length);
-
-        if (index !== this.lastIndex && index < currentStrumNotes.length) {
-            this.lastIndex = index;
-            const note = currentStrumNotes[index];
-            audio.playNote(note);
-            this.addLightEffect(pos.x, pos.y);
+        // Draw Background Phosphor Grid
+        ctx.strokeStyle = 'rgba(0, 255, 102, 0.15)';
+        ctx.lineWidth = 1;
+        
+        for (let x = margin; x <= w - margin; x += plotW / 8) {
+            ctx.beginPath();
+            ctx.moveTo(x, margin);
+            ctx.lineTo(x, baseline);
+            ctx.stroke();
         }
-    }
+        for (let y = margin; y <= baseline; y += plotH / 4) {
+            ctx.beginPath();
+            ctx.moveTo(margin, y);
+            ctx.lineTo(w - margin, y);
+            ctx.stroke();
+        }
 
-    addLightEffect(x, y) {
-        this.ripples.push({
-            x: x,
-            y: y,
-            radius: 4,
-            alpha: 1.0
+        // ADSR Envelope Curve Coordinates
+        const a = this.audioEngine.attackTime;
+        const d = this.audioEngine.decayTime;
+        const s = this.audioEngine.sustainLevel;
+        const r = this.audioEngine.releaseTime;
+
+        const totalTime = Math.max(0.5, a + d + 0.8 + r); // Fixed time scaling window
+
+        const x0 = margin;
+        const y0 = baseline;
+
+        const xA = x0 + (a / totalTime) * plotW;
+        const yA = margin; // Peak
+
+        const xD = xA + (d / totalTime) * plotW;
+        const yD = baseline - (s * plotH);
+
+        const xS = xD + (0.8 / totalTime) * plotW; // Sustain hold length
+        const yS = yD;
+
+        const xR = xS + (r / totalTime) * plotW;
+        const yR = baseline;
+
+        // Fill Envelope Area with Glowing Green Gradient
+        const grad = ctx.createLinearGradient(0, margin, 0, baseline);
+        grad.addColorStop(0, 'rgba(0, 255, 102, 0.35)');
+        grad.addColorStop(1, 'rgba(0, 255, 102, 0.02)');
+
+        ctx.beginPath();
+        ctx.moveTo(x0, y0);
+        ctx.lineTo(xA, yA);
+        ctx.lineTo(xD, yD);
+        ctx.lineTo(xS, yS);
+        ctx.lineTo(xR, yR);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Draw Bright Neon Green Outer Line
+        ctx.beginPath();
+        ctx.moveTo(x0, y0);
+        ctx.lineTo(xA, yA);
+        ctx.lineTo(xD, yD);
+        ctx.lineTo(xS, yS);
+        ctx.lineTo(xR, yR);
+        ctx.strokeStyle = '#00ff66';
+        ctx.lineWidth = 2.5;
+        ctx.shadowColor = '#00ff66';
+        ctx.shadowBlur = 8;
+        ctx.stroke();
+        ctx.shadowBlur = 0; // Reset shadow
+
+        // Draw Control Point Dots
+        const points = [
+            { x: xA, y: yA, label: 'A' },
+            { x: xD, y: yD, label: 'D' },
+            { x: xS, y: yS, label: 'S' },
+            { x: xR, y: yR, label: 'R' }
+        ];
+
+        ctx.fillStyle = '#88ffb3';
+        points.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
+            ctx.fill();
         });
-    }
-
-    animate() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        for (let i = this.ripples.length - 1; i >= 0; i--) {
-            const r = this.ripples[i];
-            
-            const grad = this.ctx.createRadialGradient(r.x, r.y, 0, r.x, r.y, r.radius);
-            grad.addColorStop(0, `rgba(255, 255, 255, ${r.alpha})`);
-            grad.addColorStop(0.5, `rgba(255, 215, 0, ${r.alpha * 0.7})`);
-            grad.addColorStop(1, `rgba(255, 215, 0, 0)`);
-
-            this.ctx.beginPath();
-            this.ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
-            this.ctx.fillStyle = grad;
-            this.ctx.fill();
-
-            r.radius += 3;
-            r.alpha -= 0.035;
-
-            if (r.alpha <= 0) {
-                this.ripples.splice(i, 1);
-            }
-        }
-
-        requestAnimationFrame(() => this.animate());
     }
 }
 
@@ -703,17 +724,18 @@ class StrumplateController {
 window.addEventListener('DOMContentLoaded', () => {
     createMatrixUI();
     initGenresAndStylesUI();
-    const strumplate = new StrumplateController(document.getElementById('strum-canvas'));
+
+    const adsrCanvas = document.getElementById('adsr-canvas');
+    const adsrRenderer = new AdsrCanvasRenderer(adsrCanvas, audio);
 
     const audioToggle = document.getElementById('toggle-audio');
     const audioStateLbl = document.getElementById('lbl-audio-state');
     const powerLed = document.getElementById('power-led');
     const droneToggle = document.getElementById('toggle-drone');
 
-    // Tassativo: assicura che il toggle sia deselezionato (OFF) all'avvio
     audioToggle.checked = false;
 
-    // Master Audio Switch Event (OFF by default)
+    // Master Audio Switch Event
     audioToggle.addEventListener('change', (e) => {
         const isEnabled = e.target.checked;
         audio.setAudioState(isEnabled);
@@ -739,15 +761,39 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('lbl-volume').textContent = `${e.target.value}%`;
     });
 
-    document.getElementById('slider-sustain').addEventListener('input', (e) => {
-        const val = parseFloat(e.target.value) / 10;
-        audio.setSustain(val);
-        document.getElementById('lbl-sustain').textContent = `${val.toFixed(1)}s`;
-    });
-
     document.getElementById('slider-cutoff').addEventListener('input', (e) => {
         const val = parseFloat(e.target.value);
         audio.setCutoff(val);
         document.getElementById('lbl-cutoff').textContent = `${val} Hz`;
     });
+
+    // ADSR Sliders Bindings & Dynamic Redraw
+    const sliderA = document.getElementById('slider-attack');
+    const sliderD = document.getElementById('slider-decay');
+    const sliderS = document.getElementById('slider-sustain');
+    const sliderR = document.getElementById('slider-release');
+
+    function updateAdsrFromSliders() {
+        const aVal = parseFloat(sliderA.value) / 100;  // 0.01s - 2.0s
+        const dVal = parseFloat(sliderD.value) / 100;  // 0.05s - 3.0s
+        const sVal = parseFloat(sliderS.value) / 100;  // 0.0 - 1.0
+        const rVal = parseFloat(sliderR.value) / 100;  // 0.05s - 5.0s
+
+        audio.setAdsr(aVal, dVal, sVal, rVal);
+
+        document.getElementById('lbl-attack').textContent = `${aVal.toFixed(2)}s`;
+        document.getElementById('lbl-decay').textContent = `${dVal.toFixed(2)}s`;
+        document.getElementById('lbl-sustain').textContent = `${Math.round(sVal * 100)}%`;
+        document.getElementById('lbl-release').textContent = `${rVal.toFixed(2)}s`;
+
+        adsrRenderer.draw();
+    }
+
+    sliderA.addEventListener('input', updateAdsrFromSliders);
+    sliderD.addEventListener('input', updateAdsrFromSliders);
+    sliderS.addEventListener('input', updateAdsrFromSliders);
+    sliderR.addEventListener('input', updateAdsrFromSliders);
+
+    // Initial draw sync
+    updateAdsrFromSliders();
 });
