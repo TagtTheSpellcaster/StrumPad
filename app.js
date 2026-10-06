@@ -746,31 +746,45 @@ function deduceKeyFromFirstStep(patternStr, chordName, selectedRootName) {
     if (!parenMatch) return selectedRootName;
 
     const mainDegree = parenMatch[1].trim();
-    const subDegrees = parenMatch[2] ? parenMatch[2].split('/').map(st => st.trim()) : [];
+    const subDegrees = parenMatch[2]
+        ? parenMatch[2].split('/').map(st => st.trim())
+        : [];
 
     const selectedRootIndex = CHROMATIC_SCALE.indexOf(selectedRootName);
     if (selectedRootIndex === -1) return selectedRootName;
 
-    // Prova ad abbinare con il grado principale
-    const mainMatchToken = mainDegree.match(/^(b[I|V|i|v]+|[I|V|i|v]+)/);
+    // Prova il grado principale.
+    const mainMatchToken = mainDegree.match(
+        /^(b?(?:VII|VI|IV|III|II|V|I|vii|vi|iv|iii|ii|i))/
+    );
+
     if (mainMatchToken && ROMAN_SEMITONES[mainMatchToken[0]] !== undefined) {
-        const parsedMain = parseDegreeToChord(mainDegree, selectedRootName); // Test per suffissi
+        const offset = ROMAN_SEMITONES[mainMatchToken[0]];
+        const tonicIndex = (selectedRootIndex - offset + 12) % 12;
+        const candidateKey = CHROMATIC_SCALE[tonicIndex];
+
+        const parsedMain = parseDegreeToChord(mainDegree, candidateKey);
+
         if (parsedMain === chordName) {
-            const offset = ROMAN_SEMITONES[mainMatchToken[0]];
-            const tonicIndex = (selectedRootIndex - offset + 12) % 12;
-            return CHROMATIC_SCALE[tonicIndex];
+            return candidateKey;
         }
     }
 
-    // Prova ad abbinare con eventuali gradi alternativi
-    for (let subDeg of subDegrees) {
-        const subMatchToken = subDeg.match(/^(b[I|V|i|v]+|[I|V|i|v]+)/);
+    // Prova eventuali gradi alternativi.
+    for (const subDeg of subDegrees) {
+        const subMatchToken = subDeg.match(
+            /^(b?(?:VII|VI|IV|III|II|V|I|vii|vi|iv|iii|ii|i))/
+        );
+
         if (subMatchToken && ROMAN_SEMITONES[subMatchToken[0]] !== undefined) {
-            const parsedSub = parseDegreeToChord(subDeg, selectedRootName);
+            const offset = ROMAN_SEMITONES[subMatchToken[0]];
+            const tonicIndex = (selectedRootIndex - offset + 12) % 12;
+            const candidateKey = CHROMATIC_SCALE[tonicIndex];
+
+            const parsedSub = parseDegreeToChord(subDeg, candidateKey);
+
             if (parsedSub === chordName) {
-                const offset = ROMAN_SEMITONES[subMatchToken[0]];
-                const tonicIndex = (selectedRootIndex - offset + 12) % 12;
-                return CHROMATIC_SCALE[tonicIndex];
+                return candidateKey;
             }
         }
     }
