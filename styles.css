@@ -1,244 +1,124 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
 body {
-  background-color: #121214;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  color: #e5e7eb;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 20px;
+    background-color: #1e1b18;
+    background-image: radial-gradient(#332d27 1px, transparent 0);
+    background-size: 16px 16px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
 }
 
-/* Chassis principale sintetizzatore */
-.synth-container {
-  background: linear-gradient(145deg, #ded6c8, #c8bead);
-  border-radius: 20px;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), inset 0 2px 3px rgba(255, 255, 255, 0.9);
-  width: 100%;
-  max-width: 1150px;
-  padding: 30px;
-  border: 3px solid #b2a694;
-  color: #222;
+/* Custom Scrollbar for matrix overflow on small screens */
+::-webkit-scrollbar {
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #c2b8a3;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+    background: #8e836f;
+    border-radius: 4px;
 }
 
-.synth-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 3px solid #a89c8a;
-  padding-bottom: 18px;
-  margin-bottom: 24px;
+/* Gold metallic plate container styling */
+.gold-plate-container {
+    background: linear-gradient(
+        135deg, 
+        #b8860b 0%, 
+        #ffd700 20%, 
+        #d4af37 40%, 
+        #fff8dc 50%, 
+        #aa771c 65%, 
+        #f0e68c 85%, 
+        #8b6508 100%
+    );
+    border: 4px solid #5a4413;
+    box-shadow: 
+        inset 0 2px 10px rgba(255,255,255,0.8),
+        inset 0 -4px 12px rgba(0,0,0,0.6),
+        0 6px 12px rgba(0,0,0,0.4);
+    position: relative;
 }
 
-.brand h1 {
-  font-size: 2.4rem;
-  letter-spacing: 2px;
-  color: #1f2937;
-  font-weight: 900;
+/* Metallic fine horizontal grooves overlay */
+.gold-plate-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.08),
+        rgba(0, 0, 0, 0.08) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    pointer-events: none;
+    z-index: 1;
 }
 
-.brand-sub {
-  font-size: 0.75rem;
-  letter-spacing: 3px;
-  color: #6b7280;
-  font-weight: 800;
-  display: block;
+/* 3D Compact Square Matrix Button */
+.matrix-btn {
+    position: relative;
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+    border-radius: 6px;
+    border-width: 2px;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.25), 0 5px 6px rgba(0,0,0,0.2);
+    outline: none;
+    cursor: pointer;
+    transition: transform 0.05s ease, box-shadow 0.05s ease, filter 0.1s ease;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 4px;
+    flex-shrink: 0;
 }
 
-.master-panel {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  background: #b8ac9a;
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: 1px solid #998c7a;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+.matrix-btn:active, .matrix-btn.active {
+    transform: translateY(3px) !important;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.3), 0 2px 3px rgba(0,0,0,0.2) !important;
 }
 
-.volume-control {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+/* Row Color Themes (Pastel Tones) */
+/* Row 1 - Maggiore (Pastel Peach/Amber) */
+.row-maj { background-color: #fce3b8; border-color: #d1a566; }
+.row-maj:hover { background-color: #ffecc9; }
 
-.volume-control label {
-  font-size: 0.65rem;
-  font-weight: 800;
-  color: #374151;
-}
+/* Row 2 - Minore (Pastel Sky Blue) */
+.row-min { background-color: #c0e3f7; border-color: #79a8c7; }
+.row-min:hover { background-color: #d4eefc; }
 
-.volume-control input[type="range"] {
-  accent-color: #d97706;
-  cursor: pointer;
-}
+/* Row 3 - Settima Dominante (Soft Coral/Rose) */
+.row-7 { background-color: #f7c6c6; border-color: #c98888; }
+.row-7:hover { background-color: #fcd7d7; }
 
-.chord-display {
-  background: #0f172a;
-  color: #10b981;
-  font-family: monospace;
-  font-size: 1.1rem;
-  padding: 8px 16px;
-  border-radius: 6px;
-  border: 2px solid #1e293b;
-  min-width: 170px;
-  text-align: center;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.9);
-}
+/* Row 4 - Settima Maggiore (Pastel Sage Green) */
+.row-maj7 { background-color: #c4ecd0; border-color: #7fba8f; }
+.row-maj7:hover { background-color: #d6f5df; }
 
-.synth-body {
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 28px;
-}
+/* Row 5 - Settima Minore (Pastel Soft Lavender) */
+.row-m7 { background-color: #e0cced; border-color: #a485b8; }
+.row-m7:hover { background-color: #ebdcf5; }
 
-@media (max-width: 950px) {
-  .synth-body {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Matrice Accordi */
-.chord-matrix-section {
-  background: #232326;
-  padding: 22px;
-  border-radius: 14px;
-  box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.6);
-}
-
-.chord-matrix-section h2 {
-  font-size: 0.8rem;
-  letter-spacing: 1.5px;
-  color: #9ca3af;
-  margin-bottom: 18px;
-}
-
-.matrix-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.chord-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.row-label {
-  width: 140px;
-  font-size: 0.75rem;
-  font-weight: 800;
-  color: #e5e7eb;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  text-align: right;
-  padding-right: 6px;
-}
-
-.row-buttons {
-  display: flex;
-  gap: 8px;
-  flex-grow: 1;
-  overflow-x: auto;
-  padding-bottom: 4px;
-}
-
-/* Pulsanti Quadrati */
-.chord-btn {
-  position: relative;
-  width: 42px;
-  height: 42px;
-  min-width: 42px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: transform 0.05s ease, box-shadow 0.05s ease;
-  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.4), 0 6px 8px rgba(0, 0, 0, 0.3);
-  outline: none;
-  padding: 0;
-}
-
-.chord-btn:active,
-.chord-btn.active {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-/* Colori Tenui Pastello per Riga */
-.chord-row[data-quality="maj"] .chord-btn { background-color: #fde68a; }
-.chord-row[data-quality="min"] .chord-btn { background-color: #bae6fd; }
-.chord-row[data-quality="7"]   .chord-btn { background-color: #fecaca; }
-.chord-row[data-quality="maj7"].chord-btn { background-color: #bbf7d0; }
-.chord-row[data-quality="m7"]  .chord-btn { background-color: #ddd6fe; }
-
-/* LED Verde Neon */
+/* Rectangular Green LED centered at bottom of button */
 .btn-led {
-  position: absolute;
-  bottom: 4px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 14px;
-  height: 4px;
-  border-radius: 1px;
-  background-color: #1f2923;
-  border: 1px solid #111813;
-  pointer-events: none;
-  transition: background-color 0.05s, box-shadow 0.05s;
+    width: 12px;
+    height: 4px;
+    background-color: #233326;
+    border: 1px solid #142116;
+    border-radius: 1px;
+    transition: background-color 0.05s ease, box-shadow 0.05s ease;
+    pointer-events: none;
+    display: block;
 }
 
-.chord-btn.active .btn-led {
-  background-color: #00ff66 !important;
-  box-shadow: 0 0 10px #00ff66, 0 0 3px #ffffff !important;
-}
-
-/* Sezione Strumplate Metallico */
-.strumplate-section {
-  background: #232326;
-  padding: 22px;
-  border-radius: 14px;
-  box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.6);
-  display: flex;
-  flex-direction: column;
-}
-
-.strumplate-section h2 {
-  font-size: 0.8rem;
-  letter-spacing: 1.5px;
-  color: #9ca3af;
-}
-
-.strumplate-header {
-  margin-bottom: 14px;
-}
-
-.touch-hint {
-  font-size: 0.65rem;
-  color: #6b7280;
-  display: block;
-  margin-top: 2px;
-}
-
-.canvas-wrapper {
-  flex-grow: 1;
-  min-height: 280px;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 4px solid #111;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
-}
-
-#strum-canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-  cursor: crosshair;
+/* Active glowing state for LED */
+.matrix-btn.active .btn-led,
+.matrix-btn:active .btn-led {
+    background-color: #00ff66 !important;
+    box-shadow: 0 0 6px #00ff66, 0 0 12px #00ff66, 0 0 16px #00ff66 !important;
+    border-color: #88ffb3 !important;
 }
