@@ -6,11 +6,11 @@ class WebAudioEngine {
         this.ctx = null;
         this.masterGain = null;
         this.volume = 0.8;
-        this.cutoffFreq = 2200; // Cutoff ripristinato
+        this.cutoffFreq = 2200;
         this.initialized = false;
         this.audioActive = false; // Tassativamente OFF all'avvio
         this.droneMode = false;
-        this.waveform = 'sawtooth'; // Forma d'onda selezionabile
+        this.waveform = 'sawtooth';
         this.activeDroneNodes = [];
         this.scheduledTimeouts = [];
 
@@ -150,14 +150,12 @@ class WebAudioEngine {
             const osc1 = this.ctx.createOscillator();
             const osc2 = this.ctx.createOscillator();
 
-            // Applicazione della forma d'onda selezionata
             osc1.type = this.waveform;
             osc2.type = (this.waveform === 'sine') ? 'triangle' : this.waveform;
 
             osc1.frequency.setValueAtTime(freq, now);
             osc2.frequency.setValueAtTime(freq * 1.002, now);
 
-            // Filter Envelope collegato alla frequenza di Cutoff impostata
             const filter = this.ctx.createBiquadFilter();
             filter.type = 'lowpass';
             filter.frequency.setValueAtTime(200, now);
@@ -167,7 +165,6 @@ class WebAudioEngine {
                 now + this.attackTime + this.decayTime
             );
 
-            // Gain ADSR Envelope
             const voiceGain = this.ctx.createGain();
             const peakGain = 0.4;
             const sustainGain = Math.max(0.0001, peakGain * this.sustainLevel);
@@ -236,11 +233,9 @@ class AdsrCanvasRenderer {
         const height = this.canvas.height;
         const ctx = this.ctx;
 
-        // 1. Sfondo Nero Profondo Monitor CRT
         ctx.fillStyle = '#020803';
         ctx.fillRect(0, 0, width, height);
 
-        // 2. Griglia Verde Scuro Oscilloscopio Anni '70
         ctx.strokeStyle = 'rgba(0, 60, 20, 0.4)';
         ctx.lineWidth = 1;
 
@@ -260,7 +255,6 @@ class AdsrCanvasRenderer {
             ctx.stroke();
         }
 
-        // Calcolo Punti Curva ADSR
         const padding = 14;
         const drawW = width - (padding * 2);
         const drawH = height - (padding * 2);
@@ -286,7 +280,6 @@ class AdsrCanvasRenderer {
         const x4 = x3 + releaseW;
         const y4 = height - padding;
 
-        // 3. Bagliore di Fondo al Fosforo
         ctx.beginPath();
         ctx.moveTo(x0, y0);
         ctx.lineTo(x1, y1);
@@ -302,7 +295,6 @@ class AdsrCanvasRenderer {
         ctx.fillStyle = grad;
         ctx.fill();
 
-        // 4. Traccia Verde Neon Brillante
         ctx.beginPath();
         ctx.moveTo(x0, y0);
         ctx.lineTo(x1, y1);
@@ -317,7 +309,6 @@ class AdsrCanvasRenderer {
         ctx.stroke();
         ctx.shadowBlur = 0;
 
-        // 5. Punti Nodi
         [ {x: x1, y: y1}, {x: x2, y: y2}, {x: x3, y: y3} ].forEach(p => {
             ctx.beginPath();
             ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
@@ -803,7 +794,6 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('lbl-volume').textContent = `${e.target.value}%`;
     });
 
-    // Controllo frequenza di Cutoff ripristinato ed attivo
     document.getElementById('slider-cutoff').addEventListener('input', (e) => {
         const val = parseFloat(e.target.value);
         audio.setCutoff(val);
