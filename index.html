@@ -124,7 +124,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
                     
-                    <!-- COLUMN 1 (4 cols): ADSR Panel (50% Width relative to synth section) -->
+                    <!-- COLUMN 1 (4 cols): ADSR Panel -->
                     <div class="md:col-span-4 bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col gap-2">
                         <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">ADSR Envelope Generator</span>
                         
@@ -169,10 +169,10 @@
                         </div>
                     </div>
 
-                    <!-- COLUMN 2 (3 cols): Waveform (Top) + Filters (Bottom) Stack in Single-Column Layout -->
+                    <!-- COLUMN 2 (3 cols): Waveform (Top) + Filters (Bottom) Stack -->
                     <div class="md:col-span-3 flex flex-col gap-3">
                         
-                        <!-- Waveform Selector Panel (Single Column) -->
+                        <!-- Waveform Selector Panel -->
                         <div class="bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col gap-1.5">
                             <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">Waveform</span>
                             <div class="flex flex-col gap-1 pt-0.5">
@@ -198,7 +198,7 @@
                             </div>
                         </div>
 
-                        <!-- Filter Controls Panel (Single Column Stacked Under Waveform) -->
+                        <!-- Filter Controls Panel -->
                         <div class="bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col gap-1.5">
                             <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">Filter</span>
                             
@@ -265,12 +265,28 @@
                         </div>
                     </div>
 
-                    <!-- COLUMN 4 (2 cols): Master Volume (Strictly Right side inside the panel) -->
+                    <!-- COLUMN 4 (2 cols): Extended Master Volume Panel with Speaker Icons -->
                     <div class="md:col-span-2 bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col items-center justify-between h-full">
                         <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1 text-center w-full">Master Vol</span>
                         
-                        <div class="vertical-slider-wrapper my-auto">
-                            <input type="range" id="slider-volume" min="0" max="100" value="80" class="v-range">
+                        <!-- Icona Altoparlante Grande (Alto Volume) -->
+                        <div class="mt-2 text-slate-700" title="Max Volume">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                            </svg>
+                        </div>
+
+                        <!-- Slider Volume Allungato -->
+                        <div class="vertical-slider-wrapper-master my-1">
+                            <input type="range" id="slider-volume" min="0" max="100" value="80" class="v-range-master">
+                        </div>
+
+                        <!-- Icona Altoparlante Piccolo (Basso Volume / Mute) -->
+                        <div class="mb-1 text-slate-500" title="Min Volume">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                            </svg>
                         </div>
 
                         <span id="lbl-volume" class="text-[10px] font-mono font-bold text-amber-950">80%</span>
