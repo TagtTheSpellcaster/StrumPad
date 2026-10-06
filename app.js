@@ -561,50 +561,58 @@ const MATRIX_ROWS = [
 // Genres & Styles Table
 const GENRES_DATA = {
     "Classical & Traditional": {
-        "Circle of C (Major)": "I - vi (I / IV) - ii (IV) - V (bVII / viio)",
-        "Simple / Plagal Cadence": "I - IV (ii) - V (bVII / viio) - I (vi)",
-        "Pachelbel Progression": "I - V (iii) - vi (I) - iii (V) - IV (ii) - I (vi) - IV (ii) - V (bVII)"
+        "Circle Progression": "I - vi (I / IV) - ii (IV) - V (bVII)",
+        "Simple Cadence": "I - IV (ii) - V (bVII) - I (vi)",
+        "Pachelbel": "I - V (iii) - vi (I) - iii (V) - IV (ii) - I (vi) - IV (ii) - V (bVII)"
     },
+
     "Jazz & Dixieland": {
-        "Major ii - V - I": "ii7 - V7 (bVII7 / VIIo7) - Imaj7 (vi7 / iii7)",
-        "Minor ii - V - I": "iiø7 - V7alt (bVII7) - imin7 (bIIImaj7)",
-        "Rhythm Turnaround": "Imaj7 - vi7 (bIII7) - ii7 (IVmaj7) - V7 (bVII7)",
-        "Dixieland / Ragtime Loop": "I - VI7 (bIII7) - II7 (bVI7) - V7 (bVII7)"
+        "Classic Jazz Cadence": "ii7 - V7 (bVII7) - Imaj7 (vi7 / iii7)",
+        "Minor Jazz Cadence": "ii7 - V7 (bVII7) - i7 (bIIImaj7)",
+        "Jazz Turnaround": "Imaj7 - vi7 (bIII7) - ii7 (IVmaj7) - V7 (bVII7)",
+        "Dixieland Loop": "I - VI7 (bIII7) - II7 (bVI7) - V7 (bVII7)"
     },
+
     "Pop & Rock": {
-        "Golden Pop Progression": "I - V (bVII) - vi (I) - IV (ii)",
-        "The '50s Progression": "I - vi (I) - IV (ii) - V (bVII)",
-        "Epic Mixolydian Rock": "I - bVII (v) - IV (ii) - I (v)",
-        "Andalusian Cadence (Flamenco/Rock)": "vi - V (bVII) - IV (bVI) - III (V7)"
+        "Golden Pop": "I - V (bVII) - vi (I) - IV (ii)",
+        "Golden Fifties": "I - vi (I) - IV (ii) - V (bVII)",
+        "Mixolydian Rock": "I - bVII (v) - IV (ii) - I (v)",
+        "Andalusian Cadence": "vi - V (bVII) - IV (bVI) - III (V7)"
     },
+
     "Country, Folk & Blues": {
-        "Three-Chord Country": "I - IV (ii) - I (vi) - V (bVII)",
-        "Standard Blues (12-Bar)": "I7 - IV7 (ii7) - I7 (vi7) - V7 (bVII7) - IV7 (ii7) - I7 (vi7) - V7 (bVII7)",
+        "Country Three-Chord": "I - IV (ii) - I (vi) - V (bVII)",
+        "Twelve-Bar Blues": "I7 - IV7 (ii7) - I7 (vi7) - V7 (bVII7) - IV7 (ii7) - I7 (vi7) - V7 (bVII7)",
         "Bluegrass Breakdown": "I - IV (ii) - V (bVII) - vi (I)"
     },
+
     "Funk & Disco": {
-        "Classic Funk Groove": "i7 - IV7 (bVIImaj7)",
+        "Classic Funk": "i7 - IV7 (bVIImaj7)",
         "Disco Vamp": "ii7 - V7 (bVII7)",
-        "Funky Turnaround": "i7 - bVII7 (IV7) - bVI7 (iiø7) - V7alt (bVII7)"
+        "Funk Turnaround": "i7 - bVII7 (IV7) - bVI7 (ii7) - V7 (bVII7)"
     },
+
     "Heavy Metal & Hard Rock": {
-        "Power Metal Loop": "i - bVI (iv) - bVII (v) - i (v)",
-        "Epic Metal Aeolian": "i - bVII (iv) - bVI (iiø) - bVII (v)",
-        "Phrygian Metal Drive": "i - bII (vii) - i (v)"
+        "Power Metal": "i - bVI (iv) - bVII (v) - i (v)",
+        "Aeolian Metal": "i - bVII (iv) - bVI (ii7) - bVII (v)",
+        "Phrygian Metal": "i - bII (vii) - i (v)"
     },
+
     "Gospel & Soul": {
-        "Gospel Plagal Cascade": "I - I7 (v7) - IV (ii) - iv (bVII7)",
+        "Gospel Cascade": "I - I7 (v7) - IV (ii) - iv (bVII7)",
         "Soul Preacher": "I - vi7 (bIII7) - IVmaj7 (ii7) - V7 (bVII7)",
         "Church Cadence": "I - bVII (v) - IV (ii) - I (vi)"
     },
+
     "Latin & Salsa": {
-        "Standard Montuno": "i - bVII (v) - bVI (iiø) - V7 (bVII7)",
-        "Salsa Clave Loop": "ii7 - V7 (bVII7) - Imaj7 (vi7) - VI7 (bIII7)"
+        "Classic Montuno": "i - bVII (v) - bVI (ii7) - V7 (bVII7)",
+        "Salsa Clave": "ii7 - V7 (bVII7) - Imaj7 (vi7) - VI7 (bIII7)"
     },
+
     "Other Styles": {
-        "Reggae Loop": "I - IV (ii)",
-        "Bossa Nova / Nu-Jazz": "Imaj7 - bII7 (V7alt) - Imaj7 (vi7)",
-        "R&B / Neo-Soul": "IVmaj7 - III7 (bVII7) - vi7 (Imaj7) - Vm7 (I7)"
+        "Reggae Groove": "I - IV (ii)",
+        "Bossa Nova": "Imaj7 - bII7 (V7) - Imaj7 (vi7)",
+        "Neo-Soul": "IVmaj7 - III7 (bVII7) - vi7 (Imaj7) - v7 (I7)"
     }
 };
 
@@ -652,7 +660,6 @@ const ROMAN_SEMITONES = {
     'bIII': 3, 'biii': 3,
     'iii': 4, 'III': 4,
     'iv': 5, 'IV': 5,
-    'bV': 6, 'bv': 6, 'viio': 6, 'VIIo': 6,
     'v': 7, 'V': 7, 'Vm': 7,
     'bVI': 8, 'bvi': 8,
     'vi': 9, 'VI': 9,
@@ -664,9 +671,7 @@ function parseDegreeToChord(degreeStr, keyRootName) {
     let clean = degreeStr.trim();
     if (!clean) return null;
 
-    clean = clean.replace('alt', '').replace('ø', 'm').replace('imin', 'im');
-
-    const match = clean.match(/^(b[I|V|i|v]+|[I|V|i|v]+|viio|VIIo)/);
+    const match = clean.match(/^(b[I|V|i|v]+|[I|V|i|v]+)/);
     if (!match) return null;
 
     const degreeToken = match[0];
@@ -722,12 +727,55 @@ function parseProgressionPattern(patternStr, keyRootName) {
         if (mainChord) {
             compiledSteps.push({
                 main: mainChord,
-                sub: subChords
+                sub: subChords,
+                mainDegree: mainRaw,
+                subDegrees: subRaw ? subRaw.split('/').map(st => st.trim()) : []
             });
         }
     });
 
     return compiledSteps;
+}
+
+function deduceKeyFromFirstStep(patternStr, chordName, selectedRootName) {
+    const rawSteps = patternStr.split(' - ');
+    if (!rawSteps.length) return selectedRootName;
+
+    const firstStepText = rawSteps[0];
+    const parenMatch = firstStepText.match(/([^\(]+)(?:\(([^\)]+)\))?/);
+    if (!parenMatch) return selectedRootName;
+
+    const mainDegree = parenMatch[1].trim();
+    const subDegrees = parenMatch[2] ? parenMatch[2].split('/').map(st => st.trim()) : [];
+
+    const selectedRootIndex = CHROMATIC_SCALE.indexOf(selectedRootName);
+    if (selectedRootIndex === -1) return selectedRootName;
+
+    // Prova ad abbinare con il grado principale
+    const mainMatchToken = mainDegree.match(/^(b[I|V|i|v]+|[I|V|i|v]+)/);
+    if (mainMatchToken && ROMAN_SEMITONES[mainMatchToken[0]] !== undefined) {
+        const parsedMain = parseDegreeToChord(mainDegree, selectedRootName); // Test per suffissi
+        if (parsedMain === chordName) {
+            const offset = ROMAN_SEMITONES[mainMatchToken[0]];
+            const tonicIndex = (selectedRootIndex - offset + 12) % 12;
+            return CHROMATIC_SCALE[tonicIndex];
+        }
+    }
+
+    // Prova ad abbinare con eventuali gradi alternativi
+    for (let subDeg of subDegrees) {
+        const subMatchToken = subDeg.match(/^(b[I|V|i|v]+|[I|V|i|v]+)/);
+        if (subMatchToken && ROMAN_SEMITONES[subMatchToken[0]] !== undefined) {
+            const parsedSub = parseDegreeToChord(subDeg, selectedRootName);
+            if (parsedSub === chordName) {
+                const offset = ROMAN_SEMITONES[subMatchToken[0]];
+                const tonicIndex = (selectedRootIndex - offset + 12) % 12;
+                return CHROMATIC_SCALE[tonicIndex];
+            }
+        }
+    }
+
+    return selectedRootName;
 }
 
 function handleProgressionStep(chordName, rootObj, rowObj) {
@@ -740,7 +788,9 @@ function handleProgressionStep(chordName, rootObj, rowObj) {
     if (!patternStr) return;
 
     if (currentProgressionStepIndex === -1) {
-        const candidateSteps = parseProgressionPattern(patternStr, rootObj.name);
+        // Deduce la tonalità di riferimento a partire dall'accordo iniziale premuto
+        const deducedKey = deduceKeyFromFirstStep(patternStr, chordName, rootObj.name);
+        const candidateSteps = parseProgressionPattern(patternStr, deducedKey);
         if (!candidateSteps.length) return;
 
         const step1 = candidateSteps[0];
@@ -752,7 +802,7 @@ function handleProgressionStep(chordName, rootObj, rowObj) {
             return;
         }
 
-        currentKeyRoot = rootObj.name;
+        currentKeyRoot = deducedKey;
         activeProgressionSteps = candidateSteps;
         currentProgressionStepIndex = 0;
 
@@ -772,9 +822,10 @@ function handleProgressionStep(chordName, rootObj, rowObj) {
         const nextStepIndexToHighlight = (currentProgressionStepIndex + 1) % activeProgressionSteps.length;
         highlightNextStepOptions(nextStepIndexToHighlight);
     } else {
-        const newCandidateSteps = parseProgressionPattern(patternStr, rootObj.name);
+        const newDeducedKey = deduceKeyFromFirstStep(patternStr, chordName, rootObj.name);
+        const newCandidateSteps = parseProgressionPattern(patternStr, newDeducedKey);
         if (newCandidateSteps.length && (chordName === newCandidateSteps[0].main || newCandidateSteps[0].sub.includes(chordName))) {
-            currentKeyRoot = rootObj.name;
+            currentKeyRoot = newDeducedKey;
             activeProgressionSteps = newCandidateSteps;
             currentProgressionStepIndex = 0;
             updateProgressionChordsDisplay();
