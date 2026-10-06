@@ -262,27 +262,29 @@
     }
 }
 
+
 /* ==========================================
-   SYNTH CONTROLS LAYOUT
+   VERTICAL ADSR / MASTER VOLUME SLIDERS
+   Native range control, matching the LFO
    ========================================== */
 
-/*
- * Let the natural height of the LFO + Synth Presets
- * stack determine the synthesis row height.
- * ADSR and Master Volume stretch to that row only.
- */
-.synth-controls-grid {
-    align-items: stretch;
+.v-range,
+.v-range-master {
+    -webkit-appearance: none;
+    appearance: none;
+    writing-mode: vertical-lr;
+    direction: rtl;
+    width: 4px;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: #c2b8a3;
+    border-radius: 9999px;
+    cursor: pointer;
+    accent-color: #92400e;
 }
 
-.synth-adsr-panel,
-.synth-volume-panel {
-    min-height: 0;
-}
-
-/* The vertical slider wrappers must remain inside the
-   compact ADSR / Master Volume panels. */
-.synth-adsr-panel .vertical-slider-wrapper,
-.synth-volume-panel .vertical-slider-wrapper-master {
-    min-height: 0;
+.v-range:focus,
+.v-range-master:focus {
+    outline: none;
 }
