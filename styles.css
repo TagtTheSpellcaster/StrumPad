@@ -83,23 +83,18 @@ body {
 }
 
 /* Temi Colore Pastello per Fila */
-/* Row 1 - Maggiore */
 .row-maj { background-color: #fce3b8; border-color: #d1a566; }
 .row-maj:hover { background-color: #ffecc9; }
 
-/* Row 2 - Minore */
 .row-min { background-color: #c0e3f7; border-color: #79a8c7; }
 .row-min:hover { background-color: #d4eefc; }
 
-/* Row 3 - Settima Dominante */
 .row-7 { background-color: #f7c6c6; border-color: #c98888; }
 .row-7:hover { background-color: #fcd7d7; }
 
-/* Row 4 - Settima Maggiore */
 .row-maj7 { background-color: #c4ecd0; border-color: #7fba8f; }
 .row-maj7:hover { background-color: #d6f5df; }
 
-/* Row 5 - Settima Minore */
 .row-m7 { background-color: #e0cced; border-color: #a485b8; }
 .row-m7:hover { background-color: #ebdcf5; }
 
@@ -115,10 +110,35 @@ body {
     display: block;
 }
 
-/* Stato attivo LED illuminato verde neon */
 .matrix-btn.active .btn-led,
 .matrix-btn:active .btn-led {
     background-color: #00ff66 !important;
     box-shadow: 0 0 6px #00ff66, 0 0 12px #00ff66, 0 0 16px #00ff66 !important;
     border-color: #88ffb3 !important;
+}
+
+/* Evidenziatori Progressioni Armoniche */
+.highlight-main {
+    outline: 3px solid #06b6d4 !important;
+    outline-offset: 2px;
+    box-shadow: 0 0 12px #06b6d4, 0 0 20px rgba(6, 182, 212, 0.6) !important;
+    animation: pulse-main 1.2s infinite ease-in-out;
+    z-index: 20;
+}
+
+.highlight-sub {
+    outline: 2px dashed #a855f7 !important;
+    outline-offset: 2px;
+    opacity: 0.82;
+    box-shadow: 0 0 8px rgba(168, 85, 247, 0.5) !important;
+    z-index: 10;
+}
+
+@keyframes pulse-main {
+    0%, 100% {
+        box-shadow: 0 0 8px #06b6d4, 0 0 16px rgba(6, 182, 212, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 16px #0891b2, 0 0 28px rgba(8, 145, 178, 0.8);
+    }
 }
