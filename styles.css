@@ -1,198 +1,138 @@
-body {
-    background-color: #1e1b18;
-    background-image: radial-gradient(#332d27 1px, transparent 0);
-    background-size: 16px 16px;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: manipulation;
+/* ==========================================
+   MATRIX ROW STYLES (PASTEL VINTAGE PALETTE)
+   ========================================== */
+
+/* Major Row (Beige/Orange Pastel) */
+.row-maj {
+    background-color: #fef3c7;
+    border-color: #fde68a;
+    color: #451a03;
+}
+.row-maj:hover {
+    background-color: #fde68a;
 }
 
-/* Custom Scrollbar for matrix overflow on small screens */
-::-webkit-scrollbar {
-    height: 8px;
+/* Minor Row (Sky Blue Pastel) */
+.row-min {
+    background-color: #e0f2fe;
+    border-color: #bae6fd;
+    color: #0c4a6e;
 }
-::-webkit-scrollbar-track {
-    background: #c2b8a3;
-    border-radius: 4px;
-}
-::-webkit-scrollbar-thumb {
-    background: #8e836f;
-    border-radius: 4px;
+.row-min:hover {
+    background-color: #bae6fd;
 }
 
-/* 1970s Green Phosphor CRT Display Frame */
-.crt-container {
-    background-color: #020803;
-    border: 3px solid #1a2e1d;
-    border-radius: 12px;
-    box-shadow: 
-        inset 0 0 10px rgba(0, 255, 102, 0.2),
-        inset 0 0 20px rgba(0, 0, 0, 0.95),
-        0 2px 6px rgba(0, 0, 0, 0.4);
-    position: relative;
-    overflow: hidden;
+/* Dominant 7th Row (Rose/Pink Pastel) */
+.row-7 {
+    background-color: #ffe4e6;
+    border-color: #fecdd3;
+    color: #881337;
+}
+.row-7:hover {
+    background-color: #fecdd3;
 }
 
-.crt-container::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        rgba(18, 16, 16, 0) 50%, 
-        rgba(0, 0, 0, 0.4) 50%
-    );
-    background-size: 100% 4px;
-    pointer-events: none;
-    z-index: 5;
-    border-radius: 10px;
+/* Major 7th Row (Emerald/Mint Pastel) */
+.row-maj7 {
+    background-color: #d1fae5;
+    border-color: #a7f3d0;
+    color: #064e3b;
+}
+.row-maj7:hover {
+    background-color: #a7f3d0;
 }
 
-/* Slider Verticali Standard Cross-Browser (ADSR) */
-.slider-vertical-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    height: 100%;
-    padding: 2px 0;
+/* Minor 7th Row (Purple/Lilac Pastel) */
+.row-m7 {
+    background-color: #f3e8ff;
+    border-color: #e9d5ff;
+    color: #581c87;
+}
+.row-m7:hover {
+    background-color: #e9d5ff;
 }
 
-.vertical-slider-wrapper {
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* Diminished Row (Sage / Soft Olive Pastel) */
+.row-dim {
+    background-color: #ecf3e6;
+    border-color: #c7dcb8;
+    color: #2a401c;
+}
+.row-dim:hover {
+    background-color: #d6e7c7;
 }
 
-.v-range {
-    writing-mode: vertical-lr; /* Firefox & Edge vertical orientation */
-    direction: rtl;
-    -webkit-appearance: slider-vertical; /* WebKit / Chrome / Safari vertical orientation */
-    width: 14px;
-    height: 60px;
-    background: #c2b8a3;
-    border-radius: 6px;
-    outline: none;
-    cursor: pointer;
-    accent-color: #b45309;
+/* Diminished 7th Row (Dusty Blue-Gray Pastel) */
+.row-dim7 {
+    background-color: #e8eef3;
+    border-color: #becee0;
+    color: #213547;
+}
+.row-dim7:hover {
+    background-color: #d2e0ee;
 }
 
-/* Slider Verticale Allungato Specifico per Master Volume */
-.vertical-slider-wrapper-master {
-    height: 120px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.v-range-master {
-    writing-mode: vertical-lr;
-    direction: rtl;
-    -webkit-appearance: slider-vertical;
-    width: 16px;
-    height: 120px;
-    background: #c2b8a3;
-    border-radius: 6px;
-    outline: none;
-    cursor: pointer;
-    accent-color: #b45309;
-}
-
-/* Preset Button Active & Hover Styles */
-.preset-btn {
-    transition: all 0.1s ease;
-}
-
-.preset-btn.active-preset {
-    background-color: #fef3c7 !important;
-    border-color: #92400e !important;
-    color: #451a03 !important;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.2), 0 0 6px rgba(180,83,9,0.3) !important;
-}
-
-/* 3D Compact Square Matrix Button */
+/* Common Matrix Button Rules */
 .matrix-btn {
     position: relative;
     width: 42px;
     height: 42px;
-    min-width: 42px;
-    min-height: 42px;
-    border-radius: 6px;
-    border-width: 2px;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.25), 0 5px 6px rgba(0,0,0,0.2);
-    outline: none;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 0.5rem;
+    font-family: monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: transform 0.05s ease, box-shadow 0.05s ease, filter 0.1s ease;
+    transition: all 0.15s ease-in-out;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
-    padding-bottom: 4px;
-    flex-shrink: 0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-.matrix-btn:active, .matrix-btn.active {
-    transform: translateY(3px) !important;
-    box-shadow: 0 1px 0 rgba(0,0,0,0.3), 0 2px 3px rgba(0,0,0,0.2) !important;
+.matrix-btn .btn-led {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.15);
+    transition: all 0.15s ease;
 }
 
-/* Pastel Row Color Themes */
-.row-maj { background-color: #fce3b8; border-color: #d1a566; }
-.row-maj:hover { background-color: #ffecc9; }
-
-.row-min { background-color: #c0e3f7; border-color: #79a8c7; }
-.row-min:hover { background-color: #d4eefc; }
-
-.row-7 { background-color: #f7c6c6; border-color: #c98888; }
-.row-7:hover { background-color: #fcd7d7; }
-
-.row-maj7 { background-color: #c4ecd0; border-color: #7fba8f; }
-.row-maj7:hover { background-color: #d6f5df; }
-
-.row-m7 { background-color: #e0cced; border-color: #a485b8; }
-.row-m7:hover { background-color: #ebdcf5; }
-
-/* Rectangular Green LED centered at bottom */
-.btn-led {
-    width: 12px;
-    height: 4px;
-    background-color: #233326;
-    border: 1px solid #142116;
-    border-radius: 1px;
-    transition: background-color 0.05s ease, box-shadow 0.05s ease;
-    pointer-events: none;
-    display: block;
+/* Active State */
+.matrix-btn.active {
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    border-color: #334155 !important;
 }
 
-.matrix-btn.active .btn-led,
-.matrix-btn:active .btn-led {
-    background-color: #00ff66 !important;
-    box-shadow: 0 0 6px #00ff66, 0 0 12px #00ff66, 0 0 16px #00ff66 !important;
-    border-color: #88ffb3 !important;
+.matrix-btn.active .btn-led {
+    background-color: #22c55e;
+    box-shadow: 0 0 6px #22c55e;
 }
 
-/* Harmonic Progression Highlights */
-.highlight-main {
-    outline: 3px solid #06b6d4 !important;
-    outline-offset: 2px;
-    box-shadow: 0 0 12px #06b6d4, 0 0 20px rgba(6, 182, 212, 0.6) !important;
-    animation: pulse-main 1.2s infinite ease-in-out;
-    z-index: 20;
+/* Progression Highlights */
+.matrix-btn.highlight-main {
+    box-shadow: 0 0 0 2px #f59e0b, 0 0 8px rgba(245, 158, 11, 0.6);
+    border-color: #f59e0b !important;
+    animation: pulseHighlightMain 1.5s infinite alternate;
 }
 
-.highlight-sub {
-    outline: 2px dashed #a855f7 !important;
-    outline-offset: 2px;
-    opacity: 0.82;
-    box-shadow: 0 0 8px rgba(168, 85, 247, 0.5) !important;
-    z-index: 10;
+.matrix-btn.highlight-sub {
+    box-shadow: 0 0 0 2px #3b82f6, 0 0 8px rgba(59, 130, 246, 0.6);
+    border-color: #3b82f6 !important;
+    animation: pulseHighlightSub 1.5s infinite alternate;
 }
 
-@keyframes pulse-main {
-    0%, 100% {
-        box-shadow: 0 0 8px #06b6d4, 0 0 16px rgba(6, 182, 212, 0.5);
-    }
-    50% {
-        box-shadow: 0 0 16px #0891b2, 0 0 28px rgba(8, 145, 178, 0.8);
-    }
+@keyframes pulseHighlightMain {
+    0% { box-shadow: 0 0 0 2px #f59e0b, 0 0 4px rgba(245, 158, 11, 0.4); }
+    100% { box-shadow: 0 0 0 3px #f59e0b, 0 0 12px rgba(245, 158, 11, 0.8); }
+}
+
+@keyframes pulseHighlightSub {
+    0% { box-shadow: 0 0 0 2px #3b82f6, 0 0 4px rgba(59, 130, 246, 0.4); }
+    100% { box-shadow: 0 0 0 3px #3b82f6, 0 0 12px rgba(59, 130, 246, 0.8); }
 }
