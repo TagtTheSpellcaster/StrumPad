@@ -9,9 +9,9 @@ class WebAudioEngine {
         this.sustainTime = 1.2;
         this.cutoffFreq = 2200;
         this.initialized = false;
-        this.audioActive = false;
+        this.audioActive = false; // Starts OFF by default
         this.droneMode = false;
-        this.activeDroneNodes = []; // Keeps track of active organ drone oscillator/gain nodes
+        this.activeDroneNodes = [];
     }
 
     init() {
@@ -45,7 +45,6 @@ class WebAudioEngine {
     }
 
     stopAll() {
-        // Stop and disconnect all active sustained drone organ nodes
         this.activeDroneNodes.forEach(item => {
             try {
                 const now = this.ctx ? this.ctx.currentTime : 0;
@@ -91,7 +90,7 @@ class WebAudioEngine {
         const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
 
         if (this.droneMode) {
-            // ORGAN DRONE SYNTHESIS (Additive Pipes + Soft Tremolo)
+            // ORGAN DRONE SYNTHESIS
             const pipeHarmonics = [
                 { mult: 0.5, type: 'sub-octave', vol: 0.25 },
                 { mult: 1.0, type: 'fundamental', vol: 0.35 },
@@ -102,7 +101,7 @@ class WebAudioEngine {
 
             const voiceGain = this.ctx.createGain();
             voiceGain.gain.setValueAtTime(0.0001, now);
-            voiceGain.gain.linearRampToValueAtTime(0.3, now + 0.06); // Smooth organ attack
+            voiceGain.gain.linearRampToValueAtTime(0.3, now + 0.06);
 
             const filter = this.ctx.createBiquadFilter();
             filter.type = 'lowpass';
@@ -166,12 +165,10 @@ class WebAudioEngine {
         if (!this.audioActive || !this.ctx) return;
 
         if (this.droneMode) {
-            // In Drone Mode, stop previous drone notes and sustain full new organ chord
             this.stopAll();
             const chordNotes = midiNotes.slice(0, 4);
             chordNotes.forEach(note => this.playNote(note));
         } else {
-            // In Pluck Mode, arpeggiate notes
             const notes = midiNotes.slice(0, 5);
             notes.forEach((note, idx) => {
                 setTimeout(() => {
@@ -693,28 +690,28 @@ window.addEventListener('DOMContentLoaded', () => {
     initGenresAndStylesUI();
     const strumplate = new StrumplateController(document.getElementById('strum-canvas'));
 
-    const btnPower = document.getElementById('btn-power');
+    const audioToggle = document.getElementById('toggle-audio');
+    const audioStateLbl = document.getElementById('lbl-audio-state');
     const powerLed = document.getElementById('power-led');
     const droneToggle = document.getElementById('toggle-drone');
 
-    // Audio / Stop Toggle Button
-    btnPower.addEventListener('click', () => {
-        if (!audio.audioActive) {
-            audio.setAudioState(true);
-            btnPower.textContent = "🔊 Audio Active (Stop)";
-            btnPower.classList.replace('bg-amber-600', 'bg-emerald-600');
+    // Master Audio Switch Event (OFF by default)
+    audioToggle.addEventListener('change', (e) => {
+        const isEnabled = e.target.checked;
+        audio.setAudioState(isEnabled);
+
+        if (isEnabled) {
+            audioStateLbl.textContent = "Audio ON";
             powerLed.classList.replace('bg-red-600', 'bg-emerald-500');
             powerLed.classList.replace('shadow-[0_0_8px_#dc2626]', 'shadow-[0_0_10px_#10b981]');
         } else {
-            audio.setAudioState(false);
-            btnPower.textContent = "🔈 Audio Inactive";
-            btnPower.classList.replace('bg-emerald-600', 'bg-amber-600');
+            audioStateLbl.textContent = "Audio OFF";
             powerLed.classList.replace('bg-emerald-500', 'bg-red-600');
             powerLed.classList.replace('shadow-[0_0_10px_#10b981]', 'shadow-[0_0_8px_#dc2626]');
         }
     });
 
-    // Drone Mode Switch
+    // Drone Mode Switch Event
     droneToggle.addEventListener('change', (e) => {
         audio.setDroneMode(e.target.checked);
     });
