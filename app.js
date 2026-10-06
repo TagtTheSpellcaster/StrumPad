@@ -55,24 +55,24 @@ class AudioEngine {
     const now = this.ctx.currentTime;
     const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
 
-    // Oscillatori (Sawtooth + Triangle)
+    // Oscillatore principale (sawtooth) + sub (triangle)
     const osc1 = this.ctx.createOscillator();
     const osc2 = this.ctx.createOscillator();
     osc1.type = 'sawtooth';
     osc2.type = 'triangle';
     osc1.frequency.value = freq;
-    osc2.frequency.value = freq * 1.001;
+    osc2.frequency.value = freq * 1.002;
 
-    // Filtro Passa-Basso
+    // Filtro Passa-Basso Dinamico con Pluck
     const filter = this.ctx.createBiquadFilter();
     filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(1200, now);
-    filter.frequency.exponentialRampToValueAtTime(150, now + 0.9);
+    filter.frequency.setValueAtTime(1400, now);
+    filter.frequency.exponentialRampToValueAtTime(200, now + 0.8);
 
-    // Inviluppo Volume
+    // Inviluppo Gain
     const gain = this.ctx.createGain();
-    gain.gain.setValueAtTime(0.35, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
+    gain.gain.setValueAtTime(0.4, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.85);
 
     osc1.connect(filter);
     osc2.connect(filter);
@@ -81,12 +81,12 @@ class AudioEngine {
 
     osc1.start(now);
     osc2.start(now);
-    osc1.stop(now + 0.95);
-    osc2.stop(now + 0.95);
+    osc1.stop(now + 0.9);
+    osc2.stop(now + 0.9);
   }
 }
 
-// --- Gestione Interfaccia e Strumplate ---
+// --- Inizializzazione Interfaccia ---
 document.addEventListener('DOMContentLoaded', () => {
   const audioEngine = new AudioEngine();
   const matrixContainer = document.getElementById('chord-matrix');
@@ -95,13 +95,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('strum-canvas');
   const ctx = canvas.getContext('2d');
 
-  let activeChord = null; // Default: nessun accordo selezionato
+  let activeChord = null;
   let activeNotes = [];
   let lastStrumIndex = -1;
   let isStrumming = false;
   const ripples = [];
 
-  // Impostazione dell'Accordo Attivo
+  // Cambio Accordo Attivo
   function setChord(rootName, rootMidi, quality, labelQuality, btnElement) {
     document.querySelectorAll('.chord-btn').forEach(b => b.classList.remove('active'));
     btnElement.classList.add('active');
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
     activeChord = { rootName, rootMidi, quality, labelQuality };
     currentChordDisplay.textContent = `${rootName} ${labelQuality}`;
 
-    // Note estese su 3 ottave per lo Strumplate
+    // Estensione note per lo Strumplate su 3 ottave
     activeNotes = [];
     for (let octave = -1; octave <= 1; octave++) {
       chordDef.intervals.forEach(interval => {
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Generazione Matrice
+  // Costruzione della Matrice di Pulsanti
   CHORD_TYPES.forEach(type => {
     const row = document.createElement('div');
     row.className = 'chord-row';
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
       led.className = 'btn-led';
       btn.appendChild(led);
 
-      // Trigger sonoro immediato sul down
+      // Suona subito al mousedown/pointerdown
       btn.addEventListener('pointerdown', (e) => {
         e.preventDefault();
         setChord(root.name, root.midi, type.quality, type.label, btn);
@@ -157,12 +157,12 @@ document.addEventListener('DOMContentLoaded', () => {
     matrixContainer.appendChild(row);
   });
 
-  // Volume Master
+  // Master Volume
   masterVolInput.addEventListener('input', (e) => {
     audioEngine.setMasterVolume(parseFloat(e.target.value));
   });
 
-  // Rendering Canvas Strumplate Metallico
+  // Canvas Strumplate Dorato e Riflessi Metallici
   function resizeCanvas() {
     const rect = canvas.parentElement.getBoundingClientRect();
     canvas.width = rect.width;
@@ -174,27 +174,27 @@ document.addEventListener('DOMContentLoaded', () => {
   function drawStrumplate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Gradiente Metallico Dorato
+    // Gradiente Metallico Dorato Vintage
     const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    grad.addColorStop(0, '#e5c07b');
-    grad.addColorStop(0.3, '#fff3a8');
-    grad.addColorStop(0.5, '#b8860b');
-    grad.addColorStop(0.8, '#ffd700');
-    grad.addColorStop(1, '#996515');
+    grad.addColorStop(0, '#d4af37');
+    grad.addColorStop(0.25, '#fff0a6');
+    grad.addColorStop(0.5, '#aa7c11');
+    grad.addColorStop(0.75, '#f3e5ab');
+    grad.addColorStop(1, '#8b6508');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Spazzolatura/Struttura Orizzontale
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    // Trama spazzolata orizzontale
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
     ctx.lineWidth = 1;
-    for (let y = 0; y < canvas.height; y += 4) {
+    for (let y = 0; y < canvas.height; y += 3) {
       ctx.beginPath();
       ctx.moveTo(0, y);
       ctx.lineTo(canvas.width, y);
       ctx.stroke();
     }
 
-    // Effetti Ondulatori Touch (Ripples)
+    // Effetti visivi ad onda (ripples)
     for (let i = ripples.length - 1; i >= 0; i--) {
       const r = ripples[i];
       ctx.beginPath();
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.stroke();
 
       r.radius += 2.5;
-      r.alpha -= 0.03;
+      r.alpha -= 0.035;
       if (r.alpha <= 0) ripples.splice(i, 1);
     }
 
@@ -212,14 +212,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   drawStrumplate();
 
-  // Interazione Strumplate
+  // Gestione Pressione e Trascinamento Strumplate
   function handleStrum(e) {
     if (!isStrumming) return;
     const rect = canvas.getBoundingClientRect();
     const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
     const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
 
-    // Se non è selezionato alcun accordo, usa C Major come fallback
+    // Se non è stato premuto ancora alcun pulsante, imposta Do Maggiore come fallback
     if (!activeChord) {
       const defaultBtn = document.querySelector('.chord-row[data-quality="maj"] .chord-btn');
       const defaultRoot = CIRCLE_OF_FIFTHS[0];
@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (clampedIndex !== lastStrumIndex) {
       audioEngine.playVoice(activeNotes[clampedIndex]);
       lastStrumIndex = clampedIndex;
-      ripples.push({ x, y, radius: 5, alpha: 0.9 });
+      ripples.push({ x, y, radius: 4, alpha: 0.95 });
     }
   }
 
