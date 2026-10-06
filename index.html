@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>StrumPad v0.97 - Retro Synth Chord & ADSR Simulator</title>
+    <title>StrumPad v1.0.1 - Retro Synth Chord & ADSR Simulator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -33,7 +33,7 @@
             <div class="flex items-center gap-3">
                 <div id="power-led" class="w-4 h-4 rounded-full bg-red-600 shadow-[0_0_8px_#dc2626]"></div>
                 <h1 class="font-extrabold text-xl sm:text-2xl tracking-wider text-slate-800 uppercase font-mono">
-                    StrumPad <span class="text-xs text-amber-900 font-bold lowercase">v0.97</span> 
+                    StrumPad <span class="text-xs text-amber-900 font-bold lowercase">v1.0.1</span> 
                     <span class="text-xs font-sans font-semibold text-amber-900 border border-amber-800 px-2 py-0.5 rounded ml-2">VINTAGE CHORD MACHINE</span>
                 </h1>
             </div>
@@ -106,46 +106,46 @@
             </div>
 
             <!-- Synthesis Engine & Controls -->
-            <div class="lg:col-span-8 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col justify-between gap-3 min-h-[290px]">
+            <div class="lg:col-span-8 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col gap-3">
                 <div class="flex justify-between items-center border-b border-slate-300 pb-1">
                     <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Synthesis Engine & Master Output</h2>
                     <span class="text-xs text-amber-900 font-medium hidden sm:inline">Analog Synthesis Controls</span>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-3 h-[250px] items-stretch">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-stretch">
                     
                     <!-- ADSR Block -->
-                    <div class="md:col-span-4 bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col justify-between h-full">
+                    <div class="md:col-span-4 bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col justify-between gap-2">
                         <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">ADSR Envelope Generator</span>
-                        <div class="crt-container rounded-xl p-2 h-24 overflow-hidden relative w-full">
+                        <div class="crt-container rounded-xl p-2 h-20 overflow-hidden relative w-full">
                             <canvas id="adsr-canvas" class="w-full h-full block rounded-lg relative z-10"></canvas>
                         </div>
-                        <div class="grid grid-cols-4 gap-1 items-center h-24 pt-1">
+                        <div class="grid grid-cols-4 gap-1 items-center h-28 pt-1">
                             <div class="slider-vertical-container">
                                 <span class="text-[10px] font-bold uppercase text-slate-700">A</span>
                                 <div class="vertical-slider-wrapper">
-                                    <input type="range" id="slider-attack" min="0.01" max="2.0" step="0.01" value="0.1" class="v-range w-1 h-full bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
+                                    <input type="range" id="slider-attack" min="0.01" max="2.0" step="0.01" value="0.1" class="v-range w-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                                 </div>
                                 <span id="lbl-attack" class="text-[10px] font-mono font-bold text-amber-950">0.10s</span>
                             </div>
                             <div class="slider-vertical-container">
                                 <span class="text-[10px] font-bold uppercase text-slate-700">D</span>
                                 <div class="vertical-slider-wrapper">
-                                    <input type="range" id="slider-decay" min="0.05" max="3.0" step="0.05" value="0.5" class="v-range w-1 h-full bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
+                                    <input type="range" id="slider-decay" min="0.05" max="3.0" step="0.05" value="0.5" class="v-range w-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                                 </div>
                                 <span id="lbl-decay" class="text-[10px] font-mono font-bold text-amber-950">0.50s</span>
                             </div>
                             <div class="slider-vertical-container">
                                 <span class="text-[10px] font-bold uppercase text-slate-700">S</span>
                                 <div class="vertical-slider-wrapper">
-                                    <input type="range" id="slider-sustain" min="0.0" max="1.0" step="0.05" value="0.6" class="v-range w-1 h-full bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
+                                    <input type="range" id="slider-sustain" min="0.0" max="1.0" step="0.05" value="0.6" class="v-range w-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                                 </div>
                                 <span id="lbl-sustain" class="text-[10px] font-mono font-bold text-amber-950">60%</span>
                             </div>
                             <div class="slider-vertical-container">
                                 <span class="text-[10px] font-bold uppercase text-slate-700">R</span>
                                 <div class="vertical-slider-wrapper">
-                                    <input type="range" id="slider-release" min="0.05" max="5.0" step="0.05" value="1.2" class="v-range w-1 h-full bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
+                                    <input type="range" id="slider-release" min="0.05" max="5.0" step="0.05" value="1.2" class="v-range w-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                                 </div>
                                 <span id="lbl-release" class="text-[10px] font-mono font-bold text-amber-950">1.20s</span>
                             </div>
@@ -153,8 +153,8 @@
                     </div>
 
                     <!-- Waveform & Filter -->
-                    <div class="md:col-span-3 flex flex-col justify-between h-full gap-2">
-                        <div class="bg-amber-50/70 px-3 py-1.5 rounded-xl border-2 border-chassisDark flex flex-col gap-1">
+                    <div class="md:col-span-3 flex flex-col justify-between gap-2">
+                        <div class="bg-amber-50/70 px-3 py-2 rounded-xl border-2 border-chassisDark flex flex-col gap-1">
                             <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-0.5">Waveform</span>
                             <div class="flex flex-col gap-0.5">
                                 <label class="inline-flex items-center gap-1.5 cursor-pointer text-[11px] font-semibold text-slate-800"><input type="radio" name="waveform" value="sawtooth" checked class="accent-amber-800 cursor-pointer"><span>Sawtooth</span></label>
@@ -163,7 +163,7 @@
                                 <label class="inline-flex items-center gap-1.5 cursor-pointer text-[11px] font-semibold text-slate-800"><input type="radio" name="waveform" value="sine" class="accent-amber-800 cursor-pointer"><span>Sine</span></label>
                             </div>
                         </div>
-                        <div class="bg-amber-50/70 p-2 rounded-xl border-2 border-chassisDark flex flex-col gap-1">
+                        <div class="bg-amber-50/70 p-2 rounded-xl border-2 border-chassisDark flex flex-col gap-1 flex-1 justify-between">
                             <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-0.5">Filter</span>
                             <div class="flex items-center justify-between gap-1">
                                 <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800"><input type="radio" name="filter-type" value="lowpass" checked class="accent-amber-800 cursor-pointer"><span>Low-pass</span></label>
@@ -183,7 +183,7 @@
                     </div>
 
                     <!-- LFO & Presets -->
-                    <div class="md:col-span-3 flex flex-col justify-between h-full gap-2">
+                    <div class="md:col-span-3 flex flex-col justify-between gap-2">
                         <div class="bg-amber-50/70 p-2 rounded-xl border-2 border-chassisDark flex flex-col gap-1">
                             <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-0.5">LFO Modulation</span>
                             <div>
@@ -199,9 +199,9 @@
                                 <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800"><input type="checkbox" id="toggle-tremolo" class="accent-amber-800 cursor-pointer"><span>Tremolo</span></label>
                             </div>
                         </div>
-                        <div class="bg-amber-50/70 p-2 rounded-xl border-2 border-chassisDark flex flex-col gap-1">
+                        <div class="bg-amber-50/70 p-2 rounded-xl border-2 border-chassisDark flex flex-col gap-1 flex-1 justify-between">
                             <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-0.5">Synth Presets</span>
-                            <div id="presets-grid" class="grid grid-cols-2 gap-1">
+                            <div id="presets-grid" class="grid grid-cols-2 gap-1 py-0.5">
                                 <button data-preset="PIANO" class="preset-btn">PIANO</button>
                                 <button data-preset="GUITAR" class="preset-btn">GUITAR</button>
                                 <button data-preset="BASS" class="preset-btn">BASS</button>
@@ -215,13 +215,13 @@
                     </div>
 
                     <!-- Master Volume -->
-                    <div class="md:col-span-2 bg-amber-50/70 p-2.5 rounded-xl border-2 border-chassisDark flex flex-col items-center justify-between h-full">
+                    <div class="md:col-span-2 bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col items-center justify-between gap-2">
                         <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-0.5 text-center w-full">Master Vol</span>
                         <div class="text-slate-700" title="Max Volume">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
                         </div>
-                        <div class="vertical-slider-wrapper-master flex-1 my-1">
-                            <input type="range" id="slider-volume" min="0" max="100" value="80" class="v-range-master w-1 h-full bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
+                        <div class="vertical-slider-wrapper-master h-28 my-1">
+                            <input type="range" id="slider-volume" min="0" max="100" value="80" class="v-range-master w-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                         </div>
                         <div class="text-slate-500" title="Min Volume">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
