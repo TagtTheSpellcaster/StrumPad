@@ -48,6 +48,7 @@
             border-radius: 4px;
         }
 
+        /* Gold metallic plate container styling */
         .gold-plate-container {
             background: linear-gradient(
                 135deg, 
@@ -130,7 +131,7 @@
         .row-m7:hover { background-color: #ebdcf5; }
 
         /* Rectangular Green LED centered at bottom of button */
-        .led-rect {
+        .btn-led {
             width: 12px;
             height: 4px;
             background-color: #233326;
@@ -142,16 +143,11 @@
         }
 
         /* Active glowing state for LED */
-        .matrix-btn.active .led-rect,
-        .matrix-btn:active .led-rect {
+        .matrix-btn.active .btn-led,
+        .matrix-btn:active .btn-led {
             background-color: #00ff66 !important;
             box-shadow: 0 0 6px #00ff66, 0 0 12px #00ff66, 0 0 16px #00ff66 !important;
             border-color: #88ffb3 !important;
-        }
-
-        /* General Hardware Controls Styling */
-        .retro-knob {
-            accent-color: #8b5cf6;
         }
     </style>
 </head>
@@ -215,7 +211,7 @@
                 <!-- Active Chord Monitor Box -->
                 <div class="bg-amber-100/90 border border-amber-300 rounded-xl p-3 flex justify-between items-center shadow-inner mt-1">
                     <span class="text-xs font-bold text-amber-900 uppercase">Accordo Selezionato:</span>
-                    <span id="lbl-active-chord" class="font-mono font-bold text-2xl text-amber-950">C</span>
+                    <span id="lbl-active-chord" class="font-mono font-bold text-2xl text-amber-950">Nessuno</span>
                 </div>
             </div>
 
@@ -351,11 +347,8 @@
             }
         }
 
-        // Circle of Fifths order starting from Eb
+        // Circle of Fifths order starting strictly from C (Do)
         const CIRCLE_OF_FIFTHS = [
-            { name: 'Eb', midi: 63 },
-            { name: 'Bb', midi: 70 },
-            { name: 'F',  midi: 65 },
             { name: 'C',  midi: 60 },
             { name: 'G',  midi: 67 },
             { name: 'D',  midi: 62 },
@@ -364,7 +357,10 @@
             { name: 'B',  midi: 71 },
             { name: 'F#', midi: 66 },
             { name: 'Db', midi: 61 },
-            { name: 'Ab', midi: 68 }
+            { name: 'Ab', midi: 68 },
+            { name: 'Eb', midi: 63 },
+            { name: 'Bb', midi: 70 },
+            { name: 'F',  midi: 65 }
         ];
 
         // 5 Matrix Row Configurations
@@ -413,8 +409,9 @@
 
         // Global State Variables
         const audio = new WebAudioEngine();
-        let selectedChordName = 'C';
-        let currentStrumNotes = [];
+        let selectedChordName = null;
+        // Default fallback notes for strumplate touch before any button selection (C Major)
+        let currentStrumNotes = calculateNotes(CIRCLE_OF_FIFTHS[0].midi, MATRIX_ROWS[0].intervals);
 
         // Calculate note ranges across multiple octaves for Strumplate
         function calculateNotes(rootMidi, intervals) {
@@ -470,13 +467,13 @@
                     const chordFullName = `${root.name}${row.suffix}`;
                     const btn = document.createElement('button');
                     
-                    // Compact square button
+                    // Compact square button without labels
                     btn.className = `matrix-btn ${row.btnClass}`;
                     btn.dataset.chord = chordFullName;
 
                     // Bottom-centered green LED rectangle
                     const led = document.createElement('span');
-                    led.className = 'led-rect';
+                    led.className = 'btn-led';
                     btn.appendChild(led);
 
                     // Immediate press handler (pointerdown/mousedown)
@@ -495,8 +492,8 @@
                 container.appendChild(rowWrapper);
             });
 
-            // Set default chord to C Major (Root index 3 in Circle starting at Eb)
-            selectChord(CIRCLE_OF_FIFTHS[3], MATRIX_ROWS[0]);
+            // Initial state: NO button selected, monitor displays "Nessuno"
+            document.getElementById('lbl-active-chord').textContent = 'Nessuno';
         }
 
         /**
