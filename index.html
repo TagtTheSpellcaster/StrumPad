@@ -24,6 +24,13 @@
         }
     </script>
     <link rel="stylesheet" href="styles.css">
+    <!-- PWA Settings -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#e5dec9">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="StrumPad">
+    <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 sm:p-5 text-slate-800">
     <div class="w-full max-w-7xl bg-chassis rounded-3xl p-4 sm:p-7 shadow-2xl border-4 border-chassisDark flex flex-col gap-6 relative">
@@ -320,5 +327,16 @@
         </footer>
     </div>
     <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((reg) => console.log('PWA Service Worker registrato con successo:', reg.scope))
+                    .catch((err) => console.error('Errore registrazione Service Worker:', err));
+            });
+        }
+    </script>
+    <script src="app.js"></script>
+</body>
 </body>
 </html>
