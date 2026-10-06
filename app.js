@@ -118,43 +118,48 @@ const CIRCLE_OF_FIFTHS = [
 const MATRIX_ROWS = [
     { 
         id: 'maj', 
-        label: '1ª Fila: Maggiori (Major)', 
+        label: 'Maggiore', 
         quality: 'maj',
         intervals: [0, 4, 7],
         suffix: '',
+        rowClass: 'row-color-maj',
         badgeColor: 'bg-amber-600 text-white'
     },
     { 
         id: 'min', 
-        label: '2ª Fila: Minori (Minor)', 
+        label: 'Minore', 
         quality: 'min',
         intervals: [0, 3, 7],
         suffix: 'm',
-        badgeColor: 'bg-slate-700 text-white'
+        rowClass: 'row-color-min',
+        badgeColor: 'bg-sky-700 text-white'
     },
     { 
         id: '7', 
-        label: '3ª Fila: Settima Dominante (7th)', 
+        label: 'Settima Dominante', 
         quality: '7',
         intervals: [0, 4, 7, 10],
         suffix: '7',
-        badgeColor: 'bg-red-700 text-white'
+        rowClass: 'row-color-7',
+        badgeColor: 'bg-rose-700 text-white'
     },
     { 
         id: 'maj7', 
-        label: '4ª Fila: Settima Maggiore (Maj7)', 
+        label: 'Settima Maggiore', 
         quality: 'maj7',
         intervals: [0, 4, 7, 11],
         suffix: 'maj7',
+        rowClass: 'row-color-maj7',
         badgeColor: 'bg-emerald-700 text-white'
     },
     { 
         id: 'm7', 
-        label: '5ª Fila: Settima Minore (m7)', 
+        label: 'Settima Minore', 
         quality: 'm7',
         intervals: [0, 3, 7, 10],
         suffix: 'm7',
-        badgeColor: 'bg-indigo-700 text-white'
+        rowClass: 'row-color-m7',
+        badgeColor: 'bg-violet-700 text-white'
     }
 ];
 
@@ -221,28 +226,38 @@ function buildMatrixUI() {
 
     MATRIX_ROWS.forEach(row => {
         const rowWrapper = document.createElement('div');
-        rowWrapper.className = 'flex flex-col gap-1';
+        rowWrapper.className = 'flex items-center gap-3';
 
+        // Row label container
         const rowHeader = document.createElement('div');
-        rowHeader.className = 'text-[11px] font-bold text-slate-600 flex items-center gap-2';
-        rowHeader.innerHTML = `<span class="px-2 py-0.5 rounded text-[10px] ${row.badgeColor}">${row.label}</span>`;
+        rowHeader.className = 'w-36 text-xs font-bold text-slate-700 flex items-center justify-end pr-2 shrink-0';
+        rowHeader.innerHTML = `<span class="px-2 py-1 rounded text-[11px] w-full text-right ${row.badgeColor}">${row.label}</span>`;
         rowWrapper.appendChild(rowHeader);
 
+        // Row button grid
         const btnRow = document.createElement('div');
-        btnRow.className = 'grid grid-cols-12 gap-1.5 sm:gap-2';
+        btnRow.className = 'flex items-center gap-1.5 sm:gap-2';
 
         CIRCLE_OF_FIFTHS.forEach(root => {
             const chordName = `${root.name}${row.suffix}`;
             const btn = document.createElement('button');
-            btn.className = `matrix-chord-btn chord-btn bg-panelBeige hover:bg-amber-100 text-slate-800 font-bold py-2 sm:py-2.5 px-1 rounded-lg border-2 border-chassisDark text-xs sm:text-sm flex flex-col items-center justify-center font-mono`;
+            
+            // Compact square button style with row-specific color scheme
+            btn.className = `matrix-chord-btn chord-btn ${row.rowClass} rounded-md border-2 flex flex-col items-center justify-end pb-1 cursor-pointer select-none`;
             btn.dataset.chord = chordName;
-            btn.innerHTML = `<span>${chordName}</span>`;
 
-            btn.addEventListener('click', () => {
+            // Green LED indicator rectangle positioned bottom center
+            btn.innerHTML = `<div class="btn-led pointer-events-none"></div>`;
+
+            // Trigger sound immediately on pointerdown/mousedown/touchstart
+            const handlePress = (e) => {
+                e.preventDefault();
                 audioEngine.init();
                 setSelection(root, row);
                 audioEngine.playChordStrum(currentStrumNotes);
-            });
+            };
+
+            btn.addEventListener('pointerdown', handlePress);
 
             btnRow.appendChild(btn);
         });
