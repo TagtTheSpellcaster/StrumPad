@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Retro Omnichord Synth Simulator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        chassis: '#e6ded0',
+                        chassisDark: '#cfc4b0',
+                        accentDark: '#38322c',
+                        panelBeige: '#f0e6d2',
+                        vintageRed: '#d9534f',
+                        vintageBlue: '#4a90e2',
+                        vintageGreen: '#5cb85c',
+                        vintageAmber: '#f0ad4e',
+                        goldPlate: '#d4af37',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Courier New', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            background-color: #1a1816;
+        }
+
+        /* Metallic/Gold gradient for Strumplate */
+        .strumplate-gradient {
+            background: linear-gradient(135deg, 
+                #bf953f 0%, 
+                #fcf6ba 25%, 
+                #b38728 50%, 
+                #fbf5b7 75%, 
+                #aa771c 100%);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* 3D Hardware Button Styles */
+        .chord-btn {
+            transition: all 0.05s ease;
+            box-shadow: 0 4px 0 #8c8273, 0 5px 8px rgba(0,0,0,0.3);
+        }
+        .chord-btn:active, .chord-btn.active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #8c8273, 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        /* Knobs & LED effects */
+        .led-indicator {
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        /* Custom scrollbar for small horizontal screens */
+        ::-webkit-scrollbar {
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #2a2621;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8c8273;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 text-slate-800 antialiased selection:bg-none">
+
+    <div id="synth-chassis" class="w-full max-w-5xl bg-chassis rounded-3xl p-4 sm:p-8 shadow-2xl border-4 border-chassisDark relative overflow-hidden flex flex-col gap-6">
+        
+        <!-- Header / Brand Section -->
+        <header class="flex flex-wrap justify-between items-center border-b-2 border-chassisDark pb-4 gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-4 h-4 rounded-full bg-red-600 led-indicator text-red-500" id="power-led"></div>
+                <h1 class="font-bold text-xl sm:text-2xl tracking-wider text-accentDark uppercase font-display">
+                    OMNI-STRUM <span class="text-xs font-normal text-amber-800 tracking-normal border border-amber-800 px-2 py-0.5 rounded">VINTAGE SYNTH</span>
+                </h1>
+            </div>
+            
+            <div class="flex items-center gap-4 text-xs font-semibold text-accentDark">
+                <button id="btn-start-audio" class="bg-vintageAmber text-slate-900 px-4 py-2 rounded-lg shadow-md font-bold hover:brightness-110 active:scale-95 transition">
+                    🔊 Abilita Audio
+                </button>
+                <div class="hidden sm:block text-right">
+                    <span class="block opacity-75">Tastiera numerica / Lettere</span>
+                    <span class="text-amber-900 font-mono">[1-9] Note / [Q,W,E,R,T] Accordi</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left Side Controls (Knobs & Switches) -->
+            <div class="lg:col-span-4 bg-panelBeige p-4 sm:p-5 rounded-2xl border-2 border-chassisDark flex flex-col justify-between gap-4">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600 border-b border-slate-300 pb-1">Master Controls</h2>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-4">
+                    <!-- Volume Control -->
+                    <div class="flex flex-col gap-1">
+                        <div class="flex justify-between text-xs font-semibold">
+                            <label for="knob-volume">Volume</label>
+                            <span id="val-volume" class="font-mono text-slate-600">80%</span>
+                        </div>
+                        <input type="range" id="knob-volume" min="0" max="100" value="80" class="accent-amber-700 h-2 bg-chassisDark rounded-lg cursor-pointer">
+                    </div>
+
+                    <!-- Sustain Control -->
+                    <div class="flex flex-col gap-1">
+                        <div class="flex justify-between text-xs font-semibold">
+                            <label for="knob-sustain">Sustain / Decay</label>
+                            <span id="val-sustain" class="font-mono text-slate-600">1.2s</span>
+                        </div>
+                        <input type="range" id="knob-sustain" min="2" max="30" value="12" class="accent-amber-700 h-2 bg-chassisDark rounded-lg cursor-pointer">
+                    </div>
+
+                    <!-- Filter Tone Cutoff -->
+                    <div class="flex flex-col gap-1">
+                        <div class="flex justify-between text-xs font-semibold">
+                            <label for="knob-cutoff">Tone / Cutoff</label>
+                            <span id="val-cutoff" class="font-mono text-slate-600">2200 Hz</span>
+                        </div>
+                        <input type="range" id="knob-cutoff" min="300" max="8000" value="2200" class="accent-amber-700 h-2 bg-chassisDark rounded-lg cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- Toggle Options -->
+                <div class="flex items-center justify-between border-t border-slate-300 pt-3 mt-2">
+                    <span class="text-xs font-bold text-slate-700">Hold / Auto-Chord</span>
+                    <button id="btn-hold" class="px-3 py-1.5 bg-slate-300 border-2 border-slate-400 text-slate-700 rounded-lg text-xs font-bold shadow active:translate-y-0.5">
+                        DISATTIVATO
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Side Strumplate -->
+            <div class="lg:col-span-8 bg-panelBeige p-4 sm:p-5 rounded-2xl border-2 border-chassisDark flex flex-col gap-3">
+                <div class="flex justify-between items-center border-b border-slate-300 pb-1">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Sonic String Strumplate</h2>
+                    <span id="current-chord-display" class="font-display font-bold text-lg text-amber-900 bg-amber-100/60 px-3 py-0.5 rounded border border-amber-300">
+                        Nessun Accordo Selected
+                    </span>
+                </div>
+                
+                <!-- Touch Strumplate Area -->
+                <div class="relative w-full h-44 sm:h-52 rounded-xl border-4 border-amber-900/40 overflow-hidden strumplate-gradient cursor-crosshair shadow-inner">
+                    <canvas id="strumplate-canvas" class="w-full h-full block"></canvas>
+                    
+                    <!-- Overlay visual guide lines -->
+                    <div class="absolute inset-0 pointer-events-none flex justify-between px-2 opacity-20">
+                        <div class="w-0.5 h-full bg-slate-900"></div>
+                        <div class="w-0.5 h-full bg-slate-900"></div>
+                        <div class="w-0.5 h-full bg-slate-900"></div>
+                        <div class="w-0.5 h-full bg-slate-900"></div>
+                        <div class="w-0.5 h-full bg-slate-900"></div>
+                        <div class="w-0.5 h-full bg-slate-900"></div>
+                        <div class="w-0.5 h-full bg-slate-900"></div>
+                        <div class="w-0.5 h-full bg-slate-900"></div>
+                    </div>
+                </div>
+                <p class="text-center text-xs text-slate-500 font-medium italic">
+                    👉 Scorri col mouse o con il dito per suonare l'arpeggio metallico
+                </p>
+            </div>
+        </div>
+
+        <!-- Chord Selection Matrix -->
+        <div class="bg-panelBeige p-4 sm:p-6 rounded-2xl border-2 border-chassisDark flex flex-col gap-4">
+            <div class="flex flex-wrap justify-between items-center gap-2">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Matrice Selezione Accordi</h2>
+                
+                <!-- Chord Type Selectors -->
+                <div id="chord-quality-selector" class="flex gap-1 sm:gap-2 overflow-x-auto pb-1">
+                    <button data-quality="maj" class="quality-btn px-3 py-1 text-xs font-bold rounded-lg bg-vintageAmber text-slate-900 shadow">Major</button>
+                    <button data-quality="min" class="quality-btn px-3 py-1 text-xs font-bold rounded-lg bg-slate-200 text-slate-700 shadow hover:bg-slate-300">Minor</button>
+                    <button data-quality="7" class="quality-btn px-3 py-1 text-xs font-bold rounded-lg bg-slate-200 text-slate-700 shadow hover:bg-slate-300">7th</button>
+                    <button data-quality="maj7" class="quality-btn px-3 py-1 text-xs font-bold rounded-lg bg-slate-200 text-slate-700 shadow hover:bg-slate-300">Maj7</button>
+                    <button data-quality="m7" class="quality-btn px-3 py-1 text-xs font-bold rounded-lg bg-slate-200 text-slate-700 shadow hover:bg-slate-300">m7</button>
+                </div>
+            </div>
+
+            <!-- Fundamental Key Grid Buttons -->
+            <div class="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-12 gap-2 sm:gap-3" id="root-buttons-container">
+                <!-- Dynamically or statically generated chord root buttons -->
+            </div>
+        </div>
+
+        <!-- Footer / Keyboard Legend -->
+        <footer class="text-center text-xs text-slate-500 border-t border-chassisDark pt-2 flex justify-between items-center">
+            <span>Sintesi Audio Web Pure (No Samples)</span>
+            <span>Simulatore Vintage Style Hardware</span>
+        </footer>
+    </div>
+
+    <script>
+        /* ===================================================================
+           1. AUDIO ENGINE (Web Audio API)
+           =================================================================== */
+        class OmnichordAudioEngine {
+            constructor() {
+                this.ctx = null;
+                this.masterGain = null;
+                this.volume = 0.8;
+                this.sustainTime = 1.2;
+                this.cutoffFreq = 2200;
+                this.isInitialized = false;
+            }
+
+            init() {
+                if (this.isInitialized) return;
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                this.ctx = new AudioCtx();
+
+                // Master gain setup
+                this.masterGain = this.ctx.createGain();
+                this.masterGain.gain.setValueAtTime(this.volume, this.ctx.currentTime);
+                this.masterGain.connect(this.ctx.destination);
+
+                this.isInitialized = true;
+                console.log("Audio Engine Initialized successfully.");
+            }
+
+            setVolume(val) {
+                this.volume = val;
+                if (this.masterGain && this.ctx) {
+                    this.masterGain.gain.linearRampToValueAtTime(this.volume, this.ctx.currentTime + 0.05);
+                }
+            }
+
+            setSustain(val) {
+                this.sustainTime = val;
+            }
+
+            setCutoff(val) {
+                this.cutoffFreq = val;
+            }
+
+            // Play synthesized retro pluck voice
+            playNote(midiNote) {
+                if (!this.isInitialized || !this.ctx) return;
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+
+                const now = this.ctx.currentTime;
+                const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
+
+                // Twin Oscillators for classic warm retro synthesizer sound
+                const osc1 = this.ctx.createOscillator();
+                const osc2 = this.ctx.createOscillator();
+                
+                osc1.type = 'sawtooth';
+                osc2.type = 'triangle';
+
+                osc1.frequency.setValueAtTime(freq, now);
+                // Slight detune for richness
+                osc2.frequency.setValueAtTime(freq * 1.002, now);
+
+                // Lowpass Biquad Filter
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(this.cutoffFreq, now);
+                // Quick filter pluck decay
+                filter.frequency.exponentialRampToValueAtTime(120, now + this.sustainTime);
+
+                // Gain Envelope (Plucked Harpsichord/String Decay)
+                const noteGain = this.ctx.createGain();
+                noteGain.gain.setValueAtTime(0.35, now);
+                noteGain.gain.exponentialRampToValueAtTime(0.0001, now + this.sustainTime);
+
+                // Connections
+                osc1.connect(filter);
+                osc2.connect(filter);
+                filter.connect(noteGain);
+                noteGain.connect(this.masterGain);
+
+                // Play
+                osc1.start(now);
+                osc2.start(now);
+                osc1.stop(now + this.sustainTime);
+                osc2.stop(now + this.sustainTime);
+            }
+        }
+
+        // Chord Roots Data
+        const ROOT_NOTES = [
+            { name: 'C',  midi: 60, key: '1' },
+            { name: 'G',  midi: 67, key: '2' },
+            { name: 'D',  midi: 62, key: '3' },
+            { name: 'A',  midi: 69, key: '4' },
+            { name: 'E',  midi: 64, key: '5' },
+            { name: 'B',  midi: 71, key: '6' },
+            { name: 'F#', midi: 66, key: '7' },
+            { name: 'Db', midi: 61, key: '8' },
+            { name: 'Ab', midi: 68, key: '9' },
+            { name: 'Eb', midi: 63, key: '0' },
+            { name: 'Bb', midi: 70, key: '-' },
+            { name: 'F',  midi: 65, key: '=' }
+        ];
+
+        // Chord Quality Intervals (relative semitones)
+        const CHORD_QUALITIES = {
+            'maj':  [0, 4, 7],
+            'min':  [0, 3, 7],
+            '7':    [0, 4, 7, 10],
+            'maj7': [0, 4, 7, 11],
+            'm7':   [0, 3, 7, 10]
+        };
+
+        // App State
+        const audioEngine = new OmnichordAudioEngine();
+        let currentRoot = ROOT_NOTES[0]; // Default C
+        let currentQuality = 'maj';
+        let currentStrumNotes = [];
+        let isHoldActive = false;
+        let activeKeyRoot = null;
+
+        /* Helper to build active chord notes spread over multiple octaves */
+        function calculateStrumNotes(rootMidi, qualityKey) {
+            const intervals = CHORD_QUALITIES[qualityKey] || CHORD_QUALITIES['maj'];
+            const notes = [];
+            // Expand across 3.5 octaves for wide touch plate coverage
+            for (let octave = -1; octave <= 2; octave++) {
+                for (let interval of intervals) {
+                    notes.push(rootMidi + interval + (octave * 12));
+                }
+            }
+            return notes.sort((a, b) => a - b);
+        }
+
+        function updateCurrentChord() {
+            currentStrumNotes = calculateStrumNotes(currentRoot.midi, currentQuality);
+            const displayEl = document.getElementById('current-chord-display');
+            const qualitySymbol = currentQuality === 'maj' ? '' : currentQuality;
+            displayEl.textContent = `${currentRoot.name}${qualitySymbol}`;
+        }
+
+        /* Build Root Note Buttons */
+        function renderRootButtons() {
+            const container = document.getElementById('root-buttons-container');
+            container.innerHTML = '';
+
+            ROOT_NOTES.forEach((root) => {
+                const btn = document.createElement('button');
+                btn.className = `chord-btn bg-panelBeige hover:bg-amber-100 text-slate-800 font-bold py-3 sm:py-4 px-2 rounded-xl border-2 border-chassisDark flex flex-col items-center justify-center gap-1 active:scale-95 text-sm sm:text-base`;
+                btn.dataset.midi = root.midi;
+                
+                btn.innerHTML = `
+                    <span>${root.name}</span>
+                    <span class="text-[10px] text-slate-400 font-mono">[${root.key}]</span>
+                `;
+
+                btn.addEventListener('click', () => {
+                    selectRootNote(root);
+                });
+
+                container.appendChild(btn);
+            });
+            
+            highlightActiveRootButton();
+        }
+
+        function selectRootNote(root) {
+            currentRoot = root;
+            updateCurrentChord();
+            highlightActiveRootButton();
+        }
+
+        function highlightActiveRootButton() {
+            const buttons = document.querySelectorAll('#root-buttons-container .chord-btn');
+            buttons.forEach(btn => {
+                if (parseInt(btn.dataset.midi) === currentRoot.midi) {
+                    btn.classList.add('bg-amber-200', 'border-amber-600', 'text-amber-900', 'active');
+                } else {
+                    btn.classList.remove('bg-amber-200', 'border-amber-600', 'text-amber-900', 'active');
+                }
+            });
+        }
+
+        /* Canvas & Strumplate Controller */
+        class StrumplateController {
+            constructor(canvas, audioEngine) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.audioEngine = audioEngine;
+                this.lastNoteIndex = -1;
+                this.isInteracting = false;
+                this.ripples = [];
+
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+                this.setupEvents();
+                this.animate();
+            }
+
+            resizeCanvas() {
+                const rect = this.canvas.parentElement.getBoundingClientRect();
+                this.canvas.width = rect.width;
+                this.canvas.height = rect.height;
+            }
+
+            setupEvents() {
+                const getCoords = (e) => {
+                    const rect = this.canvas.getBoundingClientRect();
+                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                    return {
+                        x: clientX - rect.left,
+                        y: clientY - rect.top
+                    };
+                };
+
+                const startInteract = (e) => {
+                    e.preventDefault();
+                    this.isInteracting = true;
+                    this.processInteraction(getCoords(e));
+                };
+
+                const moveInteract = (e) => {
+                    if (!this.isInteracting) return;
+                    e.preventDefault();
+                    this.processInteraction(getCoords(e));
+                };
+
+                const stopInteract = () => {
+                    this.isInteracting = false;
+                    this.lastNoteIndex = -1;
+                };
+
+                this.canvas.addEventListener('mousedown', startInteract);
+                this.canvas.addEventListener('mousemove', moveInteract);
+                window.addEventListener('mouseup', stopInteract);
+
+                this.canvas.addEventListener('touchstart', startInteract, { passive: false });
+                this.canvas.addEventListener('touchmove', moveInteract, { passive: false });
+                window.addEventListener('touchend', stopInteract);
+            }
+
+            processInteraction(coords) {
+                if (!currentStrumNotes.length) return;
+
+                const width = this.canvas.width;
+                const normalizedX = Math.max(0, Math.min(1, coords.x / width));
+                const noteIndex = Math.floor(normalizedX * currentStrumNotes.length);
+
+                if (noteIndex !== this.lastNoteIndex && noteIndex < currentStrumNotes.length) {
+                    this.lastNoteIndex = noteIndex;
+                    const noteToPlay = currentStrumNotes[noteIndex];
+                    this.audioEngine.playNote(noteToPlay);
+                    
+                    // Trigger visual sparkle effect
+                    this.addRipple(coords.x, coords.y);
+                }
+            }
+
+            addRipple(x, y) {
+                this.ripples.push({
+                    x: x,
+                    y: y,
+                    radius: 5,
+                    alpha: 1.0
+                });
+            }
+
+            animate() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Render active touch ripples/sparks
+                for (let i = this.ripples.length - 1; i >= 0; i--) {
+                    const r = this.ripples[i];
+                    this.ctx.beginPath();
+                    this.ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+                    this.ctx.fillStyle = `rgba(255, 255, 255, ${r.alpha})`;
+                    this.ctx.fill();
+
+                    r.radius += 2.5;
+                    r.alpha -= 0.04;
+
+                    if (r.alpha <= 0) {
+                        this.ripples.splice(i, 1);
+                    }
+                }
+
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // Attach UI Listeners
+        window.addEventListener('DOMContentLoaded', () => {
+            renderRootButtons();
+            updateCurrentChord();
+
+            const strumplate = new StrumplateController(
+                document.getElementById('strumplate-canvas'), 
+                audioEngine
+            );
+
+            // Enable Audio Button
+            const btnAudio = document.getElementById('btn-start-audio');
+            const powerLed = document.getElementById('power-led');
+            
+            btnAudio.addEventListener('click', () => {
+                audioEngine.init();
+                btnAudio.classList.add('hidden');
+                powerLed.classList.remove('bg-red-600', 'text-red-500');
+                powerLed.classList.add('bg-green-500', 'text-green-400');
+            });
+
+            // Sliders Controls
+            const volumeSlider = document.getElementById('knob-volume');
+            const sustainSlider = document.getElementById('knob-sustain');
+            const cutoffSlider = document.getElementById('knob-cutoff');
+
+            volumeSlider.addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value) / 100;
+                audioEngine.setVolume(val);
+                document.getElementById('val-volume').textContent = `${e.target.value}%`;
+            });
+
+            sustainSlider.addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value) / 10;
+                audioEngine.setSustain(val);
+                document.getElementById('val-sustain').textContent = `${val.toFixed(1)}s`;
+            });
+
+            cutoffSlider.addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                audioEngine.setCutoff(val);
+                document.getElementById('val-cutoff').textContent = `${val} Hz`;
+            });
+
+            // Chord Quality Selectors
+            const qualityButtons = document.querySelectorAll('.quality-btn');
+            qualityButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    qualityButtons.forEach(b => {
+                        b.classList.remove('bg-vintageAmber', 'text-slate-900');
+                        b.classList.add('bg-slate-200', 'text-slate-700');
+                    });
+                    btn.classList.remove('bg-slate-200', 'text-slate-700');
+                    btn.classList.add('bg-vintageAmber', 'text-slate-900');
+
+                    currentQuality = btn.dataset.quality;
+                    updateCurrentChord();
+                });
+            });
+
+            // Hold Toggle Button
+            const btnHold = document.getElementById('btn-hold');
+            btnHold.addEventListener('click', () => {
+                isHoldActive = !isHoldActive;
+                if (isHoldActive) {
+                    btnHold.textContent = 'ATTIVATO';
+                    btnHold.classList.replace('bg-slate-300', 'bg-vintageAmber');
+                    btnHold.classList.replace('text-slate-700', 'text-slate-900');
+                } else {
+                    btnHold.textContent = 'DISATTIVATO';
+                    btnHold.classList.replace('bg-vintageAmber', 'bg-slate-300');
+                    btnHold.classList.replace('text-slate-900', 'text-slate-700');
+                }
+            });
+
+            // Keyboard Shortcuts Handling
+            window.addEventListener('keydown', (e) => {
+                if (e.repeat) return;
+                
+                // Key to Root note lookup
+                const keyMatch = ROOT_NOTES.find(r => r.key.toLowerCase() === e.key.toLowerCase());
+                if (keyMatch) {
+                    selectRootNote(keyMatch);
+                    return;
+                }
+
+                // Keyboard Quality shortcuts: Q, W, E, R, T
+                const qualityKeys = {
+                    'q': 'maj',
+                    'w': 'min',
+                    'e': '7',
+                    'r': 'maj7',
+                    't': 'm7'
+                };
+
+                const mappedQuality = qualityKeys[e.key.toLowerCase()];
+                if (mappedQuality) {
+                    const targetBtn = document.querySelector(`.quality-btn[data-quality="${mappedQuality}"]`);
+                    if (targetBtn) targetBtn.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
