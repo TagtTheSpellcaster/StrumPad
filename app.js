@@ -103,48 +103,16 @@ const CIRCLE_OF_FIFTHS = [
     { name: 'F',  midi: 65 }
 ];
 
+// Scala CROMATICA ordinata per semitoni dal C per calcolo intervalli
+const CHROMATIC_SCALE = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+
 // 5 Righe della Matrice
 const MATRIX_ROWS = [
-    { 
-        id: 'maj', 
-        label: 'Maggiore', 
-        intervals: [0, 4, 7], 
-        suffix: '', 
-        btnClass: 'row-maj',
-        badgeStyle: 'bg-amber-200 text-amber-950 border-amber-300' 
-    },
-    { 
-        id: 'min', 
-        label: 'Minore', 
-        intervals: [0, 3, 7], 
-        suffix: 'm', 
-        btnClass: 'row-min',
-        badgeStyle: 'bg-sky-200 text-sky-950 border-sky-300' 
-    },
-    { 
-        id: '7', 
-        label: 'Settima Dominante', 
-        intervals: [0, 4, 7, 10], 
-        suffix: '7', 
-        btnClass: 'row-7',
-        badgeStyle: 'bg-rose-200 text-rose-950 border-rose-300' 
-    },
-    { 
-        id: 'maj7', 
-        label: 'Settima Maggiore', 
-        intervals: [0, 4, 7, 11], 
-        suffix: 'maj7', 
-        btnClass: 'row-maj7',
-        badgeStyle: 'bg-emerald-200 text-emerald-950 border-emerald-300' 
-    },
-    { 
-        id: 'm7', 
-        label: 'Settima Minore', 
-        intervals: [0, 3, 7, 10], 
-        suffix: 'm7', 
-        btnClass: 'row-m7',
-        badgeStyle: 'bg-purple-200 text-purple-950 border-purple-300' 
-    }
+    { id: 'maj',  label: 'Maggiore',          intervals: [0, 4, 7],     suffix: '',     btnClass: 'row-maj',  badgeStyle: 'bg-amber-200 text-amber-950 border-amber-300' },
+    { id: 'min',  label: 'Minore',            intervals: [0, 3, 7],     suffix: 'm',    btnClass: 'row-min',  badgeStyle: 'bg-sky-200 text-sky-950 border-sky-300' },
+    { id: '7',    label: 'Settima Dominante', intervals: [0, 4, 7, 10], suffix: '7',    btnClass: 'row-7',    badgeStyle: 'bg-rose-200 text-rose-950 border-rose-300' },
+    { id: 'maj7', label: 'Settima Maggiore',  intervals: [0, 4, 7, 11], suffix: 'maj7', btnClass: 'row-maj7', badgeStyle: 'bg-emerald-200 text-emerald-950 border-emerald-300' },
+    { id: 'm7',   label: 'Settima Minore',    intervals: [0, 3, 7, 10], suffix: 'm7',   btnClass: 'row-m7',   badgeStyle: 'bg-purple-200 text-purple-950 border-purple-300' }
 ];
 
 // Tabella Dati Generi, Stili e Progressioni Armoniche
@@ -202,6 +170,11 @@ const audio = new WebAudioEngine();
 let selectedChordName = null;
 let currentStrumNotes = calculateNotes(CIRCLE_OF_FIFTHS[0].midi, MATRIX_ROWS[0].intervals);
 
+// Stato dell'assistente progressioni
+let activeProgressionSteps = []; // Array di passi [{ main: 'C', sub: ['Am', 'F'] }, ...]
+let currentProgressionStepIndex = -1; // -1 = in attesa del primo accordo
+let currentKeyRoot = null; // Nota fondamentale della tonalità impostata dall'utente
+
 function calculateNotes(rootMidi, intervals) {
     const notes = [];
     for (let octave = -1; octave <= 2; octave++) {
@@ -226,6 +199,220 @@ function selectChord(rootObj, rowObj) {
             btn.classList.remove('active');
         }
     });
+
+    // Gestione della progressione armonica guidata
+    handleProgressionStep(selectedChordName, rootObj, rowObj);
+}
+
+/**
+ * LOGICA TRADUZIONE GRADI ROMANI IN ACCORDI REALI
+ */
+const ROMAN_SEMITONES = {
+    'i': 0, 'I': 0,
+    'bII': 1, 'bii': 1,
+    'ii': 2, 'II': 2,
+    'bIII': 3, 'biii': 3,
+    'iii': 4, 'III': 4,
+    'iv': 5, 'IV': 5,
+    'bV': 6, 'bv': 6, 'viio': 6, 'VIIo': 6,
+    'v': 7, 'V': 7, 'Vm': 7,
+    'bVI': 8, 'bvi': 8,
+    'vi': 9, 'VI': 9,
+    'bVII': 10, 'bvii': 10,
+    'vii': 11, 'VII': 11
+};
+
+function parseDegreeToChord(degreeStr, keyRootName) {
+    let clean = degreeStr.trim();
+    if (!clean) return null;
+
+    // Normalizzazioni per accordi speciali (es. alt, ø, m)
+    clean = clean.replace('alt', '').replace('ø', 'm').replace('imin', 'im');
+
+    // Estrai la radice romana (es: "Imaj7" -> degree "I", suffix "maj7")
+    const match = clean.match(/^(b[I|V|i|v]+|[I|V|i|v]+|viio|VIIo)/);
+    if (!match) return null;
+
+    const degreeToken = match[0];
+    const rest = clean.slice(degreeToken.length);
+
+    if (ROMAN_SEMITONES[degreeToken] === undefined) return null;
+
+    const keyIndex = CHROMATIC_SCALE.indexOf(keyRootName);
+    if (keyIndex === -1) return null;
+
+    const targetSemitone = (keyIndex + ROMAN_SEMITONES[degreeToken]) % 12;
+    const targetRoot = CHROMATIC_SCALE[targetSemitone];
+
+    // Determina la qualità (Maiuscolo = Maggiore, Minuscolo = Minore)
+    const isMinor = degreeToken === degreeToken.toLowerCase() && degreeToken !== 'I';
+
+    let chordQualitySuffix = '';
+    if (rest) {
+        chordQualitySuffix = rest;
+        if (isMinor && !chordQualitySuffix.startsWith('m')) {
+            chordQualitySuffix = 'm' + chordQualitySuffix;
+        }
+    } else {
+        chordQualitySuffix = isMinor ? 'm' : '';
+    }
+
+    return targetRoot + chordQualitySuffix;
+}
+
+/**
+ * PARSER DELLA STRINGA DELLA PROGRESSIONE
+ */
+function parseProgressionPattern(patternStr, keyRootName) {
+    if (!patternStr) return [];
+
+    // Split per gli step principali tramite tiretto ' - '
+    const rawSteps = patternStr.split(' - ');
+    const compiledSteps = [];
+
+    rawSteps.forEach(stepText => {
+        // Separa eventuale parte principale e sostitutivi tra parentesi
+        // Es: "I7 (v7)" oppure "vi (I / IV)" oppure "I"
+        const parenMatch = stepText.match(/([^\(]+)(?:\(([^\)]+)\))?/);
+        if (!parenMatch) return;
+
+        const mainRaw = parenMatch[1].trim();
+        const subRaw = parenMatch[2] ? parenMatch[2].trim() : null;
+
+        const mainChord = parseDegreeToChord(mainRaw, keyRootName);
+        const subChords = [];
+
+        if (subRaw) {
+            const subTokens = subRaw.split('/');
+            subTokens.forEach(st => {
+                const parsedSub = parseDegreeToChord(st.trim(), keyRootName);
+                if (parsedSub) subChords.push(parsedSub);
+            });
+        }
+
+        if (mainChord) {
+            compiledSteps.push({
+                main: mainChord,
+                sub: subChords
+            });
+        }
+    });
+
+    return compiledSteps;
+}
+
+/**
+ * GESTORE LOGICA AVANZAMENTO PROGRESSIONE PASSO-PASSO
+ */
+function handleProgressionStep(chordName, rootObj, rowObj) {
+    const genreSelect = document.getElementById('select-genre');
+    const styleSelect = document.getElementById('select-style');
+
+    if (!genreSelect.value || !styleSelect.value) return;
+
+    const patternStr = GENRES_DATA[genreSelect.value][styleSelect.value];
+    if (!patternStr) return;
+
+    // STEP 1: Rilevazione Tonalità e Verifiche
+    if (currentProgressionStepIndex === -1) {
+        // Calcola progressione ipotetica con la nota premuta come Key
+        const candidateSteps = parseProgressionPattern(patternStr, rootObj.name);
+        if (!candidateSteps.length) return;
+
+        const step1 = candidateSteps[0];
+        
+        // Verifica se l'accordo premuto è compatibile con il Step 1 principale o uno dei suoi sostituti
+        const isMainMatch = (chordName === step1.main);
+        const isSubMatch = step1.sub.includes(chordName);
+
+        if (!isMainMatch && !isSubMatch) {
+            // Non compatibile: riproduce suono normale ma rimane in attesa
+            clearHighlights();
+            return;
+        }
+
+        // Compatibile! Imposta tonalità base e avvia
+        currentKeyRoot = rootObj.name;
+        activeProgressionSteps = candidateSteps;
+        currentProgressionStepIndex = 0; // Passo 1 completato
+
+        updateProgressionChordsDisplay();
+        highlightNextStepOptions(1); // Evidenzia lo STEP 2
+        return;
+    }
+
+    // STEP 2, 3, N... Avanzamento della progressione
+    const nextExpectedStepIndex = (currentProgressionStepIndex + 1) % activeProgressionSteps.length;
+    const expectedStep = activeProgressionSteps[nextExpectedStepIndex];
+
+    const isNextMain = (chordName === expectedStep.main);
+    const isNextSub = expectedStep.sub.includes(chordName);
+
+    if (isNextMain || isNextSub) {
+        // L'utente ha premuto l'accordo suggerito! Avanza
+        currentProgressionStepIndex = nextExpectedStepIndex;
+        
+        const nextStepIndexToHighlight = (currentProgressionStepIndex + 1) % activeProgressionSteps.length;
+        highlightNextStepOptions(nextStepIndexToHighlight);
+    } else {
+        // Se l'utente preme un accordo fuori sequenza ma compatibile col primo passo della nuova tonalità
+        const newCandidateSteps = parseProgressionPattern(patternStr, rootObj.name);
+        if (newCandidateSteps.length && (chordName === newCandidateSteps[0].main || newCandidateSteps[0].sub.includes(chordName))) {
+            currentKeyRoot = rootObj.name;
+            activeProgressionSteps = newCandidateSteps;
+            currentProgressionStepIndex = 0;
+            updateProgressionChordsDisplay();
+            highlightNextStepOptions(1);
+        } else {
+            // Accordo totalmente fuori sequenza: resetta il loop visivo
+            resetProgressionState();
+        }
+    }
+}
+
+function clearHighlights() {
+    document.querySelectorAll('.matrix-btn').forEach(btn => {
+        btn.classList.remove('highlight-main', 'highlight-sub');
+    });
+}
+
+function highlightNextStepOptions(stepIndex) {
+    clearHighlights();
+
+    if (!activeProgressionSteps || !activeProgressionSteps[stepIndex]) return;
+
+    const stepInfo = activeProgressionSteps[stepIndex];
+
+    // Evidenzia accordo principale (Alta luminosità)
+    const mainBtn = document.querySelector(`.matrix-btn[data-chord="${stepInfo.main}"]`);
+    if (mainBtn) mainBtn.classList.add('highlight-main');
+
+    // Evidenzia accordi sostitutivi (Bassa luminosità)
+    stepInfo.sub.forEach(subChord => {
+        const subBtn = document.querySelector(`.matrix-btn[data-chord="${subChord}"]`);
+        if (subBtn) subBtn.classList.add('highlight-sub');
+    });
+}
+
+function updateProgressionChordsDisplay() {
+    const chordsLabel = document.getElementById('lbl-progression-chords');
+    if (!chordsLabel || !activeProgressionSteps.length) return;
+
+    const formatted = activeProgressionSteps.map(s => {
+        return s.sub.length ? `${s.main}(${s.sub.join('/')})` : s.main;
+    }).join(' - ');
+
+    chordsLabel.textContent = `Accordi [${currentKeyRoot}]: ${formatted}`;
+    chordsLabel.classList.remove('hidden');
+}
+
+function resetProgressionState() {
+    currentProgressionStepIndex = -1;
+    currentKeyRoot = null;
+    activeProgressionSteps = [];
+    clearHighlights();
+    const chordsLabel = document.getElementById('lbl-progression-chords');
+    if (chordsLabel) chordsLabel.classList.add('hidden');
 }
 
 function createMatrixUI() {
@@ -284,7 +471,6 @@ function initGenresAndStylesUI() {
 
     if (!genreSelect || !styleSelect || !progressionLabel) return;
 
-    // Popola selettore Generi
     Object.keys(GENRES_DATA).forEach(genre => {
         const opt = document.createElement('option');
         opt.value = genre;
@@ -292,11 +478,10 @@ function initGenresAndStylesUI() {
         genreSelect.appendChild(opt);
     });
 
-    // Evento Cambio Genere
     genreSelect.addEventListener('change', (e) => {
         const selectedGenre = e.target.value;
-        
-        // Reset selettore Stile
+        resetProgressionState();
+
         styleSelect.innerHTML = '<option value="">-- Seleziona Stile --</option>';
         progressionLabel.textContent = 'Seleziona uno stile';
 
@@ -317,10 +502,10 @@ function initGenresAndStylesUI() {
         }
     });
 
-    // Evento Cambio Stile
     styleSelect.addEventListener('change', (e) => {
         const selectedGenre = genreSelect.value;
         const selectedStyle = e.target.value;
+        resetProgressionState();
 
         if (selectedGenre && selectedStyle && GENRES_DATA[selectedGenre][selectedStyle]) {
             progressionLabel.textContent = GENRES_DATA[selectedGenre][selectedStyle];
