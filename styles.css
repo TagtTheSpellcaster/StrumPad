@@ -264,15 +264,27 @@
 
 /* ==========================================
    VERTICAL SYNTH SLIDERS
-   Same visual style as the LFO controls
    ========================================== */
 
+/*
+ * IMPORTANT:
+ * Do not make these panels height: 100%.
+ * The synthesis grid must determine its height from
+ * the actual LFO + Synth Presets stack.
+ *
+ * ADSR and Master Volume then occupy that same
+ * compact hardware-module height without stretching
+ * the whole synthesis section.
+ */
 .md\\:col-span-4:has(#adsr-canvas),
 .md\\:col-span-2:has(#slider-volume) {
-    height: 100%;
+    align-self: start;
+    height: 273px;
     min-height: 0;
+    box-sizing: border-box;
 }
 
+/* ADSR contents fit inside the compact module. */
 .md\\:col-span-4:has(#adsr-canvas) .crt-container {
     height: 7rem;
     flex-shrink: 0;
@@ -283,6 +295,7 @@
     flex-shrink: 0;
 }
 
+/* Vertical slider containers. */
 .slider-vertical-container {
     display: flex;
     flex-direction: column;
@@ -304,9 +317,8 @@
 }
 
 /*
- * Exact LFO-style control:
- * light grey/white track + amber circular thumb.
- * Vertical orientation, minimum at the bottom.
+ * Same visual language as the LFO:
+ * thin light track + round amber thumb.
  */
 .v-range,
 .v-range-master {
@@ -327,7 +339,7 @@
     accent-color: #b45309;
 }
 
-/* Track — same light native-looking bar as the LFO. */
+/* Light vertical track. */
 .v-range::-webkit-slider-runnable-track,
 .v-range-master::-webkit-slider-runnable-track {
     width: 4px;
@@ -346,7 +358,7 @@
     border: 1px solid #b2b2b2;
 }
 
-/* Thumb — round amber control exactly like the LFO. */
+/* Round amber thumb. */
 .v-range::-webkit-slider-thumb,
 .v-range-master::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -372,9 +384,4 @@
 
     background: #b45309;
     box-shadow: none;
-}
-
-/* Master Volume follows exactly the same control geometry. */
-.md\\:col-span-2:has(#slider-volume) {
-    min-height: 0;
 }
