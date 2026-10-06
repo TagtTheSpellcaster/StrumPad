@@ -1,133 +1,135 @@
-/* STREAMING_CHUNK:Styling retro hardware UI components... /
-/ Main page body and selection constraints */
+/* Main Layout & Body Background */
 body {
+background-color: #2b2725;
+background-image: radial-gradient(#3a3431 1px, transparent 0);
+background-size: 16px 16px;
+font-family: 'Inter', system-ui, -apple-system, sans-serif;
 user-select: none;
 -webkit-user-select: none;
-touch-action: manipulation;
-background-color: #1a1816;
 }
 
-/* Metallic/Gold gradient surface for Strumplate Canvas Container */
-.strumplate-gradient {
-background: linear-gradient(135deg,
-#bf953f 0%,
-#fcf6ba 25%,
-#b38728 50%,
-#fbf5b7 75%,
-#aa771c 100%);
-box-shadow: inset 0 0 15px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.3);
-}
-
-/* 3D Hardware Button Styles for Accordion Matrix */
-.chord-btn {
-transition: all 0.05s ease;
-box-shadow: 0 4px 0 #8c8273, 0 5px 6px rgba(0,0,0,0.3);
-}
-
-.chord-btn:active, .chord-btn.active {
-transform: translateY(3px);
-box-shadow: 0 1px 0 #8c8273, 0 2px 3px rgba(0,0,0,0.3);
-}
-
-/* Knobs & LED glow effects */
-.led-indicator {
-box-shadow: 0 0 8px currentColor;
-}
-
-/* Custom scrollbar for horizontal button grid scrolling on small screens */
+/* Custom Scrollbar for Matrix Slider */
 ::-webkit-scrollbar {
-height: 6px;
-width: 6px;
+height: 8px;
+width: 8px;
 }
 ::-webkit-scrollbar-track {
-background: #2a2621;
+background: #cfc4b0;
+border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb {
-background: #8c8273;
-border-radius: 3px;
+background: #a89a82;
+border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+background: #8c7d67;
 }
 
-/* 3D Hardware Button Styles for Accordion Matrix */
+/* Strumplate Metallic Gradient Surface */
+.strumplate-gradient {
+background: linear-gradient(
+135deg,
+#d8b459 0%,
+#f5e0a3 25%,
+#cba043 50%,
+#fbeabb 75%,
+#b88e32 100%
+);
+box-shadow: inset 0 2px 6px rgba(0,0,0,0.4), inset 0 -2px 6px rgba(255,255,255,0.3);
+}
+
+/* 3D Hardware Button Base Styles for Accordion Matrix */
 .chord-btn {
-transition: transform 0.05s ease, box-shadow 0.05s ease, background-color 0.1s ease;
+transition: transform 0.05s ease, box-shadow 0.05s ease, background-color 0.15s ease;
 width: 38px;
 height: 38px;
 min-width: 38px;
 min-height: 38px;
-box-shadow: 0 3px 0 rgba(0,0,0,0.3), 0 4px 5px rgba(0,0,0,0.2);
+box-shadow: 0 3px 0 rgba(0,0,0,0.25), 0 4px 5px rgba(0,0,0,0.15);
 position: relative;
 padding: 0;
+outline: none;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: flex-end;
+padding-bottom: 5px;
+border-radius: 6px;
+border-width: 2px;
 }
 
 .chord-btn:active, .chord-btn.active {
 transform: translateY(2px);
-box-shadow: 0 1px 0 rgba(0,0,0,0.4), 0 2px 3px rgba(0,0,0,0.2);
+box-shadow: 0 1px 0 rgba(0,0,0,0.3), 0 2px 3px rgba(0,0,0,0.15);
 }
 
-/* Row 1 - Maggiore (Amber/Gold) */
+/* Muted / Pastel Color Schemes for Chord Rows */
+
+/* Row 1 - Maggiore (Soft Pastel Amber/Peach) */
 .row-color-maj {
-background-color: #f59e0b;
-border-color: #b45309;
+background-color: #f6d396;
+border-color: #d1a153;
 }
 .row-color-maj:hover {
-background-color: #fbbf24;
+background-color: #fde4b6;
 }
 
-/* Row 2 - Minore (Teal/Slate) */
+/* Row 2 - Minore (Soft Muted Blue/Slate) */
 .row-color-min {
-background-color: #0284c7;
-border-color: #0369a1;
+background-color: #a3c9e8;
+border-color: #6b9ac4;
 }
 .row-color-min:hover {
-background-color: #38bdf8;
+background-color: #c2dcf2;
 }
 
-/* Row 3 - Settima Dominante (Vintage Red) */
+/* Row 3 - Settima Dominante (Muted Rose/Coral) */
 .row-color-7 {
-background-color: #e11d48;
-border-color: #be123c;
+background-color: #eab4b4;
+border-color: #c78383;
 }
 .row-color-7:hover {
-background-color: #f43f5e;
+background-color: #f4cccc;
 }
 
-/* Row 4 - Settima Maggiore (Emerald Green) */
+/* Row 4 - Settima Maggiore (Pastel Sage Green) */
 .row-color-maj7 {
-background-color: #10b981;
-border-color: #047857;
+background-color: #b2dfbe;
+border-color: #7ab88b;
 }
 .row-color-maj7:hover {
-background-color: #34d399;
+background-color: #ceefd7;
 }
 
-/* Row 5 - Settima Minore (Deep Violet) */
+/* Row 5 - Settima Minore (Soft Lavender/Violet) */
 .row-color-m7 {
-background-color: #8b5cf6;
-border-color: #6d28d9;
+background-color: #cdb4db;
+border-color: #9d7bb0;
 }
 .row-color-m7:hover {
-background-color: #a78bfa;
+background-color: #e2d2ec;
 }
 
 /* Green LED Indicator inside buttons /
 .btn-led {
-width: 12px;
-height: 4px;
-border-radius: 1px;
-background-color: #15803d; / Dark green when idle */
-border: 1px solid #052e16;
-box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+width: 14px;
+height: 5px;
+border-radius: 2px;
+background-color: #1b4325; / Dark off-state green */
+border: 1px solid #0d2613;
+box-shadow: inset 0 1px 2px rgba(0,0,0,0.6);
 transition: background-color 0.05s ease, box-shadow 0.05s ease;
+pointer-events: none;
 }
 
-/* Lit state when button is pressed/active /
+/* Illuminated LED State when button is active/pressed /
 .chord-btn.active .btn-led,
 .chord-btn:active .btn-led {
-background-color: #22c55e; / Bright glowing green */
-box-shadow: 0 0 6px #22c55e, 0 0 10px #4ade80;
+background-color: #34d399 !important; / Vivid lime green LED glow */
+box-shadow: 0 0 6px #34d399, 0 0 12px #22c55e, inset 0 0 2px #ffffff !important;
 }
 
-/* Knobs & LED glow effects */
+/* Power LED glow effect */
 .led-indicator {
 box-shadow: 0 0 8px currentColor;
 }
