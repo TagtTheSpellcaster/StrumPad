@@ -306,11 +306,15 @@
     overflow: hidden;
 }
 
-/* The LFO + Preset column defines the shared panel height. */
+/* The LFO + Preset column fills the same height as ADSR / Master.
+   The two panels split that height evenly, with the existing gap between them. */
 .synth-stack {
     min-height: 0;
+    height: 100%;
 }
 
 .synth-stack-panel {
     min-height: 0;
+    height: calc((100% - 0.5rem) / 2);
+    flex: 0 0 calc((100% - 0.5rem) / 2);
 }
