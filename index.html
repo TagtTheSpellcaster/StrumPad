@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>StrumPad v1.0.1 - Retro Synth Chord & ADSR Simulator</title>
+    <title>StrumPad v0.97 - Retro Synth Chord & ADSR Simulator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -33,7 +33,7 @@
             <div class="flex items-center gap-3">
                 <div id="power-led" class="w-4 h-4 rounded-full bg-red-600 shadow-[0_0_8px_#dc2626]"></div>
                 <h1 class="font-extrabold text-xl sm:text-2xl tracking-wider text-slate-800 uppercase font-mono">
-                    StrumPad <span class="text-xs text-amber-900 font-bold lowercase">v1.0.1</span> 
+                    StrumPad <span class="text-xs text-amber-900 font-bold lowercase">v0.97</span> 
                     <span class="text-xs font-sans font-semibold text-amber-900 border border-amber-800 px-2 py-0.5 rounded ml-2">VINTAGE CHORD MACHINE</span>
                 </h1>
             </div>
@@ -106,21 +106,21 @@
             </div>
 
             <!-- Synthesis Engine & Controls -->
-            <div class="lg:col-span-8 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col gap-3 min-h-0">
+            <div class="lg:col-span-8 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col justify-between gap-3 min-h-[290px]">
                 <div class="flex justify-between items-center border-b border-slate-300 pb-1">
                     <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Synthesis Engine & Master Output</h2>
                     <span class="text-xs text-amber-900 font-medium hidden sm:inline">Analog Synthesis Controls</span>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-3 flex-1 min-h-0 items-stretch">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3 h-[250px] items-stretch">
                     
                     <!-- ADSR Block -->
-                    <div class="md:col-span-4 bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col gap-2 h-full">
+                    <div class="md:col-span-4 bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col justify-between h-full">
                         <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">ADSR Envelope Generator</span>
-                        <div class="crt-container rounded-xl p-2 h-28 overflow-hidden relative w-full">
+                        <div class="crt-container rounded-xl p-2 h-24 overflow-hidden relative w-full">
                             <canvas id="adsr-canvas" class="w-full h-full block rounded-lg relative z-10"></canvas>
                         </div>
-                        <div class="grid grid-cols-4 gap-1 items-center flex-1 pt-1">
+                        <div class="grid grid-cols-4 gap-1 items-center h-24 pt-1">
                             <div class="slider-vertical-container">
                                 <span class="text-[10px] font-bold uppercase text-slate-700">A</span>
                                 <div class="vertical-slider-wrapper">
@@ -153,55 +153,55 @@
                     </div>
 
                     <!-- Waveform & Filter -->
-                    <div class="md:col-span-3 flex flex-col justify-between gap-2 h-full">
-                        <div class="bg-amber-50/70 px-3 py-2 rounded-xl border-2 border-chassisDark flex flex-col gap-1.5">
-                            <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">Waveform</span>
-                            <div class="flex flex-col gap-1 pt-0.5">
-                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-800"><input type="radio" name="waveform" value="sawtooth" checked class="accent-amber-800 cursor-pointer"><span>Sawtooth</span></label>
-                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-800"><input type="radio" name="waveform" value="square" class="accent-amber-800 cursor-pointer"><span>Square</span></label>
-                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-800"><input type="radio" name="waveform" value="triangle" class="accent-amber-800 cursor-pointer"><span>Triangle</span></label>
-                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-800"><input type="radio" name="waveform" value="sine" class="accent-amber-800 cursor-pointer"><span>Sine</span></label>
+                    <div class="md:col-span-3 flex flex-col justify-between h-full gap-2">
+                        <div class="bg-amber-50/70 px-3 py-1.5 rounded-xl border-2 border-chassisDark flex flex-col gap-1">
+                            <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-0.5">Waveform</span>
+                            <div class="flex flex-col gap-0.5">
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-[11px] font-semibold text-slate-800"><input type="radio" name="waveform" value="sawtooth" checked class="accent-amber-800 cursor-pointer"><span>Sawtooth</span></label>
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-[11px] font-semibold text-slate-800"><input type="radio" name="waveform" value="square" class="accent-amber-800 cursor-pointer"><span>Square</span></label>
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-[11px] font-semibold text-slate-800"><input type="radio" name="waveform" value="triangle" class="accent-amber-800 cursor-pointer"><span>Triangle</span></label>
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-[11px] font-semibold text-slate-800"><input type="radio" name="waveform" value="sine" class="accent-amber-800 cursor-pointer"><span>Sine</span></label>
                             </div>
                         </div>
-                        <div class="bg-amber-50/70 p-2.5 rounded-xl border-2 border-chassisDark flex flex-col gap-1.5 flex-1 justify-between">
-                            <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">Filter</span>
-                            <div class="flex items-center justify-between gap-1 pt-0.5">
+                        <div class="bg-amber-50/70 p-2 rounded-xl border-2 border-chassisDark flex flex-col gap-1">
+                            <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-0.5">Filter</span>
+                            <div class="flex items-center justify-between gap-1">
                                 <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800"><input type="radio" name="filter-type" value="lowpass" checked class="accent-amber-800 cursor-pointer"><span>Low-pass</span></label>
                                 <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800"><input type="radio" name="filter-type" value="highpass" class="accent-amber-800 cursor-pointer"><span>High-pass</span></label>
                             </div>
-                            <div class="flex flex-col gap-1.5 pt-1">
+                            <div class="flex flex-col gap-1">
                                 <div>
-                                    <div class="flex justify-between text-[10px] font-semibold mb-0.5"><span>Cutoff</span><span id="lbl-cutoff" class="font-mono text-slate-700">2200 Hz</span></div>
-                                    <input type="range" id="slider-cutoff" min="100" max="8000" value="2200" class="w-full h-1.5 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
+                                    <div class="flex justify-between text-[10px] font-semibold"><span>Cutoff</span><span id="lbl-cutoff" class="font-mono text-slate-700">2200 Hz</span></div>
+                                    <input type="range" id="slider-cutoff" min="100" max="8000" value="2200" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                                 </div>
                                 <div>
-                                    <div class="flex justify-between text-[10px] font-semibold mb-0.5"><span>Resonance</span><span id="lbl-resonance" class="font-mono text-slate-700">1.0</span></div>
-                                    <input type="range" id="slider-resonance" min="0.1" max="15.0" step="0.1" value="1.0" class="w-full h-1.5 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
+                                    <div class="flex justify-between text-[10px] font-semibold"><span>Resonance</span><span id="lbl-resonance" class="font-mono text-slate-700">1.0</span></div>
+                                    <input type="range" id="slider-resonance" min="0.1" max="15.0" step="0.1" value="1.0" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- LFO & Presets -->
-                    <div class="md:col-span-3 flex flex-col justify-between gap-2 h-full">
-                        <div class="bg-amber-50/70 p-2.5 rounded-xl border-2 border-chassisDark flex flex-col gap-1.5">
+                    <div class="md:col-span-3 flex flex-col justify-between h-full gap-2">
+                        <div class="bg-amber-50/70 p-2 rounded-xl border-2 border-chassisDark flex flex-col gap-1">
                             <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-0.5">LFO Modulation</span>
                             <div>
-                                <div class="flex justify-between text-[10px] font-semibold mb-0.5"><span>LFO Rate</span><span id="lbl-lfo-rate" class="font-mono text-slate-700">5.0 Hz</span></div>
+                                <div class="flex justify-between text-[10px] font-semibold"><span>LFO Rate</span><span id="lbl-lfo-rate" class="font-mono text-slate-700">5.0 Hz</span></div>
                                 <input type="range" id="slider-lfo-rate" min="0.5" max="15.0" step="0.1" value="5.0" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                             </div>
                             <div>
-                                <div class="flex justify-between text-[10px] font-semibold mb-0.5"><span>LFO Depth</span><span id="lbl-lfo-depth" class="font-mono text-slate-700">0%</span></div>
+                                <div class="flex justify-between text-[10px] font-semibold"><span>LFO Depth</span><span id="lbl-lfo-depth" class="font-mono text-slate-700">0%</span></div>
                                 <input type="range" id="slider-lfo-depth" min="0" max="100" value="0" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                             </div>
-                            <div class="flex items-center justify-between pt-1 border-t border-slate-300">
+                            <div class="flex items-center justify-between pt-0.5 border-t border-slate-300">
                                 <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800"><input type="checkbox" id="toggle-vibrato" class="accent-amber-800 cursor-pointer"><span>Vibrato</span></label>
                                 <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800"><input type="checkbox" id="toggle-tremolo" class="accent-amber-800 cursor-pointer"><span>Tremolo</span></label>
                             </div>
                         </div>
-                        <div class="bg-amber-50/70 p-2.5 rounded-xl border-2 border-chassisDark flex flex-col gap-1.5 flex-1 justify-between">
+                        <div class="bg-amber-50/70 p-2 rounded-xl border-2 border-chassisDark flex flex-col gap-1">
                             <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-0.5">Synth Presets</span>
-                            <div id="presets-grid" class="grid grid-cols-2 gap-1.5 my-auto">
+                            <div id="presets-grid" class="grid grid-cols-2 gap-1">
                                 <button data-preset="PIANO" class="preset-btn">PIANO</button>
                                 <button data-preset="GUITAR" class="preset-btn">GUITAR</button>
                                 <button data-preset="BASS" class="preset-btn">BASS</button>
@@ -215,16 +215,16 @@
                     </div>
 
                     <!-- Master Volume -->
-                    <div class="md:col-span-2 bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col items-center justify-between h-full">
-                        <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1 text-center w-full">Master Vol</span>
-                        <div class="mt-1 text-slate-700" title="Max Volume">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                    <div class="md:col-span-2 bg-amber-50/70 p-2.5 rounded-xl border-2 border-chassisDark flex flex-col items-center justify-between h-full">
+                        <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-0.5 text-center w-full">Master Vol</span>
+                        <div class="text-slate-700" title="Max Volume">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
                         </div>
-                        <div class="vertical-slider-wrapper-master my-1 flex-1">
+                        <div class="vertical-slider-wrapper-master flex-1 my-1">
                             <input type="range" id="slider-volume" min="0" max="100" value="80" class="v-range-master w-1 h-full bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                         </div>
-                        <div class="mb-1 text-slate-500" title="Min Volume">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
+                        <div class="text-slate-500" title="Min Volume">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
                         </div>
                         <span id="lbl-volume" class="text-[10px] font-mono font-bold text-amber-950">80%</span>
                     </div>
