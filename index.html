@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Retro Omnichord Synth Simulator</title>
+    <title>Retro Omni-Strum Matrix Synthesizer</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -29,56 +29,12 @@
             }
         }
     </script>
-    <style>
-        body {
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
-            background-color: #1a1816;
-        }
-
-        /* Metallic/Gold gradient for Strumplate */
-        .strumplate-gradient {
-            background: linear-gradient(135deg, 
-                #bf953f 0%, 
-                #fcf6ba 25%, 
-                #b38728 50%, 
-                #fbf5b7 75%, 
-                #aa771c 100%);
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        /* 3D Hardware Button Styles */
-        .chord-btn {
-            transition: all 0.05s ease;
-            box-shadow: 0 4px 0 #8c8273, 0 5px 6px rgba(0,0,0,0.3);
-        }
-        .chord-btn:active, .chord-btn.active {
-            transform: translateY(3px);
-            box-shadow: 0 1px 0 #8c8273, 0 2px 3px rgba(0,0,0,0.3);
-        }
-        
-        /* Knobs & LED effects */
-        .led-indicator {
-            box-shadow: 0 0 8px currentColor;
-        }
-
-        /* Custom scrollbar for horizontal button grid scrolling on small screens */
-        ::-webkit-scrollbar {
-            height: 6px;
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #2a2621;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #8c8273;
-            border-radius: 3px;
-        }
-    </style>
+    <!-- External Custom Retro Hardware CSS -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 sm:p-4 text-slate-800 antialiased selection:bg-none">
 
+    <!-- Main Instrument Chassis -->
     <div id="synth-chassis" class="w-full max-w-7xl bg-chassis rounded-3xl p-3 sm:p-6 shadow-2xl border-4 border-chassisDark relative overflow-hidden flex flex-col gap-5">
         
         <!-- Header / Brand Section -->
@@ -96,12 +52,12 @@
                 </button>
                 <div class="hidden md:block text-right">
                     <span class="block opacity-75">Tasti o Strumplate Touch</span>
-                    <span class="text-amber-900 font-mono">Matrice Circolo delle Quinte (5 File)</span>
+                    <span class="text-amber-900 font-mono">Circolo delle Quinte (5 File)</span>
                 </div>
             </div>
         </header>
 
-        <!-- Top Control Bar (Master Knobs + Strumplate Side-by-Side) -->
+        <!-- Top Section: Master Controls + Sonic Strumplate -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
             
             <!-- Master Controls Panel -->
@@ -109,16 +65,16 @@
                 <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600 border-b border-slate-300 pb-1">Controlli Generali</h2>
                 
                 <div class="grid grid-cols-3 lg:grid-cols-1 gap-3">
-                    <!-- Volume Control -->
+                    <!-- Volume Knob -->
                     <div class="flex flex-col gap-1">
                         <div class="flex justify-between text-xs font-semibold">
-                            <label for="knob-volume">Volume</label>
+                            <label for="knob-volume">Volume Master</label>
                             <span id="val-volume" class="font-mono text-slate-600">80%</span>
                         </div>
                         <input type="range" id="knob-volume" min="0" max="100" value="80" class="accent-amber-700 h-2 bg-chassisDark rounded-lg cursor-pointer">
                     </div>
 
-                    <!-- Sustain Control -->
+                    <!-- Sustain / Decay Knob -->
                     <div class="flex flex-col gap-1">
                         <div class="flex justify-between text-xs font-semibold">
                             <label for="knob-sustain">Sustain / Decay</label>
@@ -139,24 +95,24 @@
 
                 <!-- Active Chord Display -->
                 <div class="flex items-center justify-between border-t border-slate-300 pt-2 mt-1">
-                    <span class="text-xs font-bold text-slate-700">Accordo Selezionato:</span>
+                    <span class="text-xs font-bold text-slate-700">Accordo Attivo:</span>
                     <span id="current-chord-display" class="font-display font-bold text-lg text-amber-900 bg-amber-100/80 px-3 py-0.5 rounded border border-amber-300 shadow-sm">
                         C (Do Maggiore)
                     </span>
                 </div>
             </div>
 
-            <!-- Sonic String Strumplate Area -->
+            <!-- Touch Strumplate Panel -->
             <div class="lg:col-span-8 bg-panelBeige p-4 rounded-2xl border-2 border-chassisDark flex flex-col gap-2">
                 <div class="flex justify-between items-center border-b border-slate-300 pb-1">
                     <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Sonic String Strumplate</h2>
-                    <span class="text-[11px] text-amber-800 font-medium">Scorri per arpeggiare l'accordo attivo</span>
+                    <span class="text-[11px] text-amber-800 font-medium">Trascina il dito o cursore per arpeggiare</span>
                 </div>
                 
                 <div class="relative w-full h-36 sm:h-40 rounded-xl border-4 border-amber-900/40 overflow-hidden strumplate-gradient cursor-crosshair shadow-inner">
                     <canvas id="strumplate-canvas" class="w-full h-full block"></canvas>
                     
-                    <!-- Overlay visual guide lines -->
+                    <!-- Strumplate Vertical Guide Lines Overlay -->
                     <div class="absolute inset-0 pointer-events-none flex justify-between px-2 opacity-20">
                         <div class="w-0.5 h-full bg-slate-900"></div>
                         <div class="w-0.5 h-full bg-slate-900"></div>
@@ -171,16 +127,16 @@
             </div>
         </div>
 
-        <!-- 5-Row OmniChord Accordion Buttons Grid -->
+        <!-- 5-Row Accordion Matrix Grid Container -->
         <div class="bg-panelBeige p-3 sm:p-5 rounded-2xl border-2 border-chassisDark flex flex-col gap-3">
             <div class="flex justify-between items-center border-b border-slate-300 pb-1">
                 <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Matrice Accordi Circolo delle Quinte (5 File Hardware)</h2>
-                <span class="text-[11px] text-slate-500 hidden sm:inline">Premendo un bottone si attiva e suona l'accordo</span>
+                <span class="text-[11px] text-slate-500 hidden sm:inline">Premendo un bottone si seleziona e arpeggia l'accordo</span>
             </div>
 
             <div class="overflow-x-auto pb-2">
                 <div class="min-w-[850px] flex flex-col gap-2.5" id="matrix-container">
-                    <!-- 5 rows will be dynamically populated here with proper labeling -->
+                    <!-- Populated dynamically via JavaScript -->
                 </div>
             </div>
         </div>
@@ -192,400 +148,7 @@
         </footer>
     </div>
 
-    <script>
-        /* ===================================================================
-           1. AUDIO ENGINE (Web Audio API)
-           =================================================================== */
-        class OmnichordAudioEngine {
-            constructor() {
-                this.ctx = null;
-                this.masterGain = null;
-                this.volume = 0.8;
-                this.sustainTime = 1.2;
-                this.cutoffFreq = 2200;
-                this.isInitialized = false;
-            }
-
-            init() {
-                if (this.isInitialized) return;
-                const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                this.ctx = new AudioCtx();
-
-                // Master gain setup
-                this.masterGain = this.ctx.createGain();
-                this.masterGain.gain.setValueAtTime(this.volume, this.ctx.currentTime);
-                this.masterGain.connect(this.ctx.destination);
-
-                this.isInitialized = true;
-            }
-
-            setVolume(val) {
-                this.volume = val;
-                if (this.masterGain && this.ctx) {
-                    this.masterGain.gain.linearRampToValueAtTime(this.volume, this.ctx.currentTime + 0.05);
-                }
-            }
-
-            setSustain(val) {
-                this.sustainTime = val;
-            }
-
-            setCutoff(val) {
-                this.cutoffFreq = val;
-            }
-
-            // Play single synthesized retro pluck voice (for strumplate)
-            playNote(midiNote) {
-                if (!this.isInitialized || !this.ctx) return;
-                if (this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
-
-                const now = this.ctx.currentTime;
-                const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
-
-                const osc1 = this.ctx.createOscillator();
-                const osc2 = this.ctx.createOscillator();
-                
-                osc1.type = 'sawtooth';
-                osc2.type = 'triangle';
-
-                osc1.frequency.setValueAtTime(freq, now);
-                osc2.frequency.setValueAtTime(freq * 1.002, now);
-
-                const filter = this.ctx.createBiquadFilter();
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(this.cutoffFreq, now);
-                filter.frequency.exponentialRampToValueAtTime(120, now + this.sustainTime);
-
-                const noteGain = this.ctx.createGain();
-                noteGain.gain.setValueAtTime(0.3, now);
-                noteGain.gain.exponentialRampToValueAtTime(0.0001, now + this.sustainTime);
-
-                osc1.connect(filter);
-                osc2.connect(filter);
-                filter.connect(noteGain);
-                noteGain.connect(this.masterGain);
-
-                osc1.start(now);
-                osc2.start(now);
-                osc1.stop(now + this.sustainTime);
-                osc2.stop(now + this.sustainTime);
-            }
-
-            // Strum/Arpeggiate full chord when button is pressed
-            playChordStrum(midiNotes) {
-                if (!this.isInitialized || !this.ctx) return;
-                
-                // Play first 4 notes of the chord in rapid succession (strum effect)
-                const notesToPlay = midiNotes.slice(0, 5);
-                notesToPlay.forEach((note, index) => {
-                    setTimeout(() => {
-                        this.playNote(note);
-                    }, index * 40); // 40ms strum delay
-                });
-            }
-        }
-
-        /* ===================================================================
-           2. DATA STRUCTURES (Circle of Fifths & 5-Row Matrix Definition)
-           =================================================================== */
-        
-        // Circle of Fifths order starting from C
-        const CIRCLE_OF_FIFTHS = [
-            { name: 'C',  midi: 60 },
-            { name: 'G',  midi: 67 },
-            { name: 'D',  midi: 62 },
-            { name: 'A',  midi: 69 },
-            { name: 'E',  midi: 64 },
-            { name: 'B',  midi: 71 },
-            { name: 'F#', midi: 66 },
-            { name: 'Db', midi: 61 },
-            { name: 'Ab', midi: 68 },
-            { name: 'Eb', midi: 63 },
-            { name: 'Bb', midi: 70 },
-            { name: 'F',  midi: 65 }
-        ];
-
-        // 5 Rows Configuration as requested
-        const MATRIX_ROWS = [
-            { 
-                id: 'maj', 
-                label: '1ª Fila: Maggiori (Major)', 
-                quality: 'maj',
-                intervals: [0, 4, 7],
-                suffix: '',
-                badgeColor: 'bg-amber-600 text-white'
-            },
-            { 
-                id: 'min', 
-                label: '2ª Fila: Minori (Minor)', 
-                quality: 'min',
-                intervals: [0, 3, 7],
-                suffix: 'm',
-                badgeColor: 'bg-slate-700 text-white'
-            },
-            { 
-                id: '7', 
-                label: '3ª Fila: Settima Dominante (7th)', 
-                quality: '7',
-                intervals: [0, 4, 7, 10],
-                suffix: '7',
-                badgeColor: 'bg-red-700 text-white'
-            },
-            { 
-                id: 'maj7', 
-                label: '4ª Fila: Settima Maggiore (Maj7)', 
-                quality: 'maj7',
-                intervals: [0, 4, 7, 11],
-                suffix: 'maj7',
-                badgeColor: 'bg-emerald-700 text-white'
-            },
-            { 
-                id: 'm7', 
-                label: '5ª Fila: Settima Minore (m7)', 
-                quality: 'm7',
-                intervals: [0, 3, 7, 10],
-                suffix: 'm7',
-                badgeColor: 'bg-indigo-700 text-white'
-            }
-        ];
-
-        // Global App State
-        const audioEngine = new OmnichordAudioEngine();
-        let currentChordObj = {
-            rootName: 'C',
-            rootMidi: 60,
-            quality: 'maj',
-            fullName: 'C'
-        };
-        let currentStrumNotes = [];
-
-        function calculateStrumNotes(rootMidi, intervals) {
-            const notes = [];
-            for (let octave = -1; octave <= 2; octave++) {
-                for (let interval of intervals) {
-                    notes.push(rootMidi + interval + (octave * 12));
-                }
-            }
-            return notes.sort((a, b) => a - b);
-        }
-
-        function setSelection(rootObj, rowObj) {
-            currentChordObj = {
-                rootName: rootObj.name,
-                rootMidi: rootObj.midi,
-                quality: rowObj.quality,
-                fullName: `${rootObj.name}${rowObj.suffix}`
-            };
-
-            currentStrumNotes = calculateStrumNotes(rootObj.midi, rowObj.intervals);
-            
-            // Update display
-            const displayEl = document.getElementById('current-chord-display');
-            displayEl.textContent = currentChordObj.fullName;
-
-            // Highlight active button
-            const allBtns = document.querySelectorAll('.matrix-chord-btn');
-            allBtns.forEach(btn => {
-                if (btn.dataset.chord === currentChordObj.fullName) {
-                    btn.classList.add('active', 'ring-2', 'ring-amber-500', 'bg-amber-200', 'text-amber-950');
-                } else {
-                    btn.classList.remove('active', 'ring-2', 'ring-amber-500', 'bg-amber-200', 'text-amber-950');
-                }
-            });
-        }
-
-        function buildMatrixUI() {
-            const container = document.getElementById('matrix-container');
-            container.innerHTML = '';
-
-            MATRIX_ROWS.forEach(row => {
-                const rowWrapper = document.createElement('div');
-                rowWrapper.className = 'flex flex-col gap-1';
-
-                const rowHeader = document.createElement('div');
-                rowHeader.className = 'text-[11px] font-bold text-slate-600 flex items-center gap-2';
-                rowHeader.innerHTML = `<span class="px-2 py-0.5 rounded text-[10px] ${row.badgeColor}">${row.label}</span>`;
-                rowWrapper.appendChild(rowHeader);
-
-                const btnRow = document.createElement('div');
-                btnRow.className = 'grid grid-cols-12 gap-1.5 sm:gap-2';
-
-                CIRCLE_OF_FIFTHS.forEach(root => {
-                    const chordName = `${root.name}${row.suffix}`;
-                    const btn = document.createElement('button');
-                    btn.className = `matrix-chord-btn chord-btn bg-panelBeige hover:bg-amber-100 text-slate-800 font-bold py-2 sm:py-2.5 px-1 rounded-lg border-2 border-chassisDark text-xs sm:text-sm flex flex-col items-center justify-center font-mono`;
-                    btn.dataset.chord = chordName;
-
-                    btn.innerHTML = `<span>${chordName}</span>`;
-
-                    btn.addEventListener('click', () => {
-                        audioEngine.init();
-                        setSelection(root, row);
-                        audioEngine.playChordStrum(currentStrumNotes);
-                    });
-
-                    btnRow.appendChild(btn);
-                });
-
-                rowWrapper.appendChild(btnRow);
-                container.appendChild(rowWrapper);
-            });
-
-            // Default selection: C major
-            setSelection(CIRCLE_OF_FIFTHS[0], MATRIX_ROWS[0]);
-        }
-
-        /* Canvas & Strumplate Controller */
-        class StrumplateController {
-            constructor(canvas, audioEngine) {
-                this.canvas = canvas;
-                this.ctx = canvas.getContext('2d');
-                this.audioEngine = audioEngine;
-                this.lastNoteIndex = -1;
-                this.isInteracting = false;
-                this.ripples = [];
-
-                this.resizeCanvas();
-                window.addEventListener('resize', () => this.resizeCanvas());
-                this.setupEvents();
-                this.animate();
-            }
-
-            resizeCanvas() {
-                const rect = this.canvas.parentElement.getBoundingClientRect();
-                this.canvas.width = rect.width;
-                this.canvas.height = rect.height;
-            }
-
-            setupEvents() {
-                const getCoords = (e) => {
-                    const rect = this.canvas.getBoundingClientRect();
-                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                    return {
-                        x: clientX - rect.left,
-                        y: clientY - rect.top
-                    };
-                };
-
-                const startInteract = (e) => {
-                    e.preventDefault();
-                    audioEngine.init();
-                    this.isInteracting = true;
-                    this.processInteraction(getCoords(e));
-                };
-
-                const moveInteract = (e) => {
-                    if (!this.isInteracting) return;
-                    e.preventDefault();
-                    this.processInteraction(getCoords(e));
-                };
-
-                const stopInteract = () => {
-                    this.isInteracting = false;
-                    this.lastNoteIndex = -1;
-                };
-
-                this.canvas.addEventListener('mousedown', startInteract);
-                this.canvas.addEventListener('mousemove', moveInteract);
-                window.addEventListener('mouseup', stopInteract);
-
-                this.canvas.addEventListener('touchstart', startInteract, { passive: false });
-                this.canvas.addEventListener('touchmove', moveInteract, { passive: false });
-                window.addEventListener('touchend', stopInteract);
-            }
-
-            processInteraction(coords) {
-                if (!currentStrumNotes.length) return;
-
-                const width = this.canvas.width;
-                const normalizedX = Math.max(0, Math.min(1, coords.x / width));
-                const noteIndex = Math.floor(normalizedX * currentStrumNotes.length);
-
-                if (noteIndex !== this.lastNoteIndex && noteIndex < currentStrumNotes.length) {
-                    this.lastNoteIndex = noteIndex;
-                    const noteToPlay = currentStrumNotes[noteIndex];
-                    this.audioEngine.playNote(noteToPlay);
-                    this.addRipple(coords.x, coords.y);
-                }
-            }
-
-            addRipple(x, y) {
-                this.ripples.push({
-                    x: x,
-                    y: y,
-                    radius: 5,
-                    alpha: 1.0
-                });
-            }
-
-            animate() {
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-                for (let i = this.ripples.length - 1; i >= 0; i--) {
-                    const r = this.ripples[i];
-                    this.ctx.beginPath();
-                    this.ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
-                    this.ctx.fillStyle = `rgba(255, 255, 255, ${r.alpha})`;
-                    this.ctx.fill();
-
-                    r.radius += 2.5;
-                    r.alpha -= 0.04;
-
-                    if (r.alpha <= 0) {
-                        this.ripples.splice(i, 1);
-                    }
-                }
-
-                requestAnimationFrame(() => this.animate());
-            }
-        }
-
-        // Attach UI Event Listeners
-        window.addEventListener('DOMContentLoaded', () => {
-            buildMatrixUI();
-
-            const strumplate = new StrumplateController(
-                document.getElementById('strumplate-canvas'), 
-                audioEngine
-            );
-
-            // Enable Audio Button
-            const btnAudio = document.getElementById('btn-start-audio');
-            const powerLed = document.getElementById('power-led');
-            
-            btnAudio.addEventListener('click', () => {
-                audioEngine.init();
-                btnAudio.classList.add('hidden');
-                powerLed.classList.remove('bg-red-600', 'text-red-500');
-                powerLed.classList.add('bg-green-500', 'text-green-400');
-            });
-
-            // Sliders Controls
-            const volumeSlider = document.getElementById('knob-volume');
-            const sustainSlider = document.getElementById('knob-sustain');
-            const cutoffSlider = document.getElementById('knob-cutoff');
-
-            volumeSlider.addEventListener('input', (e) => {
-                const val = parseFloat(e.target.value) / 100;
-                audioEngine.setVolume(val);
-                document.getElementById('val-volume').textContent = `${e.target.value}%`;
-            });
-
-            sustainSlider.addEventListener('input', (e) => {
-                const val = parseFloat(e.target.value) / 10;
-                audioEngine.setSustain(val);
-                document.getElementById('val-sustain').textContent = `${val.toFixed(1)}s`;
-            });
-
-            cutoffSlider.addEventListener('input', (e) => {
-                const val = parseFloat(e.target.value);
-                audioEngine.setCutoff(val);
-                document.getElementById('val-cutoff').textContent = `${val} Hz`;
-            });
-        });
-    </script>
+    <!-- External Audio Logic and Interactivity JS Script -->
+    <script src="app.js"></script>
 </body>
 </html>
