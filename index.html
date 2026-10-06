@@ -106,7 +106,7 @@
         <!-- Sezione Inferiore: Matrice Accordi a Sinistra e Sezione Generi/Stili a Destra -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- Matrice Accordi (9 Colonne) -->
+            <!-- Matrice Accordi (8 Colonne) -->
             <div class="lg:col-span-8 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col gap-3">
                 <div class="flex justify-between items-center border-b border-slate-300 pb-1">
                     <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Matrice Accordi — Circolo delle Quinte</h2>
@@ -120,7 +120,7 @@
                 </div>
             </div>
 
-            <!-- Sezione Generi, Stili e Progressioni Armoniche sulla Destra (3 Colonne) -->
+            <!-- Sezione Generi, Stili e Progressioni Armoniche sulla Destra (4 Colonne) -->
             <div class="lg:col-span-4 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col justify-between gap-4">
                 <div>
                     <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600 border-b border-slate-300 pb-2 mb-3">Assistente Progressioni</h2>
@@ -149,6 +149,9 @@
                     <span class="text-[10px] font-bold text-amber-900 uppercase tracking-wider">Progressione Armonica:</span>
                     <div id="lbl-progression" class="font-mono text-sm font-bold text-amber-950 leading-relaxed break-words">
                         Seleziona un genere e uno stile
+                    </div>
+                    <div id="lbl-progression-chords" class="font-mono text-xs text-amber-800 mt-1 font-semibold border-t border-amber-200 pt-1 hidden">
+                        <!-- Mostra la progressione calcolata nelle note reali -->
                     </div>
                 </div>
             </div>
