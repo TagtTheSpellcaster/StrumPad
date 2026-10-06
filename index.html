@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OmniSynth Simulator</title>
+  <title>OmniChord Simulator</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,8 +11,8 @@
   <div class="synth-container">
     <header class="synth-header">
       <div class="brand">
-        <span class="brand-sub">ANALOG SYNTHESIZER</span>
-        <h1>STRUM-80</h1>
+        <span class="brand-sub">ELECTRONIC CHORD SYSTEM</span>
+        <h1>OMNI-SYNTH</h1>
       </div>
       <div class="master-panel">
         <div class="volume-control">
@@ -26,17 +26,17 @@
     </header>
 
     <main class="synth-body">
-      <!-- Sezione Matrice Accordi -->
+      <!-- Matrice Accordi -->
       <section class="chord-matrix-section">
         <h2>MATRICE ACCORDI</h2>
         <div id="chord-matrix" class="matrix-grid"></div>
       </section>
 
-      <!-- Sezione Strumplate Metallico -->
+      <!-- Strumplate Metallico -->
       <section class="strumplate-section">
         <div class="strumplate-header">
           <h2>SONIC STRUMPLATE</h2>
-          <span class="touch-hint">TOCCA O TRASCINA SULLA SUPERFICIE</span>
+          <span class="touch-hint">SCORRI SULLA SUPERFICIE DORATA</span>
         </div>
         <div class="canvas-wrapper">
           <canvas id="strum-canvas"></canvas>
