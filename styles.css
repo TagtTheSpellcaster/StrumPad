@@ -8,7 +8,7 @@ body {
     touch-action: manipulation;
 }
 
-/* Scrollbar personalizzata per overflow matrice */
+/* Custom Scrollbar for matrix overflow on small screens */
 ::-webkit-scrollbar {
     height: 8px;
 }
@@ -21,7 +21,7 @@ body {
     border-radius: 4px;
 }
 
-/* Stile Piastra Metallica Dorata */
+/* Gold Metallic Strumplate Container */
 .gold-plate-container {
     background: linear-gradient(
         135deg, 
@@ -41,7 +41,7 @@ body {
     position: relative;
 }
 
-/* Trame e zigrinature metalliche orizzontali */
+/* Metallic Fine Horizontal Grooves */
 .gold-plate-container::before {
     content: "";
     position: absolute;
@@ -57,7 +57,7 @@ body {
     z-index: 1;
 }
 
-/* Pulsanti Quadrati Matrice 3D */
+/* 3D Compact Square Matrix Button */
 .matrix-btn {
     position: relative;
     width: 42px;
@@ -82,7 +82,7 @@ body {
     box-shadow: 0 1px 0 rgba(0,0,0,0.3), 0 2px 3px rgba(0,0,0,0.2) !important;
 }
 
-/* Temi Colore Pastello per Fila */
+/* Pastel Row Color Themes */
 .row-maj { background-color: #fce3b8; border-color: #d1a566; }
 .row-maj:hover { background-color: #ffecc9; }
 
@@ -98,7 +98,7 @@ body {
 .row-m7 { background-color: #e0cced; border-color: #a485b8; }
 .row-m7:hover { background-color: #ebdcf5; }
 
-/* LED Verde rettangolare centrato in basso */
+/* Rectangular Green LED centered at bottom */
 .btn-led {
     width: 12px;
     height: 4px;
@@ -117,7 +117,7 @@ body {
     border-color: #88ffb3 !important;
 }
 
-/* Evidenziatori Progressioni Armoniche */
+/* Harmonic Progression Highlights */
 .highlight-main {
     outline: 3px solid #06b6d4 !important;
     outline-offset: 2px;
