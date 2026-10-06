@@ -262,26 +262,20 @@
     }
 }
 
-
 /* ==========================================
    VERTICAL ADSR / MASTER VOLUME SLIDERS
-   Native range control, matching the LFO
+   Same native range control as the LFO;
+   only the orientation is changed.
    ========================================== */
 
 .v-range,
 .v-range-master {
-    -webkit-appearance: none;
-    appearance: none;
     writing-mode: vertical-lr;
     direction: rtl;
-    width: 4px;
+    width: 0.25rem;
     height: 100%;
     margin: 0;
     padding: 0;
-    background: #c2b8a3;
-    border-radius: 9999px;
-    cursor: pointer;
-    accent-color: #92400e;
 }
 
 .v-range:focus,
@@ -289,9 +283,9 @@
     outline: none;
 }
 
-
-/* Keep the vertical controls contained inside the existing
-   ADSR 7rem slider row and the Master Volume panel. */
+/* The wrapper provides the vertical track length.
+   The range itself keeps the browser-native thumb,
+   exactly like the horizontal LFO controls. */
 .slider-vertical-container {
     display: flex;
     flex-direction: column;
@@ -310,4 +304,13 @@
     min-height: 0;
     width: 100%;
     overflow: hidden;
+}
+
+/* The LFO + Preset column defines the shared panel height. */
+.synth-stack {
+    min-height: 0;
+}
+
+.synth-stack-panel {
+    min-height: 0;
 }
