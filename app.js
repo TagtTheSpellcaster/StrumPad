@@ -566,7 +566,9 @@ const GENRES_DATA = {
         "Circle Progression": "I - vi (I / IV) - ii (IV) - V (bVII)",
         "Simple Cadence": "I - IV (ii) - V (bVII) - I (vi)",
         "Pachelbel": "I - V (iii) - vi (I) - iii (V) - IV (ii) - I (vi) - IV (ii) - V (bVII)",
-        "Diminished Cadence": "I - vii° (V) - I"
+        "Diminished Cadence": "I - vii° (V) - I",
+        "Romanesca": "I - V (vi) - vi (IV) - III (I) - IV (ii) - I (vi) - IV (ii) - V",
+        "Andalusian Classical": "i - bVII - bVI - V"
     },
 
     "Jazz & Dixieland": {
@@ -584,42 +586,72 @@ const GENRES_DATA = {
         "Golden Pop": "I - V (bVII) - vi (I) - IV (ii)",
         "Golden Fifties": "I - vi (I) - IV (ii) - V (bVII)",
         "Mixolydian Rock": "I - bVII (v) - IV (ii) - I (v)",
-        "Andalusian Cadence": "vi - V (bVII) - IV (bVI) - III (V7)"
+        "Andalusian Cadence": "vi - V (bVII) - IV (bVI) - III (V7)",
+        "Rock Anthem": "I - bVII - IV - I",
+        "Descending Pop": "I - V (iii) - vi - IV"
     },
 
-    "Country, Folk & Blues": {
+    "Country & Folk": {
         "Country Three-Chord": "I - IV (ii) - I (vi) - V (bVII)",
-        "Twelve-Bar Blues": "I7 - IV7 (ii7) - I7 (vi7) - V7 (bVII7) - IV7 (ii7) - I7 (vi7) - V7 (bVII7)",
-        "Bluegrass Breakdown": "I - IV (ii) - V (bVII) - vi (I)"
+        "Twelve-Bar Country": "I7 - I7 - IV7 - IV7 - I7 - I7 - V7 - IV7 - I7 - V7",
+        "Country Waltz": "I - IV (vi) - I - V (IV) - I - IV (ii) - V - I",
+        "Country Ballad": "I - vi (IV) - IV - V (ii)",
+        "Bluegrass Breakdown": "I - IV (ii) - V (bVII) - I (vi)",
+        "Folk Ballad": "I - V (vi) - IV (ii) - I"
+    },
+
+    "Blues": {
+        "12-Bar Blues": "I7 - IV7 (ii7) - I7 (vi7) - I7 (V7) - IV7 (ii7) - IV7 (V7) - I7 (vi7) - I7 (IV7) - V7 - IV7 - I7 - V7",
+        "Quick Change Blues": "I7 - IV7 - I7 - I7 - IV7 - IV7 - I7 - I7 - V7 - IV7 - I7 - V7",
+        "8-Bar Blues": "I7 - IV7 - I7 - VI7 - ii7 - V7 - I7 - V7",
+        "16-Bar Blues": "I7 - I7 - IV7 - IV7 - I7 - I7 - V7 - V7 - IV7 - IV7 - I7 - I7 - V7 - IV7 - I7 - V7",
+        "Minor Blues": "i7 - i7 - iv7 - iv7 - i7 - i7 - V7 - iv7 - i7 - iv7 - i7 - V7",
+        "Jazz Blues": "I7 - IV7 - I7 - VI7 - ii7 - V7 - I7 - VI7 - ii7 - V7 - I7 - V7"
     },
 
     "Funk & Disco": {
         "Classic Funk": "i7 - IV7 (bVIImaj7)",
         "Disco Vamp": "ii7 - V7 (bVII7)",
-        "Funk Turnaround": "i7 - bVII7 (IV7) - bVI7 (ii7) - V7 (bVII7)"
+        "Funk Turnaround": "i7 - bVII7 (IV7) - bVI7 (ii7) - V7 (bVII7)",
+        "Funk Minor Groove": "i7 - iv7 - bVII7 - bVI7",
+        "Disco Four-Chord": "i7 - VI7 - iv7 - V7",
+        "Funk Dominant Groove": "I7 - IV7 - I7 - V7"
     },
 
     "Heavy Metal & Hard Rock": {
         "Power Metal": "i - bVI (iv) - bVII (v) - i (v)",
         "Aeolian Metal": "i - bVII (iv) - bVI (ii7) - bVII (v)",
-        "Phrygian Metal": "i - bII (vii) - i (v)"
+        "Phrygian Metal": "i - bII (vii) - i (v)",
+        "Metal Gallop": "i - bVII - bVI - bVII",
+        "Doom Metal": "i - bVI - bVII - i",
+        "Heavy Rock": "i - bVII - IV - i"
     },
 
     "Gospel & Soul": {
         "Gospel Cascade": "I - I7 (v7) - IV (ii) - iv (bVII7)",
         "Soul Preacher": "I - vi7 (bIII7) - IVmaj7 (ii7) - V7 (bVII7)",
-        "Church Cadence": "I - bVII (v) - IV (ii) - I (vi)"
+        "Church Cadence": "I - bVII (v) - IV (ii) - I (vi)",
+        "Gospel Walkdown": "I - vi - IV - V",
+        "Soul Ballad": "Imaj7 - vi7 - IVmaj7 - V7",
+        "Gospel Turnaround": "I - vi7 - ii7 - V7"
     },
 
     "Latin & Salsa": {
         "Classic Montuno": "i - bVII (v) - bVI (ii7) - V7 (bVII7)",
-        "Salsa Clave": "ii7 - V7 (bVII7) - Imaj7 (vi7) - VI7 (bIII7)"
+        "Salsa Clave": "ii7 - V7 (bVII7) - Imaj7 (vi7) - VI7 (bIII7)",
+        "Latin Vamp": "i - iv - bVII - III7",
+        "Bossa Nova": "Imaj7 - bII7 (V7) - Imaj7",
+        "Samba Progression": "Imaj7 - VI7 - ii7 - V7",
+        "Minor Latin Groove": "i7 - iv7 - bVII7 - bVImaj7"
     },
 
     "Other Styles": {
         "Reggae Groove": "I - IV (ii)",
-        "Bossa Nova": "Imaj7 - bII7 (V7) - Imaj7 (vi7)",
-        "Neo-Soul": "IVmaj7 - III7 (bVII7) - vi7 (Imaj7) - v7 (I7)"
+        "Neo-Soul": "IVmaj7 - III7 (bVII7) - vi7 (Imaj7) - v7 (I7)",
+        "Dream Pop": "Imaj7 - V - vi7 - IVmaj7",
+        "Ambient Progression": "Imaj7 - IVmaj7 - vi7 - V",
+        "Modal Groove": "i7 - bVII - IV - i7",
+        "Cinematic": "i - bVI - III - bVII"
     }
 };
 
