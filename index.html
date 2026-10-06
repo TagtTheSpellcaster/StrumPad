@@ -308,8 +308,29 @@
                 </div>
 
                 <div class="overflow-x-auto pb-2">
-                    <div id="matrix-grid" class="inline-flex flex-col gap-3 min-w-max p-1">
-                        <!-- Generated dynamically by app.js -->
+                    <div id="matrix-grid-container" class="inline-flex flex-col gap-2 min-w-max p-1">
+                        <!-- Header Row showing Column Letters above the Matrix Buttons -->
+                        <div class="flex items-center gap-3">
+                            <div class="w-36 shrink-0"></div> <!-- Offset matching row labels -->
+                            <div class="flex items-center gap-2 font-mono text-xs font-bold text-slate-700 text-center">
+                                <span class="w-[42px]">C</span>
+                                <span class="w-[42px]">G</span>
+                                <span class="w-[42px]">D</span>
+                                <span class="w-[42px]">A</span>
+                                <span class="w-[42px]">E</span>
+                                <span class="w-[42px]">B</span>
+                                <span class="w-[42px]">F#</span>
+                                <span class="w-[42px]">Db</span>
+                                <span class="w-[42px]">Ab</span>
+                                <span class="w-[42px]">Eb</span>
+                                <span class="w-[42px]">Bb</span>
+                                <span class="w-[42px]">F</span>
+                            </div>
+                        </div>
+
+                        <div id="matrix-grid" class="flex flex-col gap-3">
+                            <!-- Generated dynamically by app.js -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -355,7 +376,7 @@
         <!-- Footer -->
         <footer class="text-center text-xs text-slate-500 border-t border-chassisDark pt-2 flex justify-between items-center">
             <span>Pure Web Audio API Synthesis</span>
-            <span>StrumPad Simulator</span>
+            <span>by Tagt The Spellcaster</span>
         </footer>
     </div>
 
