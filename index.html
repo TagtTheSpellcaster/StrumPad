@@ -233,43 +233,63 @@
 
                     </div>
 
-                    <!-- COLUMN 3 (3 cols): LFO Panel -->
-                    <div class="md:col-span-3 bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col gap-2 justify-between">
-                        <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">LFO Modulation</span>
+                    <!-- COLUMN 3 (3 cols): LFO Panel + Compact Synth Presets Panel -->
+                    <div class="md:col-span-3 flex flex-col gap-2 justify-between">
                         
-                        <div>
-                            <div class="flex justify-between text-[10px] font-semibold mb-0.5">
-                                <span>LFO Rate</span>
-                                <span id="lbl-lfo-rate" class="font-mono text-slate-700">5.0 Hz</span>
+                        <!-- Compact LFO Panel -->
+                        <div class="bg-amber-50/70 p-2.5 rounded-xl border-2 border-chassisDark flex flex-col gap-1.5">
+                            <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-0.5">LFO Modulation</span>
+                            
+                            <div>
+                                <div class="flex justify-between text-[10px] font-semibold mb-0.5">
+                                    <span>LFO Rate</span>
+                                    <span id="lbl-lfo-rate" class="font-mono text-slate-700">5.0 Hz</span>
+                                </div>
+                                <input type="range" id="slider-lfo-rate" min="0.5" max="15.0" step="0.1" value="5.0" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                             </div>
-                            <input type="range" id="slider-lfo-rate" min="0.5" max="15.0" step="0.1" value="5.0" class="w-full h-1.5 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
+
+                            <div>
+                                <div class="flex justify-between text-[10px] font-semibold mb-0.5">
+                                    <span>LFO Depth</span>
+                                    <span id="lbl-lfo-depth" class="font-mono text-slate-700">0%</span>
+                                </div>
+                                <input type="range" id="slider-lfo-depth" min="0" max="100" value="0" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
+                            </div>
+
+                            <div class="flex items-center justify-between pt-1 border-t border-slate-300">
+                                <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800">
+                                    <input type="checkbox" id="toggle-vibrato" class="accent-amber-800 cursor-pointer">
+                                    <span>Vibrato</span>
+                                </label>
+                                <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800">
+                                    <input type="checkbox" id="toggle-tremolo" class="accent-amber-800 cursor-pointer">
+                                    <span>Tremolo</span>
+                                </label>
+                            </div>
                         </div>
 
-                        <div>
-                            <div class="flex justify-between text-[10px] font-semibold mb-0.5">
-                                <span>LFO Depth</span>
-                                <span id="lbl-lfo-depth" class="font-mono text-slate-700">0%</span>
+                        <!-- Compact Synth Presets Panel -->
+                        <div class="bg-amber-50/70 p-2.5 rounded-xl border-2 border-chassisDark flex flex-col gap-1.5">
+                            <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-0.5">Synth Presets</span>
+                            <div id="presets-grid" class="grid grid-cols-2 gap-1.5">
+                                <button data-preset="PIANO" class="preset-btn text-[9px] font-bold py-1 px-1 rounded border bg-amber-100 border-amber-800 text-amber-950 shadow-sm">PIANO</button>
+                                <button data-preset="GUITAR" class="preset-btn text-[9px] font-bold py-1 px-1 rounded border bg-amber-50 border-chassisDark text-slate-800 hover:bg-amber-100">GUITAR</button>
+                                <button data-preset="BASS" class="preset-btn text-[9px] font-bold py-1 px-1 rounded border bg-amber-50 border-chassisDark text-slate-800 hover:bg-amber-100">BASS</button>
+                                <button data-preset="ORGAN" class="preset-btn text-[9px] font-bold py-1 px-1 rounded border bg-amber-50 border-chassisDark text-slate-800 hover:bg-amber-100">ORGAN</button>
+                                <button data-preset="STRINGS" class="preset-btn text-[9px] font-bold py-1 px-1 rounded border bg-amber-50 border-chassisDark text-slate-800 hover:bg-amber-100">STRINGS</button>
+                                <button data-preset="BRASS" class="preset-btn text-[9px] font-bold py-1 px-1 rounded border bg-amber-50 border-chassisDark text-slate-800 hover:bg-amber-100">BRASS</button>
+                                <button data-preset="PAD" class="preset-btn text-[9px] font-bold py-1 px-1 rounded border bg-amber-50 border-chassisDark text-slate-800 hover:bg-amber-100">PAD</button>
+                                <button data-preset="LEAD" class="preset-btn text-[9px] font-bold py-1 px-1 rounded border bg-amber-50 border-chassisDark text-slate-800 hover:bg-amber-100">LEAD</button>
                             </div>
-                            <input type="range" id="slider-lfo-depth" min="0" max="100" value="0" class="w-full h-1.5 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                         </div>
 
-                        <div class="flex flex-col gap-1 pt-1 border-t border-slate-300">
-                            <label class="inline-flex items-center justify-between cursor-pointer text-[10px] font-semibold text-slate-800">
-                                <span>Vibrato</span>
-                                <input type="checkbox" id="toggle-vibrato" class="accent-amber-800 cursor-pointer">
-                            </label>
-                            <label class="inline-flex items-center justify-between cursor-pointer text-[10px] font-semibold text-slate-800">
-                                <span>Tremolo</span>
-                                <input type="checkbox" id="toggle-tremolo" class="accent-amber-800 cursor-pointer">
-                            </label>
-                        </div>
                     </div>
 
                     <!-- COLUMN 4 (2 cols): Extended Master Volume Panel with Speaker Icons -->
                     <div class="md:col-span-2 bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col items-center justify-between h-full">
                         <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1 text-center w-full">Master Vol</span>
                         
-                        <!-- Icona Altoparlante Grande (Alto Volume) -->
+                        <!-- Speaker High Icon -->
                         <div class="mt-2 text-slate-700" title="Max Volume">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
@@ -277,12 +297,12 @@
                             </svg>
                         </div>
 
-                        <!-- Slider Volume Allungato -->
+                        <!-- Master Volume Slider Wrapper -->
                         <div class="vertical-slider-wrapper-master my-1">
                             <input type="range" id="slider-volume" min="0" max="100" value="80" class="v-range-master">
                         </div>
 
-                        <!-- Icona Altoparlante Piccolo (Basso Volume / Mute) -->
+                        <!-- Speaker Low Icon -->
                         <div class="mb-1 text-slate-500" title="Min Volume">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
@@ -300,7 +320,7 @@
         <!-- Lower Section: Chord Matrix (Left) & Progression Assistant (Right) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- Chord Matrix (8 Columns) -->
+            <!-- Chord Matrix Headers & Grid (8 Columns) -->
             <div class="lg:col-span-8 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col gap-3">
                 <div class="flex justify-between items-center border-b border-slate-300 pb-1">
                     <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Chord Matrix — Circle of Fifths</h2>
@@ -308,29 +328,24 @@
                 </div>
 
                 <div class="overflow-x-auto pb-2">
-                    <div id="matrix-grid-container" class="inline-flex flex-col gap-2 min-w-max p-1">
-                        <!-- Header Row showing Column Letters above the Matrix Buttons -->
-                        <div class="flex items-center gap-3">
-                            <div class="w-36 shrink-0"></div> <!-- Offset matching row labels -->
-                            <div class="flex items-center gap-2 font-mono text-xs font-bold text-slate-700 text-center">
-                                <span class="w-[42px]">C</span>
-                                <span class="w-[42px]">G</span>
-                                <span class="w-[42px]">D</span>
-                                <span class="w-[42px]">A</span>
-                                <span class="w-[42px]">E</span>
-                                <span class="w-[42px]">B</span>
-                                <span class="w-[42px]">F#</span>
-                                <span class="w-[42px]">Db</span>
-                                <span class="w-[42px]">Ab</span>
-                                <span class="w-[42px]">Eb</span>
-                                <span class="w-[42px]">Bb</span>
-                                <span class="w-[42px]">F</span>
-                            </div>
-                        </div>
+                    <!-- Column Root Note Headers -->
+                    <div class="flex items-center gap-3 pl-[152px] mb-1 font-mono font-bold text-xs text-slate-700 min-w-max">
+                        <span class="w-[42px] text-center">C</span>
+                        <span class="w-[42px] text-center">G</span>
+                        <span class="w-[42px] text-center">D</span>
+                        <span class="w-[42px] text-center">A</span>
+                        <span class="w-[42px] text-center">E</span>
+                        <span class="w-[42px] text-center">B</span>
+                        <span class="w-[42px] text-center">F#</span>
+                        <span class="w-[42px] text-center">Db</span>
+                        <span class="w-[42px] text-center">Ab</span>
+                        <span class="w-[42px] text-center">Eb</span>
+                        <span class="w-[42px] text-center">Bb</span>
+                        <span class="w-[42px] text-center">F</span>
+                    </div>
 
-                        <div id="matrix-grid" class="flex flex-col gap-3">
-                            <!-- Generated dynamically by app.js -->
-                        </div>
+                    <div id="matrix-grid" class="inline-flex flex-col gap-3 min-w-max p-1">
+                        <!-- Generated dynamically by app.js -->
                     </div>
                 </div>
             </div>
