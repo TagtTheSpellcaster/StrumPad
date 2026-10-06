@@ -183,18 +183,22 @@
     align-items: center;
     justify-content: space-between;
     height: 100%;
-    min-height: 0;
 }
 
-.vertical-slider-wrapper,
+.vertical-slider-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    width: 100%;
+}
+
 .vertical-slider-wrapper-master {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 1;
-    min-height: 0;
+    height: 110px;
     width: 100%;
-    overflow: hidden;
 }
 
 
