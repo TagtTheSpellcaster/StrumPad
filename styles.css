@@ -306,15 +306,58 @@
     overflow: hidden;
 }
 
-/* The LFO + Preset column fills the same height as ADSR / Master.
-   The two panels split that height evenly, with the existing gap between them. */
+/* ==========================================
+   SYNTHESIS CONTROL GEOMETRY
+   Exact reference dimensions
+   ========================================== */
+
+/* The six inner panels share a 408px control area. */
+.synth-controls-grid {
+    height: 408px;
+    flex: 0 0 408px;
+    min-height: 408px;
+}
+
+/* ADSR and Master Volume are exactly 408px high. */
+.synth-controls-grid > .md\\:col-span-4,
+.synth-controls-grid > .md\\:col-span-2 {
+    height: 408px;
+}
+
+/* Waveform + Filter: exact reference heights and gap. */
+.synth-waveform-filter {
+    height: 408px;
+    min-height: 408px;
+    gap: 42px;
+}
+
+.synth-waveform-panel {
+    height: 161px;
+    flex: 0 0 161px;
+}
+
+.synth-filter-panel {
+    height: 205px;
+    flex: 0 0 205px;
+}
+
+/* LFO + Synth Presets: exact reference heights and gap. */
 .synth-stack {
-    min-height: 0;
-    height: 100%;
+    height: 408px;
+    min-height: 408px;
+    gap: 10px;
 }
 
 .synth-stack-panel {
     min-height: 0;
-    height: calc((100% - 0.5rem) / 2);
-    flex: 0 0 calc((100% - 0.5rem) / 2);
+}
+
+.synth-stack-panel:first-child {
+    height: 201px;
+    flex: 0 0 201px;
+}
+
+.synth-stack-panel:last-child {
+    height: 197px;
+    flex: 0 0 197px;
 }
