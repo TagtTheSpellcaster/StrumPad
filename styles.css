@@ -263,125 +263,26 @@
 }
 
 /* ==========================================
-   VERTICAL SYNTH SLIDERS
+   SYNTH CONTROLS LAYOUT
    ========================================== */
 
 /*
- * IMPORTANT:
- * Do not make these panels height: 100%.
- * The synthesis grid must determine its height from
- * the actual LFO + Synth Presets stack.
- *
- * ADSR and Master Volume then occupy that same
- * compact hardware-module height without stretching
- * the whole synthesis section.
+ * Let the natural height of the LFO + Synth Presets
+ * stack determine the synthesis row height.
+ * ADSR and Master Volume stretch to that row only.
  */
-.md\\:col-span-4:has(#adsr-canvas),
-.md\\:col-span-2:has(#slider-volume) {
-    align-self: start;
-    height: 273px;
-    min-height: 0;
-    box-sizing: border-box;
+.synth-controls-grid {
+    align-items: stretch;
 }
 
-/* ADSR contents fit inside the compact module. */
-.md\\:col-span-4:has(#adsr-canvas) .crt-container {
-    height: 7rem;
-    flex-shrink: 0;
-}
-
-.md\\:col-span-4:has(#adsr-canvas) > .grid {
-    height: 7rem;
-    flex-shrink: 0;
-}
-
-/* Vertical slider containers. */
-.slider-vertical-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    height: 100%;
+.synth-adsr-panel,
+.synth-volume-panel {
     min-height: 0;
 }
 
-.vertical-slider-wrapper,
-.vertical-slider-wrapper-master {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
+/* The vertical slider wrappers must remain inside the
+   compact ADSR / Master Volume panels. */
+.synth-adsr-panel .vertical-slider-wrapper,
+.synth-volume-panel .vertical-slider-wrapper-master {
     min-height: 0;
-    width: 100%;
-    overflow: hidden;
-}
-
-/*
- * Same visual language as the LFO:
- * thin light track + round amber thumb.
- */
-.v-range,
-.v-range-master {
-    -webkit-appearance: none;
-    appearance: none;
-    writing-mode: vertical-lr;
-    direction: rtl;
-
-    width: 4px;
-    height: 100%;
-    min-height: 40px;
-
-    margin: 0;
-    padding: 0;
-
-    background: transparent;
-    cursor: pointer;
-    accent-color: #b45309;
-}
-
-/* Light vertical track. */
-.v-range::-webkit-slider-runnable-track,
-.v-range-master::-webkit-slider-runnable-track {
-    width: 4px;
-    height: 100%;
-    border-radius: 9999px;
-    background: #efefef;
-    border: 1px solid #b2b2b2;
-}
-
-.v-range::-moz-range-track,
-.v-range-master::-moz-range-track {
-    width: 4px;
-    height: 100%;
-    border-radius: 9999px;
-    background: #efefef;
-    border: 1px solid #b2b2b2;
-}
-
-/* Round amber thumb. */
-.v-range::-webkit-slider-thumb,
-.v-range-master::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-
-    width: 19px;
-    height: 19px;
-
-    border: none;
-    border-radius: 50%;
-
-    background: #b45309;
-    box-shadow: none;
-}
-
-.v-range::-moz-range-thumb,
-.v-range-master::-moz-range-thumb {
-    width: 19px;
-    height: 19px;
-
-    border: none;
-    border-radius: 50%;
-
-    background: #b45309;
-    box-shadow: none;
 }
