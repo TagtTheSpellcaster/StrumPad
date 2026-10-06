@@ -3,99 +3,72 @@
    Pastel Vintage Hardware Palette
    ========================================== */
 
-/* ------------------------------------------
-   Major Row — Beige / Amber Pastel
-   ------------------------------------------ */
+/* Major Row — Beige / Amber Pastel */
 .row-maj {
     background-color: #fef3c7;
     border-color: #d1a566;
     color: #451a03;
 }
-
 .row-maj:hover {
     background-color: #fde68a;
 }
 
-
-/* ------------------------------------------
-   Minor Row — Sky Blue Pastel
-   ------------------------------------------ */
+/* Minor Row — Sky Blue Pastel */
 .row-min {
     background-color: #e0f2fe;
     border-color: #79a8c7;
     color: #0c4a6e;
 }
-
 .row-min:hover {
     background-color: #bae6fd;
 }
 
-
-/* ------------------------------------------
-   Dominant 7th Row — Rose / Pink Pastel
-   ------------------------------------------ */
+/* Dominant 7th Row — Rose / Pink Pastel */
 .row-7 {
     background-color: #ffe4e6;
     border-color: #c98888;
     color: #881337;
 }
-
 .row-7:hover {
     background-color: #fecdd3;
 }
 
-
-/* ------------------------------------------
-   Major 7th Row — Emerald / Mint Pastel
-   ------------------------------------------ */
+/* Major 7th Row — Emerald / Mint Pastel */
 .row-maj7 {
     background-color: #d1fae5;
     border-color: #7fba8f;
     color: #064e3b;
 }
-
 .row-maj7:hover {
     background-color: #a7f3d0;
 }
 
-
-/* ------------------------------------------
-   Minor 7th Row — Purple / Lilac Pastel
-   ------------------------------------------ */
+/* Minor 7th Row — Purple / Lilac Pastel */
 .row-m7 {
     background-color: #f3e8ff;
     border-color: #a485b8;
     color: #581c87;
 }
-
 .row-m7:hover {
     background-color: #e9d5ff;
 }
 
-
-/* ------------------------------------------
-   Diminished Row — Sage / Soft Olive Pastel
-   ------------------------------------------ */
+/* Diminished Row — Sage / Soft Olive Pastel */
 .row-dim {
     background-color: #ecf3e6;
     border-color: #9fb78e;
     color: #2a401c;
 }
-
 .row-dim:hover {
     background-color: #d6e7c7;
 }
 
-
-/* ------------------------------------------
-   Diminished 7th Row — Dusty Blue-Gray Pastel
-   ------------------------------------------ */
+/* Diminished 7th Row — Dusty Blue-Gray Pastel */
 .row-dim7 {
     background-color: #e8eef3;
     border-color: #91a4b8;
     color: #213547;
 }
-
 .row-dim7:hover {
     background-color: #d2e0ee;
 }
@@ -108,164 +81,85 @@
 
 .matrix-btn {
     position: relative;
-
     width: 42px;
     height: 42px;
     min-width: 42px;
     min-height: 42px;
-
     border-width: 2px;
     border-style: solid;
     border-radius: 6px;
-
     font-family: monospace;
     font-size: 0.75rem;
     font-weight: 700;
-
     cursor: pointer;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     padding-bottom: 4px;
-
     flex-shrink: 0;
-
-    /*
-     * Physical button appearance:
-     * raised from the panel with a pronounced lower edge.
-     */
-    box-shadow:
-        0 4px 0 rgba(0, 0, 0, 0.25),
+    box-shadow: 
+        0 4px 0 rgba(0, 0, 0, 0.25), 
         0 5px 6px rgba(0, 0, 0, 0.20);
-
     outline: none;
-
-    transition:
-        transform 0.05s ease,
-        box-shadow 0.05s ease,
-        filter 0.1s ease;
+    transition: transform 0.05s ease, box-shadow 0.05s ease, filter 0.1s ease;
 }
-
-
-/* ==========================================
-   BUTTON LED
-   Small hardware-style indicator
-   ========================================== */
 
 .matrix-btn .btn-led {
     position: absolute;
-
     bottom: 3px;
     left: 50%;
-
     transform: translateX(-50%);
-
     width: 8px;
     height: 3px;
-
     border-radius: 1px;
-
     background-color: rgba(0, 0, 0, 0.18);
-
-    transition:
-        background-color 0.15s ease,
-        box-shadow 0.15s ease;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-
-/* ==========================================
-   ACTIVE CHORD
-   ========================================== */
-
+/* Active State */
 .matrix-btn.active {
-    /*
-     * Physical button pressed into the panel.
-     */
     transform: translateY(3px);
-
-    box-shadow:
-        0 1px 0 rgba(0, 0, 0, 0.25),
+    box-shadow: 
+        0 1px 0 rgba(0, 0, 0, 0.25), 
         inset 0 2px 4px rgba(0, 0, 0, 0.20);
-
     border-color: #334155 !important;
 }
 
 .matrix-btn.active .btn-led {
     background-color: #22c55e;
-
-    box-shadow:
-        0 0 6px #22c55e;
+    box-shadow: 0 0 6px #22c55e;
 }
 
-
-/* ==========================================
-   PROGRESSION — MAIN CHORD
-   Solid warm/orange highlight
-   ========================================== */
-
+/* Progression Highlights */
 .matrix-btn.highlight-main {
     border-color: #f59e0b !important;
-
-    box-shadow:
-        0 0 0 2px #f59e0b,
+    box-shadow: 
+        0 0 0 2px #f59e0b, 
         0 0 8px rgba(245, 158, 11, 0.6);
-
     animation: pulseHighlightMain 1.5s infinite alternate;
 }
 
-
-@keyframes pulseHighlightMain {
-    0% {
-        box-shadow:
-            0 0 0 2px #f59e0b,
-            0 0 4px rgba(245, 158, 11, 0.4);
-    }
-
-    100% {
-        box-shadow:
-            0 0 0 3px #f59e0b,
-            0 0 12px rgba(245, 158, 11, 0.8);
-    }
-}
-
-
-/* ==========================================
-   PROGRESSION — SECONDARY CHORD
-   Dashed outline makes the distinction
-   immediately recognizable.
-   ========================================== */
-
 .matrix-btn.highlight-sub {
     border: 2px dashed #3b82f6 !important;
-
-    box-shadow:
-        0 0 0 1px rgba(59, 130, 246, 0.35),
+    box-shadow: 
+        0 0 0 1px rgba(59, 130, 246, 0.35), 
         0 0 7px rgba(59, 130, 246, 0.45);
-
     animation: pulseHighlightSub 1.5s infinite alternate;
 }
 
-
-@keyframes pulseHighlightSub {
-    0% {
-        box-shadow:
-            0 0 0 1px rgba(59, 130, 246, 0.35),
-            0 0 4px rgba(59, 130, 246, 0.35);
-    }
-
-    100% {
-        box-shadow:
-            0 0 0 2px rgba(59, 130, 246, 0.55),
-            0 0 10px rgba(59, 130, 246, 0.65);
-    }
+@keyframes pulseHighlightMain {
+    0% { box-shadow: 0 0 0 2px #f59e0b, 0 0 4px rgba(245, 158, 11, 0.4); }
+    100% { box-shadow: 0 0 0 3px #f59e0b, 0 0 12px rgba(245, 158, 11, 0.8); }
 }
 
+@keyframes pulseHighlightSub {
+    0% { box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.35), 0 0 4px rgba(59, 130, 246, 0.35); }
+    100% { box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.55), 0 0 10px rgba(59, 130, 246, 0.65); }
+}
+
+
 /* ==========================================
-   VERTICAL ADSR / MASTER VOLUME SLIDERS
-   Same native range control as the LFO;
-   only the orientation is changed.
+   VERTICAL SLIDERS (ADSR & MASTER VOL)
    ========================================== */
 
 .v-range,
@@ -283,9 +177,6 @@
     outline: none;
 }
 
-/* The wrapper provides the vertical track length.
-   The range itself keeps the browser-native thumb,
-   exactly like the horizontal LFO controls. */
 .slider-vertical-container {
     display: flex;
     flex-direction: column;
@@ -304,4 +195,39 @@
     min-height: 0;
     width: 100%;
     overflow: hidden;
+}
+
+
+/* ==========================================
+   PRESET BUTTONS & MONITOR CRT
+   ========================================== */
+
+.preset-btn {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 4px 2px;
+    border-radius: 4px;
+    border: 1px solid #c2b8a3;
+    background-color: #fffbeb;
+    color: #1e293b;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.preset-btn:hover {
+    background-color: #fef3c7;
+}
+
+.preset-btn.active-preset {
+    background-color: #d4af37;
+    color: #ffffff;
+    border-color: #b48f27;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Monitor CRT dell'ADSR Canvas */
+.crt-container {
+    background-color: #020803;
+    border: 2px solid #a3b899;
+    box-shadow: inset 0 0 10px rgba(0, 255, 102, 0.2);
 }
