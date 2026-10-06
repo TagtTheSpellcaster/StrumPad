@@ -1,0 +1,48 @@
+/* STREAMING_CHUNK:Styling retro hardware UI components... /
+/ Main page body and selection constraints */
+body {
+user-select: none;
+-webkit-user-select: none;
+touch-action: manipulation;
+background-color: #1a1816;
+}
+
+/* Metallic/Gold gradient surface for Strumplate Canvas Container */
+.strumplate-gradient {
+background: linear-gradient(135deg,
+#bf953f 0%,
+#fcf6ba 25%,
+#b38728 50%,
+#fbf5b7 75%,
+#aa771c 100%);
+box-shadow: inset 0 0 15px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.3);
+}
+
+/* 3D Hardware Button Styles for Accordion Matrix */
+.chord-btn {
+transition: all 0.05s ease;
+box-shadow: 0 4px 0 #8c8273, 0 5px 6px rgba(0,0,0,0.3);
+}
+
+.chord-btn:active, .chord-btn.active {
+transform: translateY(3px);
+box-shadow: 0 1px 0 #8c8273, 0 2px 3px rgba(0,0,0,0.3);
+}
+
+/* Knobs & LED glow effects */
+.led-indicator {
+box-shadow: 0 0 8px currentColor;
+}
+
+/* Custom scrollbar for horizontal button grid scrolling on small screens */
+::-webkit-scrollbar {
+height: 6px;
+width: 6px;
+}
+::-webkit-scrollbar-track {
+background: #2a2621;
+}
+::-webkit-scrollbar-thumb {
+background: #8c8273;
+border-radius: 3px;
+}
