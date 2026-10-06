@@ -26,11 +26,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 sm:p-5 text-slate-800">
-
-    <!-- Main Instrument Chassis -->
     <div class="w-full max-w-7xl bg-chassis rounded-3xl p-4 sm:p-7 shadow-2xl border-4 border-chassisDark flex flex-col gap-6 relative">
-        
-        <!-- Chassis Header & Logo -->
         <header class="flex flex-wrap justify-between items-center border-b-2 border-chassisDark pb-3 gap-4">
             <div class="flex items-center gap-3">
                 <div id="power-led" class="w-4 h-4 rounded-full bg-red-600 shadow-[0_0_8px_#dc2626]"></div>
@@ -38,8 +34,6 @@
                     StrumPad <span class="text-xs text-amber-900 font-bold lowercase">v0.97</span> <span class="text-xs font-sans font-semibold text-amber-900 border border-amber-800 px-2 py-0.5 rounded ml-2">VINTAGE CHORD MACHINE</span>
                 </h1>
             </div>
-
-            <!-- Master Audio Toggle Switch (Starts OFF) -->
             <div class="flex items-center gap-3 bg-panelBg px-4 py-2 rounded-2xl border border-chassisDark shadow-sm">
                 <div class="flex flex-col text-right">
                     <span id="lbl-audio-state" class="text-xs font-bold text-slate-700">Audio OFF</span>
@@ -52,16 +46,10 @@
             </div>
         </header>
 
-        <!-- Upper Section: Left Modes Panel (4 cols) & Right Synthesis Engine (8 cols) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-            
-            <!-- Left Panel: Modes & Selected Chord Monitor -->
             <div class="lg:col-span-4 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col justify-between gap-4">
-                
                 <div class="flex flex-col gap-3">
                     <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600 border-b border-slate-300 pb-1">Performance Modes</h2>
-
-                    <!-- Drone Mode -->
                     <div class="flex items-center justify-between py-1">
                         <div class="flex flex-col">
                             <span class="text-xs font-bold text-slate-700">Drone Mode</span>
@@ -72,8 +60,6 @@
                             <div class="w-11 h-6 bg-chassisDark peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-700"></div>
                         </label>
                     </div>
-
-                    <!-- Strum Mode -->
                     <div class="flex items-center justify-between py-1 border-t border-slate-300">
                         <div class="flex flex-col">
                             <span class="text-xs font-bold text-slate-700">Strum Mode</span>
@@ -84,8 +70,6 @@
                             <div class="w-11 h-6 bg-chassisDark peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-700"></div>
                         </label>
                     </div>
-
-                    <!-- Arpeggiator -->
                     <div class="flex items-center justify-between py-1 border-t border-slate-300">
                         <div class="flex flex-col">
                             <span class="text-xs font-bold text-slate-700">Arpeggiator</span>
@@ -93,11 +77,9 @@
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="toggle-arp" class="sr-only peer">
-                            <div class="w-11 h-6 bg-chassisDark peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-700"></div>
+                            <div class="w-11 h-6 bg-chassisDark peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-700"></div>
                         </label>
                     </div>
-
-                    <!-- Horizontal Speed Slider for Strum / Arp Delay -->
                     <div class="pt-2 border-t border-slate-300 flex flex-col gap-1">
                         <div class="flex justify-between text-xs font-semibold">
                             <span>Strum / Arp Speed</span>
@@ -106,169 +88,88 @@
                         <input type="range" id="slider-speed" min="10" max="80" value="35" class="w-full h-2 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                     </div>
                 </div>
-
-                <!-- Selected Chord Monitor Box -->
                 <div class="bg-amber-100/90 border border-amber-300 rounded-xl p-3 flex justify-between items-center shadow-inner mt-1">
                     <span class="text-xs font-bold text-amber-900 uppercase">Selected Chord:</span>
                     <span id="lbl-active-chord" class="font-mono font-bold text-2xl text-amber-950">None</span>
                 </div>
             </div>
 
-            <!-- Right Panel: Synthesis Engine & Master Output -->
             <div class="lg:col-span-8 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col gap-3 min-h-0">
-                
                 <div class="flex justify-between items-center border-b border-slate-300 pb-1">
                     <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Synthesis Engine & Master Output</h2>
                     <span class="text-xs text-amber-900 font-medium hidden sm:inline">Analog Synthesis Controls</span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-3 flex-1 min-h-0">
-                    
-                    <!-- COLUMN 1 (4 cols): ADSR Panel -->
                     <div class="md:col-span-4 lg:h-[408px] lg:flex-none bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col gap-2">
                         <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">ADSR Envelope Generator</span>
-                        
-                        <!-- CRT Monitor -->
                         <div class="crt-container rounded-xl p-2 h-28 overflow-hidden relative w-full">
                             <canvas id="adsr-canvas" class="w-full h-full block rounded-lg relative z-10"></canvas>
                         </div>
-
-                        <!-- Vertical Sliders -->
                         <div class="grid grid-cols-4 gap-1 items-center h-28 pt-1">
                             <div class="slider-vertical-container">
                                 <span class="text-[10px] font-bold uppercase text-slate-700">A</span>
-                                <div class="vertical-slider-wrapper">
-                                    <input type="range" id="slider-attack" min="0.01" max="2.0" step="0.01" value="0.1" class="v-range w-1 h-full bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
-                                </div>
+                                <div class="vertical-slider-wrapper"><input type="range" id="slider-attack" min="0.01" max="2.0" step="0.01" value="0.1" class="v-range w-1 h-full bg-chassisDark rounded-lg cursor-pointer accent-amber-800"></div>
                                 <span id="lbl-attack" class="text-[10px] font-mono font-bold text-amber-950">0.10s</span>
                             </div>
-
                             <div class="slider-vertical-container">
                                 <span class="text-[10px] font-bold uppercase text-slate-700">D</span>
-                                <div class="vertical-slider-wrapper">
-                                    <input type="range" id="slider-decay" min="0.05" max="3.0" step="0.05" value="0.5" class="v-range w-1 h-full bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
-                                </div>
+                                <div class="vertical-slider-wrapper"><input type="range" id="slider-decay" min="0.05" max="3.0" step="0.05" value="0.5" class="v-range w-1 h-full bg-chassisDark rounded-lg cursor-pointer accent-amber-800"></div>
                                 <span id="lbl-decay" class="text-[10px] font-mono font-bold text-amber-950">0.50s</span>
                             </div>
-
                             <div class="slider-vertical-container">
                                 <span class="text-[10px] font-bold uppercase text-slate-700">S</span>
-                                <div class="vertical-slider-wrapper">
-                                    <input type="range" id="slider-sustain" min="0.0" max="1.0" step="0.05" value="0.6" class="v-range w-1 h-full bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
-                                </div>
+                                <div class="vertical-slider-wrapper"><input type="range" id="slider-sustain" min="0.0" max="1.0" step="0.05" value="0.6" class="v-range w-1 h-full bg-chassisDark rounded-lg cursor-pointer accent-amber-800"></div>
                                 <span id="lbl-sustain" class="text-[10px] font-mono font-bold text-amber-950">60%</span>
                             </div>
-
                             <div class="slider-vertical-container">
                                 <span class="text-[10px] font-bold uppercase text-slate-700">R</span>
-                                <div class="vertical-slider-wrapper">
-                                    <input type="range" id="slider-release" min="0.05" max="5.0" step="0.05" value="1.2" class="v-range w-1 h-full bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
-                                </div>
+                                <div class="vertical-slider-wrapper"><input type="range" id="slider-release" min="0.05" max="5.0" step="0.05" value="1.2" class="v-range w-1 h-full bg-chassisDark rounded-lg cursor-pointer accent-amber-800"></div>
                                 <span id="lbl-release" class="text-[10px] font-mono font-bold text-amber-950">1.20s</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- COLUMN 2 (3 cols): Waveform (Top) + Filters (Bottom) Stack -->
-                    <div class="md:col-span-3 flex flex-col lg:h-[408px] lg:gap-[42px]">
-                        
-                        <!-- Waveform Selector Panel -->
-                        <div class="lg:h-[161px] lg:flex-none bg-amber-50/70 px-3 py-2.5 rounded-xl border-2 border-chassisDark flex flex-col gap-2">
+                    <div class="md:col-span-3 flex flex-col lg:gap-[8px]">
+                        <div class="bg-amber-50/70 px-3 py-2.5 rounded-xl border-2 border-chassisDark flex flex-col gap-2">
                             <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">Waveform</span>
                             <div class="flex flex-col gap-1 pt-0.5">
-                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-800">
-                                    <input type="radio" name="waveform" value="sawtooth" checked class="accent-amber-800 cursor-pointer">
-                                    <span>Sawtooth</span>
-                                </label>
-
-                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-800">
-                                    <input type="radio" name="waveform" value="square" class="accent-amber-800 cursor-pointer">
-                                    <span>Square</span>
-                                </label>
-
-                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-800">
-                                    <input type="radio" name="waveform" value="triangle" class="accent-amber-800 cursor-pointer">
-                                    <span>Triangle</span>
-                                </label>
-
-                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-800">
-                                    <input type="radio" name="waveform" value="sine" class="accent-amber-800 cursor-pointer">
-                                    <span>Sine</span>
-                                </label>
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-800"><input type="radio" name="waveform" value="sawtooth" checked class="accent-amber-800 cursor-pointer"><span>Sawtooth</span></label>
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-800"><input type="radio" name="waveform" value="square" class="accent-amber-800 cursor-pointer"><span>Square</span></label>
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-800"><input type="radio" name="waveform" value="triangle" class="accent-amber-800 cursor-pointer"><span>Triangle</span></label>
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-800"><input type="radio" name="waveform" value="sine" class="accent-amber-800 cursor-pointer"><span>Sine</span></label>
                             </div>
                         </div>
 
-                        <!-- Filter Controls Panel -->
-                        <div class="lg:h-[205px] lg:flex-none bg-amber-50/70 p-2.5 rounded-xl border-2 border-chassisDark flex flex-col gap-1.5">
+                        <div class="bg-amber-50/70 p-2.5 rounded-xl border-2 border-chassisDark flex flex-col gap-1.5">
                             <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">Filter</span>
-                            
                             <div class="flex items-center justify-between gap-1 pt-0.5">
-                                <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800">
-                                    <input type="radio" name="filter-type" value="lowpass" checked class="accent-amber-800 cursor-pointer">
-                                    <span>Low-pass</span>
-                                </label>
-                                <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800">
-                                    <input type="radio" name="filter-type" value="highpass" class="accent-amber-800 cursor-pointer">
-                                    <span>High-pass</span>
-                                </label>
+                                <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800"><input type="radio" name="filter-type" value="lowpass" checked class="accent-amber-800 cursor-pointer"><span>Low-pass</span></label>
+                                <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800"><input type="radio" name="filter-type" value="highpass" class="accent-amber-800 cursor-pointer"><span>High-pass</span></label>
                             </div>
-
                             <div class="flex flex-col gap-1.5 pt-1">
                                 <div>
-                                    <div class="flex justify-between text-[10px] font-semibold mb-0.5">
-                                        <span>Cutoff</span>
-                                        <span id="lbl-cutoff" class="font-mono text-slate-700">2200 Hz</span>
-                                    </div>
+                                    <div class="flex justify-between text-[10px] font-semibold mb-0.5"><span>Cutoff</span><span id="lbl-cutoff" class="font-mono text-slate-700">2200 Hz</span></div>
                                     <input type="range" id="slider-cutoff" min="100" max="8000" value="2200" class="w-full h-1.5 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                                 </div>
                                 <div>
-                                    <div class="flex justify-between text-[10px] font-semibold mb-0.5">
-                                        <span>Resonance</span>
-                                        <span id="lbl-resonance" class="font-mono text-slate-700">1.0</span>
-                                    </div>
+                                    <div class="flex justify-between text-[10px] font-semibold mb-0.5"><span>Resonance</span><span id="lbl-resonance" class="font-mono text-slate-700">1.0</span></div>
                                     <input type="range" id="slider-resonance" min="0.1" max="15.0" step="0.1" value="1.0" class="w-full h-1.5 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
-                    <!-- COLUMN 3 (3 cols): LFO Panel + Compact Synth Presets Panel -->
                     <div class="md:col-span-3 flex flex-col gap-2 min-h-0 lg:gap-[8px]">
-                        
-                        <!-- Compact LFO Panel -->
                         <div class="bg-amber-50/70 p-2.5 rounded-xl border-2 border-chassisDark flex flex-col gap-1.5">
                             <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-0.5">LFO Modulation</span>
-                            
-                            <div>
-                                <div class="flex justify-between text-[10px] font-semibold mb-0.5">
-                                    <span>LFO Rate</span>
-                                    <span id="lbl-lfo-rate" class="font-mono text-slate-700">5.0 Hz</span>
-                                </div>
-                                <input type="range" id="slider-lfo-rate" min="0.5" max="15.0" step="0.1" value="5.0" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
-                            </div>
-
-                            <div>
-                                <div class="flex justify-between text-[10px] font-semibold mb-0.5">
-                                    <span>LFO Depth</span>
-                                    <span id="lbl-lfo-depth" class="font-mono text-slate-700">0%</span>
-                                </div>
-                                <input type="range" id="slider-lfo-depth" min="0" max="100" value="0" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
-                            </div>
-
+                            <div><div class="flex justify-between text-[10px] font-semibold mb-0.5"><span>LFO Rate</span><span id="lbl-lfo-rate" class="font-mono text-slate-700">5.0 Hz</span></div><input type="range" id="slider-lfo-rate" min="0.5" max="15.0" step="0.1" value="5.0" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800"></div>
+                            <div><div class="flex justify-between text-[10px] font-semibold mb-0.5"><span>LFO Depth</span><span id="lbl-lfo-depth" class="font-mono text-slate-700">0%</span></div><input type="range" id="slider-lfo-depth" min="0" max="100" value="0" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800"></div>
                             <div class="flex items-center justify-between pt-1 border-t border-slate-300">
-                                <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800">
-                                    <input type="checkbox" id="toggle-vibrato" class="accent-amber-800 cursor-pointer">
-                                    <span>Vibrato</span>
-                                </label>
-                                <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800">
-                                    <input type="checkbox" id="toggle-tremolo" class="accent-amber-800 cursor-pointer">
-                                    <span>Tremolo</span>
-                                </label>
+                                <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800"><input type="checkbox" id="toggle-vibrato" class="accent-amber-800 cursor-pointer"><span>Vibrato</span></label>
+                                <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800"><input type="checkbox" id="toggle-tremolo" class="accent-amber-800 cursor-pointer"><span>Tremolo</span></label>
                             </div>
                         </div>
-
-                        <!-- Compact Synth Presets Panel -->
                         <div class="bg-amber-50/70 p-2.5 rounded-xl border-2 border-chassisDark flex flex-col gap-1.5">
                             <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-0.5">Synth Presets</span>
                             <div id="presets-grid" class="grid grid-cols-2 gap-1.5">
@@ -282,103 +183,48 @@
                                 <button data-preset="LEAD" class="preset-btn text-[9px] font-bold py-1 px-1 rounded border bg-amber-50 border-chassisDark text-slate-800 hover:bg-amber-100 cursor-pointer">LEAD</button>
                             </div>
                         </div>
-
                     </div>
 
-                    <!-- COLUMN 4 (2 cols): Extended Master Volume Panel with Speaker Icons -->
                     <div class="md:col-span-2 lg:h-[408px] lg:flex-none bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col items-center justify-between min-h-0">
                         <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1 text-center w-full">Master Vol</span>
-                        
-                        <!-- Speaker High Icon -->
-                        <div class="mt-2 text-slate-700" title="Max Volume">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                            </svg>
-                        </div>
-
-                        <!-- Master Volume Slider Wrapper -->
-                        <div class="vertical-slider-wrapper-master my-1">
-                            <input type="range" id="slider-volume" min="0" max="100" value="80" class="v-range-master w-1 h-full bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
-                        </div>
-
-                        <!-- Speaker Low Icon -->
-                        <div class="mb-1 text-slate-500" title="Min Volume">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                            </svg>
-                        </div>
-
+                        <div class="mt-2 text-slate-700" title="Max Volume"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg></div>
+                        <div class="vertical-slider-wrapper-master my-1"><input type="range" id="slider-volume" min="0" max="100" value="80" class="v-range-master w-1 h-full bg-chassisDark rounded-lg cursor-pointer accent-amber-800"></div>
+                        <div class="mb-1 text-slate-500" title="Min Volume"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg></div>
                         <span id="lbl-volume" class="text-[10px] font-mono font-bold text-amber-950">80%</span>
                     </div>
-
                 </div>
             </div>
-
         </div>
 
-        <!-- Lower Section: Chord Matrix (Left) & Progression Assistant (Right) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
-            <!-- Chord Matrix Headers & Grid (8 Columns) -->
             <div class="lg:col-span-8 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col gap-3">
                 <div class="flex justify-between items-center border-b border-slate-300 pb-1">
                     <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Chord Matrix — Circle of Fifths</h2>
                     <span class="text-xs text-slate-500 hidden sm:inline">Press a button to trigger chord</span>
                 </div>
-
-                <div class="overflow-x-auto pb-2">
-                    <div id="matrix-grid" class="inline-flex flex-col gap-3 min-w-max p-1">
-                        <!-- Generated dynamically by app.js (header included) -->
-                    </div>
-                </div>
+                <div class="overflow-x-auto pb-2"><div id="matrix-grid" class="inline-flex flex-col gap-3 min-w-max p-1"></div></div>
             </div>
-
-            <!-- Genres, Styles & Harmonic Progression Assistant (4 Columns) -->
             <div class="lg:col-span-4 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col justify-between gap-4">
                 <div>
                     <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600 border-b border-slate-300 pb-2 mb-3">Progression Assistant</h2>
-                    
                     <div class="flex flex-col gap-3">
-                        <!-- Genre Select -->
-                        <div>
-                            <label for="select-genre" class="block text-xs font-semibold text-slate-700 mb-1">Musical Genre</label>
-                            <select id="select-genre" class="w-full p-2 bg-amber-50 border border-chassisDark rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-600">
-                                <option value="">-- Select Genre --</option>
-                            </select>
-                        </div>
-
-                        <!-- Style Select -->
-                        <div>
-                            <label for="select-style" class="block text-xs font-semibold text-slate-700 mb-1">Style</label>
-                            <select id="select-style" disabled class="w-full p-2 bg-amber-50 border border-chassisDark rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-600 disabled:opacity-50 cursor-pointer">
-                                <option value="">-- Select a Genre First --</option>
-                            </select>
-                        </div>
+                        <div><label for="select-genre" class="block text-xs font-semibold text-slate-700 mb-1">Musical Genre</label><select id="select-genre" class="w-full p-2 bg-amber-50 border border-chassisDark rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-600"><option value="">-- Select Genre --</option></select></div>
+                        <div><label for="select-style" class="block text-xs font-semibold text-slate-700 mb-1">Style</label><select id="select-style" disabled class="w-full p-2 bg-amber-50 border border-chassisDark rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-600 disabled:opacity-50 cursor-pointer"><option value="">-- Select a Genre First --</option></select></div>
                     </div>
                 </div>
-
-                <!-- Progression Display Box -->
                 <div class="bg-amber-100/90 border border-amber-300 rounded-xl p-3 shadow-inner flex flex-col gap-1 min-h-[90px] justify-center">
                     <span class="text-[10px] font-bold text-amber-900 uppercase tracking-wider">Harmonic Progression:</span>
-                    <div id="lbl-progression" class="font-mono text-sm font-bold text-amber-950 leading-relaxed break-words">
-                        Select a genre and style
-                    </div>
-                    <div id="lbl-progression-chords" class="font-mono text-xs text-amber-800 mt-1 font-semibold border-t border-amber-200 pt-1 hidden">
-                        <!-- Shows actual progression chords -->
-                    </div>
+                    <div id="lbl-progression" class="font-mono text-sm font-bold text-amber-950 leading-relaxed break-words">Select a genre and style</div>
+                    <div id="lbl-progression-chords" class="font-mono text-xs text-amber-800 mt-1 font-semibold border-t border-amber-200 pt-1 hidden"></div>
                 </div>
             </div>
-
         </div>
 
-        <!-- Footer -->
         <footer class="text-center text-xs text-slate-500 border-t border-chassisDark pt-2 flex justify-between items-center">
             <span>Pure Web Audio API Synthesis</span>
             <span>by Tagt The Spellcaster</span>
         </footer>
     </div>
-
     <script src="app.js"></script>
 </body>
 </html>
