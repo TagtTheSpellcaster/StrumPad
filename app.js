@@ -5,7 +5,7 @@ class WebAudioEngine {
     constructor() {
         this.ctx = null;
         this.masterGain = null;
-        this.volume = 0.8;
+        this.volume = Math.pow(0.8, 1.5); // Inizializzato al valore percepito di 80% (0.8^1.5)
         this.cutoffFreq = 2200;
         this.resonanceQ = 1.0;
         this.filterType = 'lowpass';
@@ -85,7 +85,10 @@ class WebAudioEngine {
     }
 
     setVolume(val) {
-        this.volume = val;
+        // Conversione non lineare percettiva: 0 -> 0, 100 -> 1.0, curva esponenziale x^1.5
+        const normalized = Math.max(0, Math.min(100, val)) / 100;
+        this.volume = normalized === 0 ? 0 : Math.pow(normalized, 1.5);
+
         if (this.masterGain && this.ctx && this.audioActive) {
             this.masterGain.gain.linearRampToValueAtTime(this.volume, this.ctx.currentTime + 0.05);
         }
@@ -1135,7 +1138,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Master Volume Vertical Slider
     document.getElementById('slider-volume').addEventListener('input', (e) => {
-        audio.setVolume(parseFloat(e.target.value) / 100);
+        audio.setVolume(parseFloat(e.target.value));
         document.getElementById('lbl-volume').textContent = `${e.target.value}%`;
     });
 });
