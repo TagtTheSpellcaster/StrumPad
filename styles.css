@@ -261,3 +261,107 @@
             0 0 10px rgba(59, 130, 246, 0.65);
     }
 }
+
+
+/* ==========================================
+   VERTICAL SYNTH SLIDERS
+   ADSR + MASTER VOLUME
+   Vintage amber hardware controls
+   ========================================== */
+
+.slider-vertical-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    min-height: 0;
+}
+
+.vertical-slider-wrapper,
+.vertical-slider-wrapper-master {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+}
+
+.vertical-slider-wrapper {
+    width: 100%;
+    flex: 1;
+}
+
+.vertical-slider-wrapper-master {
+    width: 100%;
+    flex: 1;
+}
+
+/* Remove browser's horizontal blue range styling */
+.v-range,
+.v-range-master {
+    -webkit-appearance: none;
+    appearance: none;
+    writing-mode: vertical-lr;
+    direction: rtl;
+    width: 18px;
+    height: 100%;
+    min-height: 60px;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+    accent-color: #92400e;
+}
+
+/* WebKit track */
+.v-range::-webkit-slider-runnable-track,
+.v-range-master::-webkit-slider-runnable-track {
+    width: 6px;
+    border-radius: 3px;
+    background: #c8b89a;
+    border: 1px solid #927b5a;
+}
+
+/* WebKit thumb */
+.v-range::-webkit-slider-thumb,
+.v-range-master::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 8px;
+    margin-left: 0;
+    margin-top: -2px;
+    border: 1px solid #5f3b16;
+    border-radius: 2px;
+    background: #92400e;
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.30);
+}
+
+/* Firefox track */
+.v-range::-moz-range-track,
+.v-range-master::-moz-range-track {
+    width: 6px;
+    border-radius: 3px;
+    background: #c8b89a;
+    border: 1px solid #927b5a;
+}
+
+/* Firefox thumb */
+.v-range::-moz-range-thumb,
+.v-range-master::-moz-range-thumb {
+    width: 16px;
+    height: 8px;
+    border: 1px solid #5f3b16;
+    border-radius: 2px;
+    background: #92400e;
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.30);
+}
+
+/* Keep keyboard focus visible without the browser blue outline */
+.v-range:focus-visible,
+.v-range-master:focus-visible {
+    outline: 2px solid #d97706;
+    outline-offset: 3px;
+}
