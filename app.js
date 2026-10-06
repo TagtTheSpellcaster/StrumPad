@@ -114,7 +114,7 @@ const CIRCLE_OF_FIFTHS = [
     { name: 'F',  midi: 65 }
 ];
 
-// 5 Matrix Rows Configurations
+// 5 Matrix Rows Configurations (Muted pastel badges)
 const MATRIX_ROWS = [
     { 
         id: 'maj', 
@@ -123,7 +123,7 @@ const MATRIX_ROWS = [
         intervals: [0, 4, 7],
         suffix: '',
         rowClass: 'row-color-maj',
-        badgeColor: 'bg-amber-600 text-white'
+        badgeColor: 'bg-amber-200 text-amber-900 border border-amber-300'
     },
     { 
         id: 'min', 
@@ -132,7 +132,7 @@ const MATRIX_ROWS = [
         intervals: [0, 3, 7],
         suffix: 'm',
         rowClass: 'row-color-min',
-        badgeColor: 'bg-sky-700 text-white'
+        badgeColor: 'bg-sky-200 text-sky-900 border border-sky-300'
     },
     { 
         id: '7', 
@@ -141,7 +141,7 @@ const MATRIX_ROWS = [
         intervals: [0, 4, 7, 10],
         suffix: '7',
         rowClass: 'row-color-7',
-        badgeColor: 'bg-rose-700 text-white'
+        badgeColor: 'bg-rose-200 text-rose-900 border border-rose-300'
     },
     { 
         id: 'maj7', 
@@ -150,7 +150,7 @@ const MATRIX_ROWS = [
         intervals: [0, 4, 7, 11],
         suffix: 'maj7',
         rowClass: 'row-color-maj7',
-        badgeColor: 'bg-emerald-700 text-white'
+        badgeColor: 'bg-emerald-200 text-emerald-900 border border-emerald-300'
     },
     { 
         id: 'm7', 
@@ -159,7 +159,7 @@ const MATRIX_ROWS = [
         intervals: [0, 3, 7, 10],
         suffix: 'm7',
         rowClass: 'row-color-m7',
-        badgeColor: 'bg-violet-700 text-white'
+        badgeColor: 'bg-purple-200 text-purple-900 border border-purple-300'
     }
 ];
 
@@ -209,9 +209,9 @@ function setSelection(rootObj, rowObj) {
     const allBtns = document.querySelectorAll('.matrix-chord-btn');
     allBtns.forEach(btn => {
         if (btn.dataset.chord === currentChordObj.fullName) {
-            btn.classList.add('active', 'ring-2', 'ring-amber-500', 'bg-amber-200', 'text-amber-950');
+            btn.classList.add('active');
         } else {
-            btn.classList.remove('active', 'ring-2', 'ring-amber-500', 'bg-amber-200', 'text-amber-950');
+            btn.classList.remove('active');
         }
     });
 }
@@ -231,7 +231,7 @@ function buildMatrixUI() {
         // Row label container
         const rowHeader = document.createElement('div');
         rowHeader.className = 'w-36 text-xs font-bold text-slate-700 flex items-center justify-end pr-2 shrink-0';
-        rowHeader.innerHTML = `<span class="px-2 py-1 rounded text-[11px] w-full text-right ${row.badgeColor}">${row.label}</span>`;
+        rowHeader.innerHTML = `<span class="px-2 py-1 rounded-md text-[11px] font-semibold w-full text-right shadow-sm ${row.badgeColor}">${row.label}</span>`;
         rowWrapper.appendChild(rowHeader);
 
         // Row button grid
@@ -243,11 +243,11 @@ function buildMatrixUI() {
             const btn = document.createElement('button');
             
             // Compact square button style with row-specific color scheme
-            btn.className = `matrix-chord-btn chord-btn ${row.rowClass} rounded-md border-2 flex flex-col items-center justify-end pb-1 cursor-pointer select-none`;
+            btn.className = `matrix-chord-btn chord-btn ${row.rowClass} select-none`;
             btn.dataset.chord = chordName;
 
             // Green LED indicator rectangle positioned bottom center
-            btn.innerHTML = `<div class="btn-led pointer-events-none"></div>`;
+            btn.innerHTML = `<div class="btn-led"></div>`;
 
             // Trigger sound immediately on pointerdown/mousedown/touchstart
             const handlePress = (e) => {
