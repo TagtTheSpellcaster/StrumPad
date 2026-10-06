@@ -1,6 +1,6 @@
 # StrumPad
 
-[![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)](https://github.com/TagtTheSpellcaster/StrumPad)
+[![Version](https://img.shields.io/badge/version-1.1.2-blue.svg)](https://github.com/TagtTheSpellcaster/StrumPad)
 [![License](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Web Audio API](https://img.shields.io/badge/Web%20Audio%20API-Native-8B5CF6.svg)](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
