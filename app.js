@@ -549,13 +549,15 @@ const CIRCLE_OF_FIFTHS = [
 // Chromatic Scale for intervals
 const CHROMATIC_SCALE = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 
-// 5 Matrix Rows
+// 7 Matrix Rows (Inclusi Diminished e Diminished 7th)
 const MATRIX_ROWS = [
-    { id: 'maj',  label: 'Major',             intervals: [0, 4, 7],     suffix: '',     btnClass: 'row-maj',  badgeStyle: 'bg-amber-200 text-amber-950 border-amber-300' },
-    { id: 'min',  label: 'Minor',             intervals: [0, 3, 7],     suffix: 'm',    btnClass: 'row-min',  badgeStyle: 'bg-sky-200 text-sky-950 border-sky-300' },
-    { id: '7',    label: 'Dominant 7th',      intervals: [0, 4, 7, 10], suffix: '7',    btnClass: 'row-7',    badgeStyle: 'bg-rose-200 text-rose-950 border-rose-300' },
-    { id: 'maj7', label: 'Major 7th',         intervals: [0, 4, 7, 11], suffix: 'maj7', btnClass: 'row-maj7', badgeStyle: 'bg-emerald-200 text-emerald-950 border-emerald-300' },
-    { id: 'm7',   label: 'Minor 7th',         intervals: [0, 3, 7, 10], suffix: 'm7',   btnClass: 'row-m7',   badgeStyle: 'bg-purple-200 text-purple-950 border-purple-300' }
+    { id: 'maj',  label: 'Major',          intervals: [0, 4, 7],    suffix: '',     btnClass: 'row-maj',  badgeStyle: 'bg-amber-200 text-amber-950 border-amber-300' },
+    { id: 'min',  label: 'Minor',          intervals: [0, 3, 7],    suffix: 'm',    btnClass: 'row-min',  badgeStyle: 'bg-sky-200 text-sky-950 border-sky-300' },
+    { id: '7',    label: 'Dominant 7th',   intervals: [0, 4, 7, 10],suffix: '7',    btnClass: 'row-7',    badgeStyle: 'bg-rose-200 text-rose-950 border-rose-300' },
+    { id: 'maj7', label: 'Major 7th',      intervals: [0, 4, 7, 11],suffix: 'maj7', btnClass: 'row-maj7', badgeStyle: 'bg-emerald-200 text-emerald-950 border-emerald-300' },
+    { id: 'm7',   label: 'Minor 7th',      intervals: [0, 3, 7, 10],suffix: 'm7',   btnClass: 'row-m7',   badgeStyle: 'bg-purple-200 text-purple-950 border-purple-300' },
+    { id: 'dim',  label: 'Diminished',     intervals: [0, 3, 6],    suffix: 'dim',  btnClass: 'row-dim',  badgeStyle: 'bg-stone-200 text-stone-900 border-stone-300' },
+    { id: 'dim7', label: 'Diminished 7th', intervals: [0, 3, 6, 9], suffix: 'dim7', btnClass: 'row-dim7', badgeStyle: 'bg-slate-200 text-slate-900 border-slate-300' }
 ];
 
 // Genres & Styles Table
@@ -677,7 +679,7 @@ function parseDegreeToChord(degreeStr, keyRootName) {
 
     const hasFlat = !!match[1];
     const baseRoman = match[2];
-    const rest = clean.slice(match[0].length);
+    const rest = clean.slice(match[0].length).trim();
 
     // Mappatura dei gradi romani naturali ai semitoni rispetto alla tonica
     const NATURAL_ROMAN_SEMITONES = {
@@ -703,9 +705,15 @@ function parseDegreeToChord(degreeStr, keyRootName) {
     const isMinor = baseRoman === baseRoman.toLowerCase() && baseRoman !== 'I';
 
     let chordQualitySuffix = '';
-    if (rest) {
+
+    // Gestione notazioni per Diminished e Diminished 7th (es. °7, ° , dim7, dim)
+    if (rest === '°7' || rest === 'dim7') {
+        chordQualitySuffix = 'dim7';
+    } else if (rest === '°' || rest === 'dim') {
+        chordQualitySuffix = 'dim';
+    } else if (rest) {
         chordQualitySuffix = rest;
-        if (isMinor && !chordQualitySuffix.startsWith('m')) {
+        if (isMinor && !chordQualitySuffix.startsWith('m') && !chordQualitySuffix.startsWith('dim')) {
             chordQualitySuffix = 'm' + chordQualitySuffix;
         }
     } else {
@@ -934,7 +942,7 @@ function createMatrixUI() {
     headerRowWrapper.appendChild(headerBtnGrid);
     container.appendChild(headerRowWrapper);
 
-    // 2. Genera le 5 righe della matrice di accordi
+    // 2. Genera le 7 righe della matrice di accordi
     MATRIX_ROWS.forEach(row => {
         const rowWrapper = document.createElement('div');
         rowWrapper.className = 'flex items-center gap-3';
