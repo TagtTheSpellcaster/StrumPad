@@ -671,21 +671,36 @@ function parseDegreeToChord(degreeStr, keyRootName) {
     let clean = degreeStr.trim();
     if (!clean) return null;
 
-    const match = clean.match(/^(b[I|V|i|v]+|[I|V|i|v]+)/);
+    // Riconosce l'eventuale alterazione 'b' e il grado romano di base
+    const match = clean.match(/^(b)?(VII|VI|IV|III|II|V|I|vii|vi|iv|iii|ii|i)/);
     if (!match) return null;
 
-    const degreeToken = match[0];
-    const rest = clean.slice(degreeToken.length);
+    const hasFlat = !!match[1];
+    const baseRoman = match[2];
+    const rest = clean.slice(match[0].length);
 
-    if (ROMAN_SEMITONES[degreeToken] === undefined) return null;
+    // Mappatura dei gradi romani naturali ai semitoni rispetto alla tonica
+    const NATURAL_ROMAN_SEMITONES = {
+        'I': 0,   'i': 0,
+        'II': 2,  'ii': 2,
+        'III': 4, 'iii': 4,
+        'IV': 5,  'iv': 5,
+        'V': 7,   'v': 7,
+        'VI': 9,  'vi': 9,
+        'VII': 11, 'vii': 11
+    };
+
+    if (NATURAL_ROMAN_SEMITONES[baseRoman] === undefined) return null;
 
     const keyIndex = CHROMATIC_SCALE.indexOf(keyRootName);
     if (keyIndex === -1) return null;
 
-    const targetSemitone = (keyIndex + ROMAN_SEMITONES[degreeToken]) % 12;
+    const baseOffset = NATURAL_ROMAN_SEMITONES[baseRoman];
+    const flatOffset = hasFlat ? -1 : 0;
+    const targetSemitone = (keyIndex + baseOffset + flatOffset + 12) % 12;
     const targetRoot = CHROMATIC_SCALE[targetSemitone];
 
-    const isMinor = degreeToken === degreeToken.toLowerCase() && degreeToken !== 'I';
+    const isMinor = baseRoman === baseRoman.toLowerCase() && baseRoman !== 'I';
 
     let chordQualitySuffix = '';
     if (rest) {
