@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>StrumPad - Retro Synth Chord & Strumplate Simulator</title>
+    <title>StrumPad - Retro Synth Chord Simulator</title>
     <!-- Tailwind CSS for Responsive Layout Utilities -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -53,12 +53,12 @@
             </div>
         </header>
 
-        <!-- Upper Section: Master Controls & Metallic Strumplate -->
+        <!-- Upper Section: Master Modulation Controls & ADSR Envelope Filter -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
             <!-- Master Control Panel -->
             <div class="lg:col-span-4 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col justify-between gap-4">
-                <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600 border-b border-slate-300 pb-1">Modulation Controls</h2>
+                <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600 border-b border-slate-300 pb-1">Master Controls</h2>
                 
                 <div class="flex flex-col gap-3">
                     <!-- Master Volume -->
@@ -68,15 +68,6 @@
                             <span id="lbl-volume" class="font-mono text-slate-700">80%</span>
                         </div>
                         <input type="range" id="slider-volume" min="0" max="100" value="80" class="w-full h-2 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
-                    </div>
-
-                    <!-- Sustain / Decay Time -->
-                    <div>
-                        <div class="flex justify-between text-xs font-semibold mb-1">
-                            <span>Sustain / Decay</span>
-                            <span id="lbl-sustain" class="font-mono text-slate-700">1.2s</span>
-                        </div>
-                        <input type="range" id="slider-sustain" min="2" max="30" value="12" class="w-full h-2 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                     </div>
 
                     <!-- Filter Tone Cutoff -->
@@ -108,15 +99,61 @@
                 </div>
             </div>
 
-            <!-- Metallic Strumplate Touch Pad -->
-            <div class="lg:col-span-8 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col gap-2">
+            <!-- ADSR Envelope Filter Panel -->
+            <div class="lg:col-span-8 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col gap-3">
                 <div class="flex justify-between items-center border-b border-slate-300 pb-1">
-                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Sonic Strumplate (Metallic Plate)</h2>
-                    <span class="text-xs text-amber-900 font-medium hidden sm:inline">Swipe or drag finger/mouse</span>
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">ADSR Envelope Generator</h2>
+                    <span class="text-xs text-amber-900 font-medium hidden sm:inline">Real-time Green Phosphor Filter Curve</span>
                 </div>
 
-                <div class="gold-plate-container w-full h-44 rounded-xl overflow-hidden cursor-crosshair">
-                    <canvas id="strum-canvas" class="w-full h-full block relative z-10"></canvas>
+                <div class="flex flex-col md:flex-row gap-4 h-full items-stretch">
+                    
+                    <!-- Green Phosphor Display Screen -->
+                    <div class="phosphor-screen-container flex-grow h-36 md:h-auto min-h-[140px] rounded-xl overflow-hidden relative border-2 border-emerald-950 shadow-inner">
+                        <canvas id="adsr-canvas" class="w-full h-full block relative z-10"></canvas>
+                        <div class="screen-glare"></div>
+                    </div>
+
+                    <!-- Vertical Sliders Bank -->
+                    <div class="flex items-center justify-around gap-2 bg-chassisDark/30 p-2 sm:p-3 rounded-xl border border-chassisDark min-w-[220px]">
+                        
+                        <!-- Attack Slider -->
+                        <div class="v-slider-group">
+                            <span id="lbl-attack" class="v-slider-val">0.10s</span>
+                            <div class="v-slider-track-wrap">
+                                <input type="range" id="slider-attack" min="1" max="200" value="10" orient="vertical" class="v-slider">
+                            </div>
+                            <span class="v-slider-title">ATTACK</span>
+                        </div>
+
+                        <!-- Decay Slider -->
+                        <div class="v-slider-group">
+                            <span id="lbl-decay" class="v-slider-val">0.40s</span>
+                            <div class="v-slider-track-wrap">
+                                <input type="range" id="slider-decay" min="5" max="300" value="40" orient="vertical" class="v-slider">
+                            </div>
+                            <span class="v-slider-title">DECAY</span>
+                        </div>
+
+                        <!-- Sustain Slider -->
+                        <div class="v-slider-group">
+                            <span id="lbl-sustain" class="v-slider-val">70%</span>
+                            <div class="v-slider-track-wrap">
+                                <input type="range" id="slider-sustain" min="0" max="100" value="70" orient="vertical" class="v-slider">
+                            </div>
+                            <span class="v-slider-title">SUSTAIN</span>
+                        </div>
+
+                        <!-- Release Slider -->
+                        <div class="v-slider-group">
+                            <span id="lbl-release" class="v-slider-val">1.20s</span>
+                            <div class="v-slider-track-wrap">
+                                <input type="range" id="slider-release" min="5" max="500" value="120" orient="vertical" class="v-slider">
+                            </div>
+                            <span class="v-slider-title">RELEASE</span>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
