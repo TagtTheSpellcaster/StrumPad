@@ -1,5 +1,5 @@
 /**
- * Web Audio API Engine Class for StrumPad Synth with ADSR & Custom Waveforms
+ * Web Audio API Engine Class for StrumPad Synth
  */
 class WebAudioEngine {
     constructor() {
@@ -7,9 +7,17 @@ class WebAudioEngine {
         this.masterGain = null;
         this.volume = 0.8;
         this.cutoffFreq = 2200;
+        this.resonanceQ = 1.0;
+        this.filterType = 'lowpass';
         this.initialized = false;
-        this.audioActive = false; // Tassativamente OFF all'avvio
+        this.audioActive = false;
+        
+        // Performance modes
         this.droneMode = false;
+        this.strumMode = false;
+        this.arpMode = false;
+        this.speedDelayMs = 35; // Default strum delay
+
         this.waveform = 'sawtooth';
         this.activeDroneNodes = [];
         this.scheduledTimeouts = [];
@@ -19,6 +27,12 @@ class WebAudioEngine {
         this.decayTime = 0.50;
         this.sustainLevel = 0.60;
         this.releaseTime = 1.20;
+
+        // LFO Parameters
+        this.lfoRate = 5.0;
+        this.lfoDepth = 0.0;
+        this.vibratoEnabled = false;
+        this.tremoloEnabled = false;
     }
 
     init() {
@@ -77,15 +91,46 @@ class WebAudioEngine {
         }
     }
 
-    setCutoff(val) {
-        this.cutoffFreq = val;
+    setFilter(type, cutoff, resonance) {
+        this.filterType = type;
+        this.cutoffFreq = cutoff;
+        this.resonanceQ = resonance;
+    }
+
+    setLfo(rate, depth, vibrato, tremolo) {
+        this.lfoRate = rate;
+        this.lfoDepth = depth;
+        this.vibratoEnabled = vibrato;
+        this.tremoloEnabled = tremolo;
     }
 
     setDroneMode(enabled) {
         this.droneMode = enabled;
-        if (!enabled) {
+        if (enabled) {
+            this.strumMode = false;
+            this.arpMode = false;
             this.stopAll();
         }
+    }
+
+    setStrumMode(enabled) {
+        if (this.droneMode) return;
+        this.strumMode = enabled;
+        if (enabled) {
+            this.arpMode = false;
+        }
+    }
+
+    setArpMode(enabled) {
+        if (this.droneMode) return;
+        this.arpMode = enabled;
+        if (enabled) {
+            this.strumMode = false;
+        }
+    }
+
+    setSpeedDelay(ms) {
+        this.speedDelayMs = ms;
     }
 
     setWaveform(type) {
@@ -120,8 +165,9 @@ class WebAudioEngine {
             voiceGain.gain.linearRampToValueAtTime(0.3, now + Math.max(0.05, this.attackTime));
 
             const filter = this.ctx.createBiquadFilter();
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(Math.min(this.cutoffFreq * 1.5, 7000), now);
+            filter.type = this.filterType;
+            filter.frequency.setValueAtTime(this.cutoffFreq, now);
+            filter.Q.setValueAtTime(this.resonanceQ, now);
 
             const oscList = [];
             pipeHarmonics.forEach(h => {
@@ -146,7 +192,7 @@ class WebAudioEngine {
                 gain: voiceGain
             });
         } else {
-            // RETRO SYNTH VOICE WITH SELECTED WAVEFORM & ADSR ENVELOPE
+            // RETRO SYNTH VOICE WITH FULL FILTERS, LFO & ADSR
             const osc1 = this.ctx.createOscillator();
             const osc2 = this.ctx.createOscillator();
 
@@ -156,15 +202,23 @@ class WebAudioEngine {
             osc1.frequency.setValueAtTime(freq, now);
             osc2.frequency.setValueAtTime(freq * 1.002, now);
 
+            // Biquad Filter (Low-pass or High-pass with Cutoff & Resonance)
             const filter = this.ctx.createBiquadFilter();
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(200, now);
-            filter.frequency.linearRampToValueAtTime(this.cutoffFreq, now + this.attackTime);
-            filter.frequency.exponentialRampToValueAtTime(
-                Math.max(100, this.cutoffFreq * this.sustainLevel), 
-                now + this.attackTime + this.decayTime
-            );
+            filter.type = this.filterType;
+            filter.Q.setValueAtTime(this.resonanceQ, now);
 
+            if (this.filterType === 'lowpass') {
+                filter.frequency.setValueAtTime(200, now);
+                filter.frequency.linearRampToValueAtTime(this.cutoffFreq, now + this.attackTime);
+                filter.frequency.exponentialRampToValueAtTime(
+                    Math.max(50, this.cutoffFreq * this.sustainLevel), 
+                    now + this.attackTime + this.decayTime
+                );
+            } else { // High-pass
+                filter.frequency.setValueAtTime(this.cutoffFreq, now);
+            }
+
+            // Gain ADSR Envelope
             const voiceGain = this.ctx.createGain();
             const peakGain = 0.4;
             const sustainGain = Math.max(0.0001, peakGain * this.sustainLevel);
@@ -176,6 +230,30 @@ class WebAudioEngine {
             const noteDuration = this.attackTime + this.decayTime + 0.2;
             voiceGain.gain.setValueAtTime(sustainGain, now + noteDuration);
             voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + noteDuration + this.releaseTime);
+
+            // LFO MODULATION (Vibrato / Tremolo)
+            if (this.lfoDepth > 0 && (this.vibratoEnabled || this.tremoloEnabled)) {
+                const lfo = this.ctx.createOscillator();
+                lfo.frequency.setValueAtTime(this.lfoRate, now);
+
+                if (this.vibratoEnabled) {
+                    const vibratoGain = this.ctx.createGain();
+                    vibratoGain.gain.setValueAtTime(this.lfoDepth * 12.0, now); // Pitch modulation range
+                    lfo.connect(vibratoGain);
+                    vibratoGain.connect(osc1.frequency);
+                    vibratoGain.connect(osc2.frequency);
+                }
+
+                if (this.tremoloEnabled) {
+                    const tremoloGain = this.ctx.createGain();
+                    tremoloGain.gain.setValueAtTime((this.lfoDepth / 100) * 0.3, now); // Amplitude modulation
+                    lfo.connect(tremoloGain);
+                    tremoloGain.connect(voiceGain.gain);
+                }
+
+                lfo.start(now);
+                lfo.stop(now + noteDuration + this.releaseTime + 0.1);
+            }
 
             osc1.connect(filter);
             osc2.connect(filter);
@@ -197,16 +275,20 @@ class WebAudioEngine {
             this.stopAll();
             const chordNotes = midiNotes.slice(0, 4);
             chordNotes.forEach(note => this.playNote(note));
-        } else {
-            const notes = midiNotes.slice(0, 5);
+        } else if (this.strumMode || this.arpMode) {
+            const notes = midiNotes.slice(0, this.arpMode ? 6 : 5);
             notes.forEach((note, idx) => {
                 const t = setTimeout(() => {
                     if (this.audioActive) {
                         this.playNote(note);
                     }
-                }, idx * 35);
+                }, idx * this.speedDelayMs);
                 this.scheduledTimeouts.push(t);
             });
+        } else {
+            // Simultaneous Chord Play
+            const notes = midiNotes.slice(0, 4);
+            notes.forEach(note => this.playNote(note));
         }
     }
 }
@@ -346,7 +428,7 @@ const MATRIX_ROWS = [
     { id: 'm7',   label: 'Minor 7th',         intervals: [0, 3, 7, 10], suffix: 'm7',   btnClass: 'row-m7',   badgeStyle: 'bg-purple-200 text-purple-950 border-purple-300' }
 ];
 
-// Translated Genres, Styles & Progressions Table
+// Genres & Styles Table
 const GENRES_DATA = {
     "Classical & Traditional": {
         "Circle of C (Major)": "I - vi (I / IV) - ii (IV) - V (bVII / viio)",
@@ -725,9 +807,68 @@ window.addEventListener('DOMContentLoaded', () => {
     const audioToggle = document.getElementById('toggle-audio');
     const audioStateLbl = document.getElementById('lbl-audio-state');
     const powerLed = document.getElementById('power-led');
+    
+    // Performance Toggles
     const droneToggle = document.getElementById('toggle-drone');
+    const strumToggle = document.getElementById('toggle-strum');
+    const arpToggle = document.getElementById('toggle-arp');
+    const sliderSpeed = document.getElementById('slider-speed');
+    const lblSpeed = document.getElementById('lbl-speed');
 
-    // ADSR Sliders Elements
+    // Update Speed Range according to active mode (Strum vs Arp)
+    function updateSpeedLimits() {
+        if (arpToggle.checked) {
+            sliderSpeed.min = "100";
+            sliderSpeed.max = "500";
+            if (parseInt(sliderSpeed.value) < 100) sliderSpeed.value = "200";
+        } else {
+            sliderSpeed.min = "10";
+            sliderSpeed.max = "80";
+            if (parseInt(sliderSpeed.value) > 80) sliderSpeed.value = "35";
+        }
+        lblSpeed.textContent = `${sliderSpeed.value} ms`;
+        audio.setSpeedDelay(parseInt(sliderSpeed.value));
+    }
+
+    droneToggle.addEventListener('change', (e) => {
+        const enabled = e.target.checked;
+        if (enabled) {
+            strumToggle.checked = false;
+            arpToggle.checked = false;
+        }
+        audio.setDroneMode(enabled);
+        updateSpeedLimits();
+    });
+
+    strumToggle.addEventListener('change', (e) => {
+        const enabled = e.target.checked;
+        if (enabled) {
+            droneToggle.checked = false;
+            arpToggle.checked = false;
+            audio.setDroneMode(false);
+        }
+        audio.setStrumMode(enabled);
+        updateSpeedLimits();
+    });
+
+    arpToggle.addEventListener('change', (e) => {
+        const enabled = e.target.checked;
+        if (enabled) {
+            droneToggle.checked = false;
+            strumToggle.checked = false;
+            audio.setDroneMode(false);
+        }
+        audio.setArpMode(enabled);
+        updateSpeedLimits();
+    });
+
+    sliderSpeed.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        lblSpeed.textContent = `${val} ms`;
+        audio.setSpeedDelay(val);
+    });
+
+    // ADSR Sliders
     const slAttack = document.getElementById('slider-attack');
     const slDecay = document.getElementById('slider-decay');
     const slSustain = document.getElementById('slider-sustain');
@@ -758,16 +899,62 @@ window.addEventListener('DOMContentLoaded', () => {
     slSustain.addEventListener('input', updateAdsr);
     slRelease.addEventListener('input', updateAdsr);
 
-    // Initial ADSR Draw
     updateAdsr();
 
-    // Gestore del cambio di Forma d'Onda
+    // Waveform Radio Buttons
     document.querySelectorAll('input[name="waveform"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
             audio.setWaveform(e.target.value);
         });
     });
 
+    // Filter Controls
+    const sliderCutoff = document.getElementById('slider-cutoff');
+    const sliderResonance = document.getElementById('slider-resonance');
+    const lblCutoff = document.getElementById('lbl-cutoff');
+    const lblResonance = document.getElementById('lbl-resonance');
+
+    function updateFilters() {
+        const filterType = document.querySelector('input[name="filter-type"]:checked').value;
+        const cutoff = parseFloat(sliderCutoff.value);
+        const resonance = parseFloat(sliderResonance.value);
+
+        lblCutoff.textContent = `${cutoff} Hz`;
+        lblResonance.textContent = resonance.toFixed(1);
+
+        audio.setFilter(filterType, cutoff, resonance);
+    }
+
+    document.querySelectorAll('input[name="filter-type"]').forEach(radio => radio.addEventListener('change', updateFilters));
+    sliderCutoff.addEventListener('input', updateFilters);
+    sliderResonance.addEventListener('input', updateFilters);
+
+    // LFO Controls
+    const sliderLfoRate = document.getElementById('slider-lfo-rate');
+    const sliderLfoDepth = document.getElementById('slider-lfo-depth');
+    const toggleVibrato = document.getElementById('toggle-vibrato');
+    const toggleTremolo = document.getElementById('toggle-tremolo');
+    const lblLfoRate = document.getElementById('lbl-lfo-rate');
+    const lblLfoDepth = document.getElementById('lbl-lfo-depth');
+
+    function updateLfo() {
+        const rate = parseFloat(sliderLfoRate.value);
+        const depth = parseFloat(sliderLfoDepth.value);
+        const vibrato = toggleVibrato.checked;
+        const tremolo = toggleTremolo.checked;
+
+        lblLfoRate.textContent = `${rate.toFixed(1)} Hz`;
+        lblLfoDepth.textContent = `${Math.round(depth)}%`;
+
+        audio.setLfo(rate, depth, vibrato, tremolo);
+    }
+
+    sliderLfoRate.addEventListener('input', updateLfo);
+    sliderLfoDepth.addEventListener('input', updateLfo);
+    toggleVibrato.addEventListener('change', updateLfo);
+    toggleTremolo.addEventListener('change', updateLfo);
+
+    // Audio Power Switch
     audioToggle.checked = false;
 
     audioToggle.addEventListener('change', (e) => {
@@ -785,18 +972,9 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    droneToggle.addEventListener('change', (e) => {
-        audio.setDroneMode(e.target.checked);
-    });
-
+    // Master Volume Vertical Slider
     document.getElementById('slider-volume').addEventListener('input', (e) => {
         audio.setVolume(parseFloat(e.target.value) / 100);
         document.getElementById('lbl-volume').textContent = `${e.target.value}%`;
-    });
-
-    document.getElementById('slider-cutoff').addEventListener('input', (e) => {
-        const val = parseFloat(e.target.value);
-        audio.setCutoff(val);
-        document.getElementById('lbl-cutoff').textContent = `${val} Hz`;
     });
 });
