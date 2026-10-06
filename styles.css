@@ -7,9 +7,9 @@
 }
 
 body {
-  background-color: #1a1a1e;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #d1d5db;
+  background-color: #121214;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #e5e7eb;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -17,39 +17,39 @@ body {
   padding: 20px;
 }
 
-/* Chassis del sintetizzatore */
+/* Chassis principale sintetizzatore */
 .synth-container {
-  background: linear-gradient(145deg, #e6ded1, #d4cbbe);
-  border-radius: 16px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 2px 3px rgba(255, 255, 255, 0.8);
+  background: linear-gradient(145deg, #ded6c8, #c8bead);
+  border-radius: 20px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), inset 0 2px 3px rgba(255, 255, 255, 0.9);
   width: 100%;
-  max-width: 1100px;
-  padding: 28px;
-  border: 2px solid #b8af9f;
-  color: #333;
+  max-width: 1150px;
+  padding: 30px;
+  border: 3px solid #b2a694;
+  color: #222;
 }
 
 .synth-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 3px solid #b5a996;
+  border-bottom: 3px solid #a89c8a;
   padding-bottom: 18px;
   margin-bottom: 24px;
 }
 
 .brand h1 {
-  font-size: 2.2rem;
+  font-size: 2.4rem;
   letter-spacing: 2px;
-  color: #2b2b2b;
+  color: #1f2937;
   font-weight: 900;
 }
 
 .brand-sub {
   font-size: 0.75rem;
   letter-spacing: 3px;
-  color: #786f60;
-  font-weight: 700;
+  color: #6b7280;
+  font-weight: 800;
   display: block;
 }
 
@@ -57,111 +57,112 @@ body {
   display: flex;
   align-items: center;
   gap: 24px;
-  background: #c7bcac;
-  padding: 10px 18px;
-  border-radius: 8px;
-  border: 1px solid #a89d8d;
+  background: #b8ac9a;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1px solid #998c7a;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .volume-control {
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
 
-  label {
-    font-size: 0.65rem;
-    font-weight: 800;
-    color: #4a443a;
-  }
+.volume-control label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #374151;
+}
 
-  input[type="range"] {
-    accent-color: #d97706;
-    cursor: pointer;
-  }
+.volume-control input[type="range"] {
+  accent-color: #d97706;
+  cursor: pointer;
 }
 
 .chord-display {
-  background: #111827;
+  background: #0f172a;
   color: #10b981;
   font-family: monospace;
   font-size: 1.1rem;
-  padding: 6px 14px;
-  border-radius: 4px;
-  border: 2px solid #374151;
-  min-width: 160px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 2px solid #1e293b;
+  min-width: 170px;
   text-align: center;
-  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.9);
 }
 
 .synth-body {
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: 1fr 320px;
   gap: 28px;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 950px) {
   .synth-body {
     grid-template-columns: 1fr;
   }
 }
 
-/* Griglia Accordi */
+/* Matrice Accordi */
 .chord-matrix-section {
-  background: #28282b;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: inset 0 4px 10px rgba(0,0,0,0.5);
+  background: #232326;
+  padding: 22px;
+  border-radius: 14px;
+  box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.6);
+}
 
-  h2 {
-    font-size: 0.8rem;
-    letter-spacing: 1.5px;
-    color: #9ca3af;
-    margin-bottom: 16px;
-  }
+.chord-matrix-section h2 {
+  font-size: 0.8rem;
+  letter-spacing: 1.5px;
+  color: #9ca3af;
+  margin-bottom: 18px;
 }
 
 .matrix-grid {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .chord-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .row-label {
-  width: 130px;
+  width: 140px;
   font-size: 0.75rem;
-  font-weight: 700;
-  color: #d1d5db;
+  font-weight: 800;
+  color: #e5e7eb;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   text-align: right;
-  padding-right: 8px;
+  padding-right: 6px;
 }
 
 .row-buttons {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   flex-grow: 1;
   overflow-x: auto;
   padding-bottom: 4px;
 }
 
-/* Stile Pulsanti Quadrati */
+/* Pulsanti Quadrati */
 .chord-btn {
   position: relative;
-  width: 38px;
-  height: 38px;
-  min-width: 38px;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.05s ease;
-  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.4), 0 5px 6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.4), 0 6px 8px rgba(0, 0, 0, 0.3);
   outline: none;
   padding: 0;
 }
@@ -169,54 +170,54 @@ body {
 .chord-btn:active,
 .chord-btn.active {
   transform: translateY(3px);
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4), 0 2px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Colori Pastello per Riga */
-.chord-row[data-quality="maj"] .chord-btn { background-color: #fce7f3; }
-.chord-row[data-quality="min"] .chord-btn { background-color: #e0f2fe; }
-.chord-row[data-quality="7"]   .chord-btn { background-color: #fee2e2; }
-.chord-row[data-quality="maj7"].chord-btn { background-color: #dcfce7; }
-.chord-row[data-quality="m7"]  .chord-btn { background-color: #f3e8ff; }
+/* Colori Tenui Pastello per Riga */
+.chord-row[data-quality="maj"] .chord-btn { background-color: #fde68a; }
+.chord-row[data-quality="min"] .chord-btn { background-color: #bae6fd; }
+.chord-row[data-quality="7"]   .chord-btn { background-color: #fecaca; }
+.chord-row[data-quality="maj7"].chord-btn { background-color: #bbf7d0; }
+.chord-row[data-quality="m7"]  .chord-btn { background-color: #ddd6fe; }
 
-/* LED Verde Integrato */
+/* LED Verde Neon */
 .btn-led {
   position: absolute;
-  bottom: 3px;
+  bottom: 4px;
   left: 50%;
   transform: translateX(-50%);
-  width: 12px;
+  width: 14px;
   height: 4px;
   border-radius: 1px;
-  background-color: #27302b;
-  border: 1px solid #1a201c;
+  background-color: #1f2923;
+  border: 1px solid #111813;
   pointer-events: none;
   transition: background-color 0.05s, box-shadow 0.05s;
 }
 
 .chord-btn.active .btn-led {
   background-color: #00ff66 !important;
-  box-shadow: 0 0 8px #00ff66, 0 0 2px #ffffff !important;
+  box-shadow: 0 0 10px #00ff66, 0 0 3px #ffffff !important;
 }
 
 /* Sezione Strumplate Metallico */
 .strumplate-section {
-  background: #28282b;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.5);
+  background: #232326;
+  padding: 22px;
+  border-radius: 14px;
+  box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
+}
 
-  h2 {
-    font-size: 0.8rem;
-    letter-spacing: 1.5px;
-    color: #9ca3af;
-  }
+.strumplate-section h2 {
+  font-size: 0.8rem;
+  letter-spacing: 1.5px;
+  color: #9ca3af;
 }
 
 .strumplate-header {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .touch-hint {
@@ -228,11 +229,11 @@ body {
 
 .canvas-wrapper {
   flex-grow: 1;
-  min-height: 250px;
-  border-radius: 8px;
+  min-height: 280px;
+  border-radius: 10px;
   overflow: hidden;
-  border: 3px solid #111;
-  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
+  border: 4px solid #111;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
 }
 
 #strum-canvas {
