@@ -265,10 +265,29 @@
 
 /* ==========================================
    VERTICAL SYNTH SLIDERS
-   ADSR + MASTER VOLUME
-   Vintage amber hardware controls
+   Same visual language as the LFO controls
    ========================================== */
 
+/* ADSR and Master Volume occupy the same
+   vertical footprint as the LFO + Presets stack. */
+.md\\:col-span-4:has(#adsr-canvas),
+.md\\:col-span-2:has(#slider-volume) {
+    height: 100%;
+    min-height: 0;
+}
+
+/* Keep the ADSR panel compact. */
+.md\\:col-span-4:has(#adsr-canvas) .crt-container {
+    height: 7rem;
+    flex-shrink: 0;
+}
+
+.md\\:col-span-4:has(#adsr-canvas) > .grid {
+    height: 7rem;
+    flex-shrink: 0;
+}
+
+/* Vertical slider containers. */
 .slider-vertical-container {
     display: flex;
     flex-direction: column;
@@ -278,90 +297,79 @@
     min-height: 0;
 }
 
+/*
+ * Use the same native horizontal range appearance as
+ * the LFO controls, then rotate it 90 degrees.
+ * The result is a vertical white track with a round thumb.
+ */
 .vertical-slider-wrapper,
 .vertical-slider-wrapper-master {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex: 1;
     min-height: 0;
-}
-
-.vertical-slider-wrapper {
     width: 100%;
-    flex: 1;
+    overflow: hidden;
 }
 
-.vertical-slider-wrapper-master {
-    width: 100%;
-    flex: 1;
-}
-
-/* Remove browser's horizontal blue range styling */
 .v-range,
 .v-range-master {
     -webkit-appearance: none;
     appearance: none;
-    writing-mode: vertical-lr;
-    direction: rtl;
-    width: 18px;
-    height: 100%;
-    min-height: 60px;
+    width: 100%;
+    height: 4px;
     margin: 0;
     padding: 0;
-    background: transparent;
+    background: #ffffff;
+    border-radius: 9999px;
     cursor: pointer;
     accent-color: #92400e;
+    transform: rotate(-90deg);
 }
 
-/* WebKit track */
-.v-range::-webkit-slider-runnable-track,
-.v-range-master::-webkit-slider-runnable-track {
-    width: 6px;
-    border-radius: 3px;
-    background: #c8b89a;
-    border: 1px solid #927b5a;
-}
-
-/* WebKit thumb */
+/* Round thumb — same compact control language as LFO. */
 .v-range::-webkit-slider-thumb,
 .v-range-master::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 16px;
-    height: 8px;
-    margin-left: 0;
-    margin-top: -2px;
-    border: 1px solid #5f3b16;
-    border-radius: 2px;
-    background: #92400e;
-    box-shadow:
-        0 1px 2px rgba(0, 0, 0, 0.30);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1px solid #92400e;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
-/* Firefox track */
-.v-range::-moz-range-track,
-.v-range-master::-moz-range-track {
-    width: 6px;
-    border-radius: 3px;
-    background: #c8b89a;
-    border: 1px solid #927b5a;
-}
-
-/* Firefox thumb */
 .v-range::-moz-range-thumb,
 .v-range-master::-moz-range-thumb {
-    width: 16px;
-    height: 8px;
-    border: 1px solid #5f3b16;
-    border-radius: 2px;
-    background: #92400e;
-    box-shadow:
-        0 1px 2px rgba(0, 0, 0, 0.30);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1px solid #92400e;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
-/* Keep keyboard focus visible without the browser blue outline */
-.v-range:focus-visible,
-.v-range-master:focus-visible {
-    outline: 2px solid #d97706;
-    outline-offset: 3px;
+.v-range::-webkit-slider-runnable-track,
+.v-range-master::-webkit-slider-runnable-track {
+    height: 4px;
+    background: #ffffff;
+    border-radius: 9999px;
+}
+
+.v-range::-moz-range-track,
+.v-range-master::-moz-range-track {
+    height: 4px;
+    background: #ffffff;
+    border-radius: 9999px;
+}
+
+/* Master Volume uses the same vertical footprint. */
+.md\\:col-span-2:has(#slider-volume) {
+    min-height: 0;
+}
+
+.md\\:col-span-2:has(#slider-volume) .vertical-slider-wrapper-master {
+    min-height: 0;
 }
