@@ -573,7 +573,11 @@ const GENRES_DATA = {
         "Classic Jazz Cadence": "ii7 - V7 (bVII7) - Imaj7 (vi7 / iii7)",
         "Minor Jazz Cadence": "ii7 - V7 (bVII7) - i7 (bIIImaj7)",
         "Jazz Turnaround": "Imaj7 - vi7 (bIII7) - ii7 (IVmaj7) - V7 (bVII7)",
-        "Dixieland Loop": "I - VI7 (bIII7) - II7 (bVI7) - V7 (bVII7)"
+        "Dixieland Loop": "I - VI7 (bIII7) - II7 (bVI7) - V7 (bVII7)",
+        "Rhythm Changes": "Imaj7 - VI7 - ii7 - V7",
+        "Backdoor Progression": "IVmaj7 - bVII7 - Imaj7",
+        "Tritone Substitution": "ii7 - bII7 - Imaj7",
+        "Diminished Passing Chord": "Imaj7 - vii°7 (V7) - ii7 - V7"
     },
 
     "Pop & Rock": {
