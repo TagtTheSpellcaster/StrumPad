@@ -1,434 +1,255 @@
-/**
- * Omnichord Web Audio Engine Class
- * Handles sound synthesis using pure Web Audio API oscillators, filters and dynamic envelopes.
- */
-class OmnichordAudioEngine {
-    constructor() {
-        this.ctx = null;
-        this.masterGain = null;
-        this.volume = 0.8;
-        this.sustainTime = 1.2;
-        this.cutoffFreq = 2200;
-        this.isInitialized = false;
-    }
-
-    // Initialize Web Audio Context on first user interaction
-    init() {
-        if (this.isInitialized) return;
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        this.ctx = new AudioCtx();
-
-        // Setup master gain node
-        this.masterGain = this.ctx.createGain();
-        this.masterGain.gain.setValueAtTime(this.volume, this.ctx.currentTime);
-        this.masterGain.connect(this.ctx.destination);
-
-        this.isInitialized = true;
-    }
-
-    setVolume(val) {
-        this.volume = val;
-        if (this.masterGain && this.ctx) {
-            this.masterGain.gain.linearRampToValueAtTime(this.volume, this.ctx.currentTime + 0.05);
-        }
-    }
-
-    setSustain(val) {
-        this.sustainTime = val;
-    }
-
-    setCutoff(val) {
-        this.cutoffFreq = val;
-    }
-
-    // Play a single synthesized retro pluck voice
-    playNote(midiNote) {
-        if (!this.isInitialized || !this.ctx) return;
-        if (this.ctx.state === 'suspended') {
-            this.ctx.resume();
-        }
-
-        const now = this.ctx.currentTime;
-        const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
-
-        // Twin oscillators for rich warm retro timbre
-        const osc1 = this.ctx.createOscillator();
-        const osc2 = this.ctx.createOscillator();
-        
-        osc1.type = 'sawtooth';
-        osc2.type = 'triangle';
-
-        osc1.frequency.setValueAtTime(freq, now);
-        osc2.frequency.setValueAtTime(freq * 1.002, now); // Slight detune for warmth
-
-        // Lowpass filter envelope
-        const filter = this.ctx.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(this.cutoffFreq, now);
-        filter.frequency.exponentialRampToValueAtTime(120, now + this.sustainTime);
-
-        // Gain envelope (Pluck decay)
-        const noteGain = this.ctx.createGain();
-        noteGain.gain.setValueAtTime(0.3, now);
-        noteGain.gain.exponentialRampToValueAtTime(0.0001, now + this.sustainTime);
-
-        // Connections
-        osc1.connect(filter);
-        osc2.connect(filter);
-        filter.connect(noteGain);
-        noteGain.connect(this.masterGain);
-
-        osc1.start(now);
-        osc2.start(now);
-        osc1.stop(now + this.sustainTime);
-        osc2.stop(now + this.sustainTime);
-    }
-
-    // Arpeggiate chord notes in rapid succession (strum effect on button press)
-    playChordStrum(midiNotes) {
-        if (!this.isInitialized || !this.ctx) return;
-        
-        const notesToPlay = midiNotes.slice(0, 5);
-        notesToPlay.forEach((note, index) => {
-            setTimeout(() => {
-                this.playNote(note);
-            }, index * 40); // 40ms strum interval
-        });
-    }
-}
-
-
-// Circle of Fifths order starting from C
+// --- Circolo delle Quinte (Inizio da C / Do) ---
 const CIRCLE_OF_FIFTHS = [
-    { name: 'C',  midi: 60 },
-    { name: 'G',  midi: 67 },
-    { name: 'D',  midi: 62 },
-    { name: 'A',  midi: 69 },
-    { name: 'E',  midi: 64 },
-    { name: 'B',  midi: 71 },
-    { name: 'F#', midi: 66 },
-    { name: 'Db', midi: 61 },
-    { name: 'Ab', midi: 68 },
-    { name: 'Eb', midi: 63 },
-    { name: 'Bb', midi: 70 },
-    { name: 'F',  midi: 65 }
+  { name: 'C',  midi: 60 },
+  { name: 'G',  midi: 67 },
+  { name: 'D',  midi: 62 },
+  { name: 'A',  midi: 69 },
+  { name: 'E',  midi: 64 },
+  { name: 'B',  midi: 71 },
+  { name: 'F#', midi: 66 },
+  { name: 'Db', midi: 61 },
+  { name: 'Ab', midi: 68 },
+  { name: 'Eb', midi: 63 },
+  { name: 'Bb', midi: 70 },
+  { name: 'F',  midi: 65 }
 ];
 
-// 5 Matrix Rows Configurations (Muted pastel badges)
-const MATRIX_ROWS = [
-    { 
-        id: 'maj', 
-        label: 'Maggiore', 
-        quality: 'maj',
-        intervals: [0, 4, 7],
-        suffix: '',
-        rowClass: 'row-color-maj',
-        badgeColor: 'bg-amber-200 text-amber-900 border border-amber-300'
-    },
-    { 
-        id: 'min', 
-        label: 'Minore', 
-        quality: 'min',
-        intervals: [0, 3, 7],
-        suffix: 'm',
-        rowClass: 'row-color-min',
-        badgeColor: 'bg-sky-200 text-sky-900 border border-sky-300'
-    },
-    { 
-        id: '7', 
-        label: 'Settima Dominante', 
-        quality: '7',
-        intervals: [0, 4, 7, 10],
-        suffix: '7',
-        rowClass: 'row-color-7',
-        badgeColor: 'bg-rose-200 text-rose-900 border border-rose-300'
-    },
-    { 
-        id: 'maj7', 
-        label: 'Settima Maggiore', 
-        quality: 'maj7',
-        intervals: [0, 4, 7, 11],
-        suffix: 'maj7',
-        rowClass: 'row-color-maj7',
-        badgeColor: 'bg-emerald-200 text-emerald-900 border border-emerald-300'
-    },
-    { 
-        id: 'm7', 
-        label: 'Settima Minore', 
-        quality: 'm7',
-        intervals: [0, 3, 7, 10],
-        suffix: 'm7',
-        rowClass: 'row-color-m7',
-        badgeColor: 'bg-purple-200 text-purple-900 border border-purple-300'
-    }
+const CHORD_TYPES = [
+  { label: 'Maggiore',          quality: 'maj',  intervals: [0, 4, 7] },
+  { label: 'Minore',            quality: 'min',  intervals: [0, 3, 7] },
+  { label: 'Settima Dominante', quality: '7',    intervals: [0, 4, 7, 10] },
+  { label: 'Settima Maggiore',  quality: 'maj7', intervals: [0, 4, 7, 11] },
+  { label: 'Settima Minore',    quality: 'm7',   intervals: [0, 3, 7, 10] }
 ];
 
-// Global State
-const audioEngine = new OmnichordAudioEngine();
-let currentChordObj = {
-    rootName: 'C',
-    rootMidi: 60,
-    quality: 'maj',
-    fullName: 'C'
-};
-let currentStrumNotes = [];
+// --- Motore Audio (Web Audio API) ---
+class AudioEngine {
+  constructor() {
+    this.ctx = null;
+    this.masterGain = null;
+    this.volume = 0.7;
+  }
 
-/**
- * Calculates strumplate octave note ranges for the current chord
- */
-function calculateStrumNotes(rootMidi, intervals) {
-    const notes = [];
-    for (let octave = -1; octave <= 2; octave++) {
-        for (let interval of intervals) {
-            notes.push(rootMidi + interval + (octave * 12));
-        }
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AudioCtx();
+      this.masterGain = this.ctx.createGain();
+      this.masterGain.gain.value = this.volume;
+      this.masterGain.connect(this.ctx.destination);
     }
-    return notes.sort((a, b) => a - b);
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+
+  setMasterVolume(val) {
+    this.volume = val;
+    if (this.masterGain) {
+      this.masterGain.gain.value = val;
+    }
+  }
+
+  playVoice(midiNote) {
+    this.init();
+    const now = this.ctx.currentTime;
+    const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
+
+    // Oscillatori (Sawtooth + Triangle)
+    const osc1 = this.ctx.createOscillator();
+    const osc2 = this.ctx.createOscillator();
+    osc1.type = 'sawtooth';
+    osc2.type = 'triangle';
+    osc1.frequency.value = freq;
+    osc2.frequency.value = freq * 1.001;
+
+    // Filtro Passa-Basso
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(1200, now);
+    filter.frequency.exponentialRampToValueAtTime(150, now + 0.9);
+
+    // Inviluppo Volume
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.35, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
+
+    osc1.connect(filter);
+    osc2.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.masterGain);
+
+    osc1.start(now);
+    osc2.start(now);
+    osc1.stop(now + 0.95);
+    osc2.stop(now + 0.95);
+  }
 }
 
-/**
- * Updates selected chord state and highlights matrix UI
- */
-function setSelection(rootObj, rowObj) {
-    currentChordObj = {
-        rootName: rootObj.name,
-        rootMidi: rootObj.midi,
-        quality: rowObj.quality,
-        fullName: `${rootObj.name}${rowObj.suffix}`
-    };
+// --- Gestione Interfaccia e Strumplate ---
+document.addEventListener('DOMContentLoaded', () => {
+  const audioEngine = new AudioEngine();
+  const matrixContainer = document.getElementById('chord-matrix');
+  const currentChordDisplay = document.getElementById('current-chord');
+  const masterVolInput = document.getElementById('master-vol');
+  const canvas = document.getElementById('strum-canvas');
+  const ctx = canvas.getContext('2d');
 
-    currentStrumNotes = calculateStrumNotes(rootObj.midi, rowObj.intervals);
-    
-    // Update display
-    const displayEl = document.getElementById('current-chord-display');
-    if (displayEl) {
-        displayEl.textContent = currentChordObj.fullName;
+  let activeChord = null; // Default: nessun accordo selezionato
+  let activeNotes = [];
+  let lastStrumIndex = -1;
+  let isStrumming = false;
+  const ripples = [];
+
+  // Impostazione dell'Accordo Attivo
+  function setChord(rootName, rootMidi, quality, labelQuality, btnElement) {
+    document.querySelectorAll('.chord-btn').forEach(b => b.classList.remove('active'));
+    btnElement.classList.add('active');
+
+    const chordDef = CHORD_TYPES.find(t => t.quality === quality);
+    activeChord = { rootName, rootMidi, quality, labelQuality };
+    currentChordDisplay.textContent = `${rootName} ${labelQuality}`;
+
+    // Note estese su 3 ottave per lo Strumplate
+    activeNotes = [];
+    for (let octave = -1; octave <= 1; octave++) {
+      chordDef.intervals.forEach(interval => {
+        activeNotes.push(rootMidi + interval + (octave * 12));
+      });
     }
+  }
 
-    // Highlight active button in matrix
-    const allBtns = document.querySelectorAll('.matrix-chord-btn');
-    allBtns.forEach(btn => {
-        if (btn.dataset.chord === currentChordObj.fullName) {
-            btn.classList.add('active');
-        } else {
-            btn.classList.remove('active');
-        }
+  // Generazione Matrice
+  CHORD_TYPES.forEach(type => {
+    const row = document.createElement('div');
+    row.className = 'chord-row';
+    row.dataset.quality = type.quality;
+
+    const label = document.createElement('div');
+    label.className = 'row-label';
+    label.textContent = type.label;
+    row.appendChild(label);
+
+    const btnContainer = document.createElement('div');
+    btnContainer.className = 'row-buttons';
+
+    CIRCLE_OF_FIFTHS.forEach(root => {
+      const btn = document.createElement('button');
+      btn.className = 'chord-btn';
+      btn.title = `${root.name} ${type.label}`;
+
+      // LED verde integrato
+      const led = document.createElement('span');
+      led.className = 'btn-led';
+      btn.appendChild(led);
+
+      // Trigger sonoro immediato sul down
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        setChord(root.name, root.midi, type.quality, type.label, btn);
+        audioEngine.playVoice(root.midi);
+      });
+
+      btnContainer.appendChild(btn);
     });
-}
 
-/**
- * Builds the 5-row Accordion Buttons UI Matrix dynamically
- */
-function buildMatrixUI() {
-    const container = document.getElementById('matrix-container');
-    if (!container) return;
-    container.innerHTML = '';
+    row.appendChild(btnContainer);
+    matrixContainer.appendChild(row);
+  });
 
-    MATRIX_ROWS.forEach(row => {
-        const rowWrapper = document.createElement('div');
-        rowWrapper.className = 'flex items-center gap-3';
+  // Volume Master
+  masterVolInput.addEventListener('input', (e) => {
+    audioEngine.setMasterVolume(parseFloat(e.target.value));
+  });
 
-        // Row label container
-        const rowHeader = document.createElement('div');
-        rowHeader.className = 'w-36 text-xs font-bold text-slate-700 flex items-center justify-end pr-2 shrink-0';
-        rowHeader.innerHTML = `<span class="px-2 py-1 rounded-md text-[11px] font-semibold w-full text-right shadow-sm ${row.badgeColor}">${row.label}</span>`;
-        rowWrapper.appendChild(rowHeader);
+  // Rendering Canvas Strumplate Metallico
+  function resizeCanvas() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
 
-        // Row button grid
-        const btnRow = document.createElement('div');
-        btnRow.className = 'flex items-center gap-1.5 sm:gap-2';
+  function drawStrumplate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        CIRCLE_OF_FIFTHS.forEach(root => {
-            const chordName = `${root.name}${row.suffix}`;
-            const btn = document.createElement('button');
-            
-            // Compact square button style with row-specific color scheme
-            btn.className = `matrix-chord-btn chord-btn ${row.rowClass} select-none`;
-            btn.dataset.chord = chordName;
+    // Gradiente Metallico Dorato
+    const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    grad.addColorStop(0, '#e5c07b');
+    grad.addColorStop(0.3, '#fff3a8');
+    grad.addColorStop(0.5, '#b8860b');
+    grad.addColorStop(0.8, '#ffd700');
+    grad.addColorStop(1, '#996515');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Green LED indicator rectangle positioned bottom center
-            btn.innerHTML = `<div class="btn-led"></div>`;
-
-            // Trigger sound immediately on pointerdown/mousedown/touchstart
-            const handlePress = (e) => {
-                e.preventDefault();
-                audioEngine.init();
-                setSelection(root, row);
-                audioEngine.playChordStrum(currentStrumNotes);
-            };
-
-            btn.addEventListener('pointerdown', handlePress);
-
-            btnRow.appendChild(btn);
-        });
-
-        rowWrapper.appendChild(btnRow);
-        container.appendChild(rowWrapper);
-    });
-
-    // Default selection: C Major
-    setSelection(CIRCLE_OF_FIFTHS[0], MATRIX_ROWS[0]);
-}
-
-
-/**
- * Strumplate Canvas Interactivity Controller Class
- */
-class StrumplateController {
-    constructor(canvas, audioEngine) {
-        this.canvas = canvas;
-        this.ctx = canvas.getContext('2d');
-        this.audioEngine = audioEngine;
-        this.lastNoteIndex = -1;
-        this.isInteracting = false;
-        this.ripples = [];
-
-        this.resizeCanvas();
-        window.addEventListener('resize', () => this.resizeCanvas());
-        this.setupEvents();
-        this.animate();
+    // Spazzolatura/Struttura Orizzontale
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.lineWidth = 1;
+    for (let y = 0; y < canvas.height; y += 4) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+      ctx.stroke();
     }
 
-    resizeCanvas() {
-        const rect = this.canvas.parentElement.getBoundingClientRect();
-        this.canvas.width = rect.width;
-        this.canvas.height = rect.height;
+    // Effetti Ondulatori Touch (Ripples)
+    for (let i = ripples.length - 1; i >= 0; i--) {
+      const r = ripples[i];
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(255, 255, 255, ${r.alpha})`;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      r.radius += 2.5;
+      r.alpha -= 0.03;
+      if (r.alpha <= 0) ripples.splice(i, 1);
     }
 
-    setupEvents() {
-        const getCoords = (e) => {
-            const rect = this.canvas.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            return {
-                x: clientX - rect.left,
-                y: clientY - rect.top
-            };
-        };
+    requestAnimationFrame(drawStrumplate);
+  }
+  drawStrumplate();
 
-        const startInteract = (e) => {
-            e.preventDefault();
-            this.audioEngine.init();
-            this.isInteracting = true;
-            this.processInteraction(getCoords(e));
-        };
+  // Interazione Strumplate
+  function handleStrum(e) {
+    if (!isStrumming) return;
+    const rect = canvas.getBoundingClientRect();
+    const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+    const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
 
-        const moveInteract = (e) => {
-            if (!this.isInteracting) return;
-            e.preventDefault();
-            this.processInteraction(getCoords(e));
-        };
-
-        const stopInteract = () => {
-            this.isInteracting = false;
-            this.lastNoteIndex = -1;
-        };
-
-        this.canvas.addEventListener('mousedown', startInteract);
-        this.canvas.addEventListener('mousemove', moveInteract);
-        window.addEventListener('mouseup', stopInteract);
-
-        this.canvas.addEventListener('touchstart', startInteract, { passive: false });
-        this.canvas.addEventListener('touchmove', moveInteract, { passive: false });
-        window.addEventListener('touchend', stopInteract);
+    // Se non è selezionato alcun accordo, usa C Major come fallback
+    if (!activeChord) {
+      const defaultBtn = document.querySelector('.chord-row[data-quality="maj"] .chord-btn');
+      const defaultRoot = CIRCLE_OF_FIFTHS[0];
+      setChord(defaultRoot.name, defaultRoot.midi, 'maj', 'Maggiore', defaultBtn);
     }
 
-    processInteraction(coords) {
-        if (!currentStrumNotes.length) return;
+    const noteCount = activeNotes.length;
+    const index = Math.floor((y / canvas.height) * noteCount);
+    const clampedIndex = Math.max(0, Math.min(noteCount - 1, index));
 
-        const width = this.canvas.width;
-        const normalizedX = Math.max(0, Math.min(1, coords.x / width));
-        const noteIndex = Math.floor(normalizedX * currentStrumNotes.length);
-
-        if (noteIndex !== this.lastNoteIndex && noteIndex < currentStrumNotes.length) {
-            this.lastNoteIndex = noteIndex;
-            const noteToPlay = currentStrumNotes[noteIndex];
-            this.audioEngine.playNote(noteToPlay);
-            this.addRipple(coords.x, coords.y);
-        }
+    if (clampedIndex !== lastStrumIndex) {
+      audioEngine.playVoice(activeNotes[clampedIndex]);
+      lastStrumIndex = clampedIndex;
+      ripples.push({ x, y, radius: 5, alpha: 0.9 });
     }
+  }
 
-    addRipple(x, y) {
-        this.ripples.push({
-            x: x,
-            y: y,
-            radius: 5,
-            alpha: 1.0
-        });
-    }
+  canvas.addEventListener('pointerdown', (e) => {
+    isStrumming = true;
+    canvas.setPointerCapture(e.pointerId);
+    handleStrum(e);
+  });
 
-    animate() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  canvas.addEventListener('pointermove', handleStrum);
 
-        for (let i = this.ripples.length - 1; i >= 0; i--) {
-            const r = this.ripples[i];
-            this.ctx.beginPath();
-            this.ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
-            this.ctx.fillStyle = `rgba(255, 255, 255, ${r.alpha})`;
-            this.ctx.fill();
+  const stopStrumming = () => {
+    isStrumming = false;
+    lastStrumIndex = -1;
+  };
 
-            r.radius += 2.5;
-            r.alpha -= 0.04;
-
-            if (r.alpha <= 0) {
-                this.ripples.splice(i, 1);
-            }
-        }
-
-        requestAnimationFrame(() => this.animate());
-    }
-}
-
-
-window.addEventListener('DOMContentLoaded', () => {
-    // Build Accordion Matrix UI
-    buildMatrixUI();
-
-    // Initialize Canvas Strumplate
-    const strumplate = new StrumplateController(
-        document.getElementById('strumplate-canvas'), 
-        audioEngine
-    );
-
-    // Audio Start Toggle Button Listener
-    const btnAudio = document.getElementById('btn-start-audio');
-    const powerLed = document.getElementById('power-led');
-    
-    if (btnAudio && powerLed) {
-        btnAudio.addEventListener('click', () => {
-            audioEngine.init();
-            btnAudio.classList.add('hidden');
-            powerLed.classList.remove('bg-red-600', 'text-red-500');
-            powerLed.classList.add('bg-green-500', 'text-green-400');
-        });
-    }
-
-    // Sliders Event Handlers
-    const volumeSlider = document.getElementById('knob-volume');
-    const sustainSlider = document.getElementById('knob-sustain');
-    const cutoffSlider = document.getElementById('knob-cutoff');
-
-    if (volumeSlider) {
-        volumeSlider.addEventListener('input', (e) => {
-            const val = parseFloat(e.target.value) / 100;
-            audioEngine.setVolume(val);
-            document.getElementById('val-volume').textContent = `${e.target.value}%`;
-        });
-    }
-
-    if (sustainSlider) {
-        sustainSlider.addEventListener('input', (e) => {
-            const val = parseFloat(e.target.value) / 10;
-            audioEngine.setSustain(val);
-            document.getElementById('val-sustain').textContent = `${val.toFixed(1)}s`;
-        });
-    }
-
-    if (cutoffSlider) {
-        cutoffSlider.addEventListener('input', (e) => {
-            const val = parseFloat(e.target.value);
-            audioEngine.setCutoff(val);
-            document.getElementById('val-cutoff').textContent = `${val} Hz`;
-        });
-    }
+  canvas.addEventListener('pointerup', stopStrumming);
+  canvas.addEventListener('pointercancel', stopStrumming);
 });
