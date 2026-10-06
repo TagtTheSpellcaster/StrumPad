@@ -33,6 +33,9 @@ class WebAudioEngine {
         this.lfoDepth = 0.0;
         this.vibratoEnabled = false;
         this.tremoloEnabled = false;
+
+        // Preset Octave Offset
+        this.octaveOffset = 0;
     }
 
     init() {
@@ -140,6 +143,10 @@ class WebAudioEngine {
         this.waveform = type;
     }
 
+    setOctaveOffset(offset) {
+        this.octaveOffset = offset || 0;
+    }
+
     setAdsr(attack, decay, sustain, release) {
         this.attackTime = attack;
         this.decayTime = decay;
@@ -151,7 +158,8 @@ class WebAudioEngine {
         if (!this.audioActive || !this.ctx) return;
 
         const now = this.ctx.currentTime;
-        const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
+        const actualMidiNote = midiNote + this.octaveOffset;
+        const freq = 440 * Math.pow(2, (actualMidiNote - 69) / 12);
 
         if (this.droneMode) {
             const pipeHarmonics = [
@@ -411,7 +419,8 @@ const SYNTH_PRESETS = {
         lfoRate: 0.5,       // 0% Rate
         lfoDepth: 0,        // 0% Depth
         vibrato: false,
-        tremolo: false
+        tremolo: false,
+        octaveOffset: 0
     },
     GUITAR: {
         waveform: 'sawtooth',
@@ -425,7 +434,8 @@ const SYNTH_PRESETS = {
         lfoRate: 0.5,
         lfoDepth: 0,
         vibrato: false,
-        tremolo: false
+        tremolo: false,
+        octaveOffset: 0
     },
     BASS: {
         waveform: 'sawtooth',
@@ -439,7 +449,8 @@ const SYNTH_PRESETS = {
         lfoRate: 0.5,
         lfoDepth: 0,        // Nessun LFO
         vibrato: false,
-        tremolo: false
+        tremolo: false,
+        octaveOffset: -12   // Trasposizione di -1 ottava (-12 semitoni)
     },
     ORGAN: {
         waveform: 'square',
@@ -453,7 +464,8 @@ const SYNTH_PRESETS = {
         lfoRate: 0.5,
         lfoDepth: 0,        // Nessun LFO
         vibrato: false,
-        tremolo: false
+        tremolo: false,
+        octaveOffset: 0
     },
     STRINGS: {
         waveform: 'sawtooth',
@@ -467,7 +479,8 @@ const SYNTH_PRESETS = {
         lfoRate: 5.5,       // LFO a 5.5 Hz
         lfoDepth: 3,        // Vibrato molto leggero (3%)
         vibrato: true,
-        tremolo: false
+        tremolo: false,
+        octaveOffset: 0
     },
     BRASS: {
         waveform: 'sawtooth',
@@ -481,7 +494,8 @@ const SYNTH_PRESETS = {
         lfoRate: 5.0,       // LFO a 5 Hz
         lfoDepth: 2,        // Vibrato molto leggero (2%)
         vibrato: true,
-        tremolo: false
+        tremolo: false,
+        octaveOffset: 0
     },
     PAD: {
         waveform: 'triangle',
@@ -495,7 +509,8 @@ const SYNTH_PRESETS = {
         lfoRate: 1.5,       // LFO lento (1.5 Hz)
         lfoDepth: 2,        // Modulazione leggerissima (2%)
         vibrato: false,     // Vibrato OFF per evitare effetti evidenti
-        tremolo: false
+        tremolo: false,
+        octaveOffset: 0
     },
     LEAD: {
         waveform: 'sawtooth',
@@ -509,7 +524,8 @@ const SYNTH_PRESETS = {
         lfoRate: 5.5,       // LFO a 5.5 Hz
         lfoDepth: 4,        // Vibrato percepibile ma controllato (4%)
         vibrato: true,
-        tremolo: false
+        tremolo: false,
+        octaveOffset: 0
     }
 };
 
@@ -1117,6 +1133,9 @@ window.addEventListener('DOMContentLoaded', () => {
         toggleVibrato.checked = preset.vibrato;
         toggleTremolo.checked = preset.tremolo;
         updateLfo();
+
+        // Octave Offset
+        audio.setOctaveOffset(preset.octaveOffset || 0);
 
         // Visual Selection Highlight
         const presetButtons = document.querySelectorAll('.preset-btn');
