@@ -441,14 +441,14 @@ const SYNTH_PRESETS = {
     BASS: {
         waveform: 'sawtooth',
         filterType: 'lowpass',
-        cutoff: 800,        // Cutoff basso per timbro profondo e scuro
-        resonance: 2.0,     // Resonance moderata per stabilità e corpo
-        attack: 0.01,       // Attack molto rapido
-        decay: 0.50,        // Decay breve/moderato (0.50s)
-        sustain: 0.70,      // Sustain alto (70%)
-        release: 0.30,      // Release breve (0.30s)
+        cutoff: 2628,
+        resonance: 2.7,
+        attack: 0.01,
+        decay: 0.90,
+        sustain: 0.70,
+        release: 0.75,
         lfoRate: 0.5,
-        lfoDepth: 0,        // Nessun LFO
+        lfoDepth: 0,
         vibrato: false,
         tremolo: false,
         octaveOffset: -12   // Trasposizione di -1 ottava (-12 semitoni)
@@ -456,14 +456,14 @@ const SYNTH_PRESETS = {
     ORGAN: {
         waveform: 'square',
         filterType: 'lowpass',
-        cutoff: 3500,       // Cutoff medio
-        resonance: 0.8,     // Resonance bassa
-        attack: 0.01,       // Attack minimo
-        decay: 0.05,        // Decay minimo
-        sustain: 1.00,      // Sustain massimo (100%)
-        release: 0.40,      // Release breve/moderato (0.40s)
+        cutoff: 4445,
+        resonance: 0.8,
+        attack: 0.01,
+        decay: 0.05,
+        sustain: 1.00,
+        release: 0.75,
         lfoRate: 0.5,
-        lfoDepth: 0,        // Nessun LFO
+        lfoDepth: 0,
         vibrato: false,
         tremolo: false,
         octaveOffset: 0
@@ -471,14 +471,14 @@ const SYNTH_PRESETS = {
     STRINGS: {
         waveform: 'sawtooth',
         filterType: 'lowpass',
-        cutoff: 2200,       // Cutoff medio-basso per timbro caldo
-        resonance: 0.5,     // Resonance molto bassa
-        attack: 0.80,       // Attack lento (0.80s)
-        decay: 0.80,        // Decay moderato (0.80s)
-        sustain: 0.85,      // Sustain alto (85%)
-        release: 2.50,      // Release lungo (2.50s)
-        lfoRate: 5.5,       // LFO a 5.5 Hz
-        lfoDepth: 3,        // Vibrato molto leggero (3%)
+        cutoff: 3500,
+        resonance: 0.3,
+        attack: 0.25,
+        decay: 0.25,
+        sustain: 0.85,
+        release: 1.00,
+        lfoRate: 5.0,
+        lfoDepth: 25,
         vibrato: true,
         tremolo: false,
         octaveOffset: 0
@@ -486,14 +486,14 @@ const SYNTH_PRESETS = {
     BRASS: {
         waveform: 'sawtooth',
         filterType: 'lowpass',
-        cutoff: 4800,       // Cutoff medio-alto
-        resonance: 1.8,     // Resonance bassa/moderata
-        attack: 0.10,       // Attack breve ma non istantaneo (0.10s)
-        decay: 0.60,        // Decay moderato (0.60s)
-        sustain: 0.80,      // Sustain alto (80%)
-        release: 0.60,      // Release moderato (0.60s)
-        lfoRate: 5.0,       // LFO a 5 Hz
-        lfoDepth: 2,        // Vibrato molto leggero (2%)
+        cutoff: 5472,
+        resonance: 1.5,
+        attack: 0.12,
+        decay: 0.50,
+        sustain: 0.82,
+        release: 0.90,
+        lfoRate: 5.0,
+        lfoDepth: 8,
         vibrato: true,
         tremolo: false,
         octaveOffset: 0
@@ -501,29 +501,29 @@ const SYNTH_PRESETS = {
     PAD: {
         waveform: 'triangle',
         filterType: 'lowpass',
-        cutoff: 1800,       // Cutoff medio-basso per timbro atmosferico
-        resonance: 0.3,     // Resonance minima
-        attack: 1.50,       // Attack molto lento (1.50s)
-        decay: 1.00,        // Decay moderato (1.00s)
-        sustain: 0.88,      // Sustain alto (88%)
-        release: 3.50,      // Release molto lungo (3.50s)
-        lfoRate: 1.5,       // LFO lento (1.5 Hz)
-        lfoDepth: 2,        // Modulazione leggerissima (2%)
-        vibrato: false,     // Vibrato OFF per evitare effetti evidenti
+        cutoff: 3260,
+        resonance: 0.5,
+        attack: 1.20,
+        decay: 0.70,
+        sustain: 0.88,
+        release: 3.50,
+        lfoRate: 2.0,
+        lfoDepth: 6,
+        vibrato: true,
         tremolo: false,
         octaveOffset: 0
     },
     LEAD: {
         waveform: 'sawtooth',
         filterType: 'lowpass',
-        cutoff: 6200,       // Cutoff alto per presenza e brillantezza
-        resonance: 4.5,     // Resonance moderata/alta per carattere sintetico
-        attack: 0.03,       // Attack rapido (0.03s)
-        decay: 0.50,        // Decay breve/moderato (0.50s)
-        sustain: 0.78,      // Sustain alto (78%)
-        release: 0.50,      // Release moderato (0.50s)
-        lfoRate: 5.5,       // LFO a 5.5 Hz
-        lfoDepth: 4,        // Vibrato percepibile ma controllato (4%)
+        cutoff: 6262,
+        resonance: 3.0,
+        attack: 0.06,
+        decay: 0.60,
+        sustain: 0.78,
+        release: 1.00,
+        lfoRate: 5.5,
+        lfoDepth: 12,
         vibrato: true,
         tremolo: false,
         octaveOffset: 0
