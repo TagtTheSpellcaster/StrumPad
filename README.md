@@ -6,6 +6,8 @@
 [![Web Audio API](https://img.shields.io/badge/Web%20Audio%20API-Native-8B5CF6.svg)](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-CDN-06B6D4.svg)](https://tailwindcss.com/)
 
+**▶ [Launch StrumPad](https://tagtthespellcaster.github.io/StrumPad/)**
+
 **StrumPad v1.0.1** is a browser-based, vintage-style **chord machine and analog-modeled synthesizer** designed for playing chords, exploring harmonic progressions, and experimenting with sound.
 
 Its main purpose is harmonic exploration: select a musical style, choose a progression, establish the key by playing its first chord, and then follow the visual guidance provided by the **Harmonic Progression Assistant**.
