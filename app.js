@@ -816,6 +816,28 @@ function createMatrixUI() {
     if (!container) return;
     container.innerHTML = '';
 
+    // 1. Rigenera l'intestazione Vintage Anni '70 per le note in cima alle colonne
+    const headerRowWrapper = document.createElement('div');
+    headerRowWrapper.className = 'flex items-center gap-3 mb-1';
+
+    const headerEmptyBox = document.createElement('div');
+    headerEmptyBox.className = 'w-36 text-right shrink-0 pr-2';
+    headerRowWrapper.appendChild(headerEmptyBox);
+
+    const headerBtnGrid = document.createElement('div');
+    headerBtnGrid.className = 'flex items-center gap-2';
+
+    CIRCLE_OF_FIFTHS.forEach(root => {
+        const headerBox = document.createElement('div');
+        headerBox.className = 'w-[42px] h-[42px] flex items-center justify-center font-mono font-bold text-xs text-amber-950 bg-amber-100/80 border border-chassisDark rounded-lg shadow-inner';
+        headerBox.textContent = root.name;
+        headerBtnGrid.appendChild(headerBox);
+    });
+
+    headerRowWrapper.appendChild(headerBtnGrid);
+    container.appendChild(headerRowWrapper);
+
+    // 2. Genera le 5 righe della matrice di accordi
     MATRIX_ROWS.forEach(row => {
         const rowWrapper = document.createElement('div');
         rowWrapper.className = 'flex items-center gap-3';
