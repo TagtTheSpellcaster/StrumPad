@@ -8,7 +8,7 @@
 
 **▶ [Launch StrumPad](https://tagtthespellcaster.github.io/StrumPad/)**
 
-**StrumPad v1.0.1** is a browser-based, vintage-style **chord machine and analog-modeled synthesizer** designed for playing chords, exploring harmonic progressions, and experimenting with sound.
+**StrumPad v1.1.2** is a browser-based, vintage-style **chord machine and analog-modeled synthesizer** designed for playing chords, exploring harmonic progressions, and experimenting with sound.
 
 Its main purpose is harmonic exploration: select a musical style, choose a progression, establish the key by playing its first chord, and then follow the visual guidance provided by the **Harmonic Progression Assistant**.
 
@@ -133,7 +133,8 @@ Available categories include:
 - Classical & Traditional
 - Jazz & Dixieland
 - Pop & Rock
-- Country, Folk & Blues
+- Country & Folk
+- Blues
 - Funk & Disco
 - Heavy Metal & Hard Rock
 - Gospel & Soul
