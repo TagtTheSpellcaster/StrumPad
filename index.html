@@ -51,11 +51,11 @@
         /* 3D Hardware Button Styles */
         .chord-btn {
             transition: all 0.05s ease;
-            box-shadow: 0 4px 0 #8c8273, 0 5px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 0 #8c8273, 0 5px 6px rgba(0,0,0,0.3);
         }
         .chord-btn:active, .chord-btn.active {
             transform: translateY(3px);
-            box-shadow: 0 1px 0 #8c8273, 0 2px 4px rgba(0,0,0,0.3);
+            box-shadow: 0 1px 0 #8c8273, 0 2px 3px rgba(0,0,0,0.3);
         }
         
         /* Knobs & LED effects */
@@ -63,9 +63,10 @@
             box-shadow: 0 0 8px currentColor;
         }
 
-        /* Custom scrollbar for small horizontal screens */
+        /* Custom scrollbar for horizontal button grid scrolling on small screens */
         ::-webkit-scrollbar {
             height: 6px;
+            width: 6px;
         }
         ::-webkit-scrollbar-track {
             background: #2a2621;
@@ -78,14 +79,14 @@
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 sm:p-4 text-slate-800 antialiased selection:bg-none">
 
-    <div id="synth-chassis" class="w-full max-w-5xl bg-chassis rounded-3xl p-4 sm:p-8 shadow-2xl border-4 border-chassisDark relative overflow-hidden flex flex-col gap-6">
+    <div id="synth-chassis" class="w-full max-w-7xl bg-chassis rounded-3xl p-3 sm:p-6 shadow-2xl border-4 border-chassisDark relative overflow-hidden flex flex-col gap-5">
         
         <!-- Header / Brand Section -->
-        <header class="flex flex-wrap justify-between items-center border-b-2 border-chassisDark pb-4 gap-4">
+        <header class="flex flex-wrap justify-between items-center border-b-2 border-chassisDark pb-3 gap-3">
             <div class="flex items-center gap-3">
                 <div class="w-4 h-4 rounded-full bg-red-600 led-indicator text-red-500" id="power-led"></div>
                 <h1 class="font-bold text-xl sm:text-2xl tracking-wider text-accentDark uppercase font-display">
-                    OMNI-STRUM <span class="text-xs font-normal text-amber-800 tracking-normal border border-amber-800 px-2 py-0.5 rounded">VINTAGE SYNTH</span>
+                    OMNI-STRUM <span class="text-xs font-normal text-amber-800 tracking-normal border border-amber-800 px-2 py-0.5 rounded">CLASSIC MATRIX</span>
                 </h1>
             </div>
             
@@ -93,20 +94,21 @@
                 <button id="btn-start-audio" class="bg-vintageAmber text-slate-900 px-4 py-2 rounded-lg shadow-md font-bold hover:brightness-110 active:scale-95 transition">
                     🔊 Abilita Audio
                 </button>
-                <div class="hidden sm:block text-right">
-                    <span class="block opacity-75">Tastiera numerica / Lettere</span>
-                    <span class="text-amber-900 font-mono">[1-9] Note / [Q,W,E,R,T] Accordi</span>
+                <div class="hidden md:block text-right">
+                    <span class="block opacity-75">Tasti o Strumplate Touch</span>
+                    <span class="text-amber-900 font-mono">Matrice Circolo delle Quinte (5 File)</span>
                 </div>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Top Control Bar (Master Knobs + Strumplate Side-by-Side) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
             
-            <!-- Left Side Controls (Knobs & Switches) -->
-            <div class="lg:col-span-4 bg-panelBeige p-4 sm:p-5 rounded-2xl border-2 border-chassisDark flex flex-col justify-between gap-4">
-                <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600 border-b border-slate-300 pb-1">Master Controls</h2>
+            <!-- Master Controls Panel -->
+            <div class="lg:col-span-4 bg-panelBeige p-4 rounded-2xl border-2 border-chassisDark flex flex-col justify-between gap-3">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600 border-b border-slate-300 pb-1">Controlli Generali</h2>
                 
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-4">
+                <div class="grid grid-cols-3 lg:grid-cols-1 gap-3">
                     <!-- Volume Control -->
                     <div class="flex flex-col gap-1">
                         <div class="flex justify-between text-xs font-semibold">
@@ -135,26 +137,23 @@
                     </div>
                 </div>
 
-                <!-- Toggle Options -->
-                <div class="flex items-center justify-between border-t border-slate-300 pt-3 mt-2">
-                    <span class="text-xs font-bold text-slate-700">Hold / Auto-Chord</span>
-                    <button id="btn-hold" class="px-3 py-1.5 bg-slate-300 border-2 border-slate-400 text-slate-700 rounded-lg text-xs font-bold shadow active:translate-y-0.5">
-                        DISATTIVATO
-                    </button>
+                <!-- Active Chord Display -->
+                <div class="flex items-center justify-between border-t border-slate-300 pt-2 mt-1">
+                    <span class="text-xs font-bold text-slate-700">Accordo Selezionato:</span>
+                    <span id="current-chord-display" class="font-display font-bold text-lg text-amber-900 bg-amber-100/80 px-3 py-0.5 rounded border border-amber-300 shadow-sm">
+                        C (Do Maggiore)
+                    </span>
                 </div>
             </div>
 
-            <!-- Right Side Strumplate -->
-            <div class="lg:col-span-8 bg-panelBeige p-4 sm:p-5 rounded-2xl border-2 border-chassisDark flex flex-col gap-3">
+            <!-- Sonic String Strumplate Area -->
+            <div class="lg:col-span-8 bg-panelBeige p-4 rounded-2xl border-2 border-chassisDark flex flex-col gap-2">
                 <div class="flex justify-between items-center border-b border-slate-300 pb-1">
                     <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Sonic String Strumplate</h2>
-                    <span id="current-chord-display" class="font-display font-bold text-lg text-amber-900 bg-amber-100/60 px-3 py-0.5 rounded border border-amber-300">
-                        Nessun Accordo Selected
-                    </span>
+                    <span class="text-[11px] text-amber-800 font-medium">Scorri per arpeggiare l'accordo attivo</span>
                 </div>
                 
-                <!-- Touch Strumplate Area -->
-                <div class="relative w-full h-44 sm:h-52 rounded-xl border-4 border-amber-900/40 overflow-hidden strumplate-gradient cursor-crosshair shadow-inner">
+                <div class="relative w-full h-36 sm:h-40 rounded-xl border-4 border-amber-900/40 overflow-hidden strumplate-gradient cursor-crosshair shadow-inner">
                     <canvas id="strumplate-canvas" class="w-full h-full block"></canvas>
                     
                     <!-- Overlay visual guide lines -->
@@ -169,37 +168,27 @@
                         <div class="w-0.5 h-full bg-slate-900"></div>
                     </div>
                 </div>
-                <p class="text-center text-xs text-slate-500 font-medium italic">
-                    👉 Scorri col mouse o con il dito per suonare l'arpeggio metallico
-                </p>
             </div>
         </div>
 
-        <!-- Chord Selection Matrix -->
-        <div class="bg-panelBeige p-4 sm:p-6 rounded-2xl border-2 border-chassisDark flex flex-col gap-4">
-            <div class="flex flex-wrap justify-between items-center gap-2">
-                <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Matrice Selezione Accordi</h2>
-                
-                <!-- Chord Type Selectors -->
-                <div id="chord-quality-selector" class="flex gap-1 sm:gap-2 overflow-x-auto pb-1">
-                    <button data-quality="maj" class="quality-btn px-3 py-1 text-xs font-bold rounded-lg bg-vintageAmber text-slate-900 shadow">Major</button>
-                    <button data-quality="min" class="quality-btn px-3 py-1 text-xs font-bold rounded-lg bg-slate-200 text-slate-700 shadow hover:bg-slate-300">Minor</button>
-                    <button data-quality="7" class="quality-btn px-3 py-1 text-xs font-bold rounded-lg bg-slate-200 text-slate-700 shadow hover:bg-slate-300">7th</button>
-                    <button data-quality="maj7" class="quality-btn px-3 py-1 text-xs font-bold rounded-lg bg-slate-200 text-slate-700 shadow hover:bg-slate-300">Maj7</button>
-                    <button data-quality="m7" class="quality-btn px-3 py-1 text-xs font-bold rounded-lg bg-slate-200 text-slate-700 shadow hover:bg-slate-300">m7</button>
+        <!-- 5-Row OmniChord Accordion Buttons Grid -->
+        <div class="bg-panelBeige p-3 sm:p-5 rounded-2xl border-2 border-chassisDark flex flex-col gap-3">
+            <div class="flex justify-between items-center border-b border-slate-300 pb-1">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Matrice Accordi Circolo delle Quinte (5 File Hardware)</h2>
+                <span class="text-[11px] text-slate-500 hidden sm:inline">Premendo un bottone si attiva e suona l'accordo</span>
+            </div>
+
+            <div class="overflow-x-auto pb-2">
+                <div class="min-w-[850px] flex flex-col gap-2.5" id="matrix-container">
+                    <!-- 5 rows will be dynamically populated here with proper labeling -->
                 </div>
             </div>
-
-            <!-- Fundamental Key Grid Buttons -->
-            <div class="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-12 gap-2 sm:gap-3" id="root-buttons-container">
-                <!-- Dynamically or statically generated chord root buttons -->
-            </div>
         </div>
 
-        <!-- Footer / Keyboard Legend -->
+        <!-- Footer -->
         <footer class="text-center text-xs text-slate-500 border-t border-chassisDark pt-2 flex justify-between items-center">
-            <span>Sintesi Audio Web Pure (No Samples)</span>
-            <span>Simulatore Vintage Style Hardware</span>
+            <span>Sintesi Web Audio API Diretta</span>
+            <span>Omni-Strum Matrix Simulator</span>
         </footer>
     </div>
 
@@ -228,7 +217,6 @@
                 this.masterGain.connect(this.ctx.destination);
 
                 this.isInitialized = true;
-                console.log("Audio Engine Initialized successfully.");
             }
 
             setVolume(val) {
@@ -246,7 +234,7 @@
                 this.cutoffFreq = val;
             }
 
-            // Play synthesized retro pluck voice
+            // Play single synthesized retro pluck voice (for strumplate)
             playNote(midiNote) {
                 if (!this.isInitialized || !this.ctx) return;
                 if (this.ctx.state === 'suspended') {
@@ -256,7 +244,6 @@
                 const now = this.ctx.currentTime;
                 const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
 
-                // Twin Oscillators for classic warm retro synthesizer sound
                 const osc1 = this.ctx.createOscillator();
                 const osc2 = this.ctx.createOscillator();
                 
@@ -264,73 +251,118 @@
                 osc2.type = 'triangle';
 
                 osc1.frequency.setValueAtTime(freq, now);
-                // Slight detune for richness
                 osc2.frequency.setValueAtTime(freq * 1.002, now);
 
-                // Lowpass Biquad Filter
                 const filter = this.ctx.createBiquadFilter();
                 filter.type = 'lowpass';
                 filter.frequency.setValueAtTime(this.cutoffFreq, now);
-                // Quick filter pluck decay
                 filter.frequency.exponentialRampToValueAtTime(120, now + this.sustainTime);
 
-                // Gain Envelope (Plucked Harpsichord/String Decay)
                 const noteGain = this.ctx.createGain();
-                noteGain.gain.setValueAtTime(0.35, now);
+                noteGain.gain.setValueAtTime(0.3, now);
                 noteGain.gain.exponentialRampToValueAtTime(0.0001, now + this.sustainTime);
 
-                // Connections
                 osc1.connect(filter);
                 osc2.connect(filter);
                 filter.connect(noteGain);
                 noteGain.connect(this.masterGain);
 
-                // Play
                 osc1.start(now);
                 osc2.start(now);
                 osc1.stop(now + this.sustainTime);
                 osc2.stop(now + this.sustainTime);
             }
+
+            // Strum/Arpeggiate full chord when button is pressed
+            playChordStrum(midiNotes) {
+                if (!this.isInitialized || !this.ctx) return;
+                
+                // Play first 4 notes of the chord in rapid succession (strum effect)
+                const notesToPlay = midiNotes.slice(0, 5);
+                notesToPlay.forEach((note, index) => {
+                    setTimeout(() => {
+                        this.playNote(note);
+                    }, index * 40); // 40ms strum delay
+                });
+            }
         }
 
-        // Chord Roots Data
-        const ROOT_NOTES = [
-            { name: 'C',  midi: 60, key: '1' },
-            { name: 'G',  midi: 67, key: '2' },
-            { name: 'D',  midi: 62, key: '3' },
-            { name: 'A',  midi: 69, key: '4' },
-            { name: 'E',  midi: 64, key: '5' },
-            { name: 'B',  midi: 71, key: '6' },
-            { name: 'F#', midi: 66, key: '7' },
-            { name: 'Db', midi: 61, key: '8' },
-            { name: 'Ab', midi: 68, key: '9' },
-            { name: 'Eb', midi: 63, key: '0' },
-            { name: 'Bb', midi: 70, key: '-' },
-            { name: 'F',  midi: 65, key: '=' }
+        /* ===================================================================
+           2. DATA STRUCTURES (Circle of Fifths & 5-Row Matrix Definition)
+           =================================================================== */
+        
+        // Circle of Fifths order starting from C
+        const CIRCLE_OF_FIFTHS = [
+            { name: 'C',  midi: 60 },
+            { name: 'G',  midi: 67 },
+            { name: 'D',  midi: 62 },
+            { name: 'A',  midi: 69 },
+            { name: 'E',  midi: 64 },
+            { name: 'B',  midi: 71 },
+            { name: 'F#', midi: 66 },
+            { name: 'Db', midi: 61 },
+            { name: 'Ab', midi: 68 },
+            { name: 'Eb', midi: 63 },
+            { name: 'Bb', midi: 70 },
+            { name: 'F',  midi: 65 }
         ];
 
-        // Chord Quality Intervals (relative semitones)
-        const CHORD_QUALITIES = {
-            'maj':  [0, 4, 7],
-            'min':  [0, 3, 7],
-            '7':    [0, 4, 7, 10],
-            'maj7': [0, 4, 7, 11],
-            'm7':   [0, 3, 7, 10]
-        };
+        // 5 Rows Configuration as requested
+        const MATRIX_ROWS = [
+            { 
+                id: 'maj', 
+                label: '1ª Fila: Maggiori (Major)', 
+                quality: 'maj',
+                intervals: [0, 4, 7],
+                suffix: '',
+                badgeColor: 'bg-amber-600 text-white'
+            },
+            { 
+                id: 'min', 
+                label: '2ª Fila: Minori (Minor)', 
+                quality: 'min',
+                intervals: [0, 3, 7],
+                suffix: 'm',
+                badgeColor: 'bg-slate-700 text-white'
+            },
+            { 
+                id: '7', 
+                label: '3ª Fila: Settima Dominante (7th)', 
+                quality: '7',
+                intervals: [0, 4, 7, 10],
+                suffix: '7',
+                badgeColor: 'bg-red-700 text-white'
+            },
+            { 
+                id: 'maj7', 
+                label: '4ª Fila: Settima Maggiore (Maj7)', 
+                quality: 'maj7',
+                intervals: [0, 4, 7, 11],
+                suffix: 'maj7',
+                badgeColor: 'bg-emerald-700 text-white'
+            },
+            { 
+                id: 'm7', 
+                label: '5ª Fila: Settima Minore (m7)', 
+                quality: 'm7',
+                intervals: [0, 3, 7, 10],
+                suffix: 'm7',
+                badgeColor: 'bg-indigo-700 text-white'
+            }
+        ];
 
-        // App State
+        // Global App State
         const audioEngine = new OmnichordAudioEngine();
-        let currentRoot = ROOT_NOTES[0]; // Default C
-        let currentQuality = 'maj';
+        let currentChordObj = {
+            rootName: 'C',
+            rootMidi: 60,
+            quality: 'maj',
+            fullName: 'C'
+        };
         let currentStrumNotes = [];
-        let isHoldActive = false;
-        let activeKeyRoot = null;
 
-        /* Helper to build active chord notes spread over multiple octaves */
-        function calculateStrumNotes(rootMidi, qualityKey) {
-            const intervals = CHORD_QUALITIES[qualityKey] || CHORD_QUALITIES['maj'];
+        function calculateStrumNotes(rootMidi, intervals) {
             const notes = [];
-            // Expand across 3.5 octaves for wide touch plate coverage
             for (let octave = -1; octave <= 2; octave++) {
                 for (let interval of intervals) {
                     notes.push(rootMidi + interval + (octave * 12));
@@ -339,53 +371,70 @@
             return notes.sort((a, b) => a - b);
         }
 
-        function updateCurrentChord() {
-            currentStrumNotes = calculateStrumNotes(currentRoot.midi, currentQuality);
-            const displayEl = document.getElementById('current-chord-display');
-            const qualitySymbol = currentQuality === 'maj' ? '' : currentQuality;
-            displayEl.textContent = `${currentRoot.name}${qualitySymbol}`;
-        }
+        function setSelection(rootObj, rowObj) {
+            currentChordObj = {
+                rootName: rootObj.name,
+                rootMidi: rootObj.midi,
+                quality: rowObj.quality,
+                fullName: `${rootObj.name}${rowObj.suffix}`
+            };
 
-        /* Build Root Note Buttons */
-        function renderRootButtons() {
-            const container = document.getElementById('root-buttons-container');
-            container.innerHTML = '';
-
-            ROOT_NOTES.forEach((root) => {
-                const btn = document.createElement('button');
-                btn.className = `chord-btn bg-panelBeige hover:bg-amber-100 text-slate-800 font-bold py-3 sm:py-4 px-2 rounded-xl border-2 border-chassisDark flex flex-col items-center justify-center gap-1 active:scale-95 text-sm sm:text-base`;
-                btn.dataset.midi = root.midi;
-                
-                btn.innerHTML = `
-                    <span>${root.name}</span>
-                    <span class="text-[10px] text-slate-400 font-mono">[${root.key}]</span>
-                `;
-
-                btn.addEventListener('click', () => {
-                    selectRootNote(root);
-                });
-
-                container.appendChild(btn);
-            });
+            currentStrumNotes = calculateStrumNotes(rootObj.midi, rowObj.intervals);
             
-            highlightActiveRootButton();
-        }
+            // Update display
+            const displayEl = document.getElementById('current-chord-display');
+            displayEl.textContent = currentChordObj.fullName;
 
-        function selectRootNote(root) {
-            currentRoot = root;
-            updateCurrentChord();
-            highlightActiveRootButton();
-        }
-
-        function highlightActiveRootButton() {
-            const buttons = document.querySelectorAll('#root-buttons-container .chord-btn');
-            buttons.forEach(btn => {
-                if (parseInt(btn.dataset.midi) === currentRoot.midi) {
-                    btn.classList.add('bg-amber-200', 'border-amber-600', 'text-amber-900', 'active');
+            // Highlight active button
+            const allBtns = document.querySelectorAll('.matrix-chord-btn');
+            allBtns.forEach(btn => {
+                if (btn.dataset.chord === currentChordObj.fullName) {
+                    btn.classList.add('active', 'ring-2', 'ring-amber-500', 'bg-amber-200', 'text-amber-950');
                 } else {
-                    btn.classList.remove('bg-amber-200', 'border-amber-600', 'text-amber-900', 'active');
+                    btn.classList.remove('active', 'ring-2', 'ring-amber-500', 'bg-amber-200', 'text-amber-950');
                 }
             });
+        }
+
+        function buildMatrixUI() {
+            const container = document.getElementById('matrix-container');
+            container.innerHTML = '';
+
+            MATRIX_ROWS.forEach(row => {
+                const rowWrapper = document.createElement('div');
+                rowWrapper.className = 'flex flex-col gap-1';
+
+                const rowHeader = document.createElement('div');
+                rowHeader.className = 'text-[11px] font-bold text-slate-600 flex items-center gap-2';
+                rowHeader.innerHTML = `<span class="px-2 py-0.5 rounded text-[10px] ${row.badgeColor}">${row.label}</span>`;
+                rowWrapper.appendChild(rowHeader);
+
+                const btnRow = document.createElement('div');
+                btnRow.className = 'grid grid-cols-12 gap-1.5 sm:gap-2';
+
+                CIRCLE_OF_FIFTHS.forEach(root => {
+                    const chordName = `${root.name}${row.suffix}`;
+                    const btn = document.createElement('button');
+                    btn.className = `matrix-chord-btn chord-btn bg-panelBeige hover:bg-amber-100 text-slate-800 font-bold py-2 sm:py-2.5 px-1 rounded-lg border-2 border-chassisDark text-xs sm:text-sm flex flex-col items-center justify-center font-mono`;
+                    btn.dataset.chord = chordName;
+
+                    btn.innerHTML = `<span>${chordName}</span>`;
+
+                    btn.addEventListener('click', () => {
+                        audioEngine.init();
+                        setSelection(root, row);
+                        audioEngine.playChordStrum(currentStrumNotes);
+                    });
+
+                    btnRow.appendChild(btn);
+                });
+
+                rowWrapper.appendChild(btnRow);
+                container.appendChild(rowWrapper);
+            });
+
+            // Default selection: C major
+            setSelection(CIRCLE_OF_FIFTHS[0], MATRIX_ROWS[0]);
         }
 
         /* Canvas & Strumplate Controller */
@@ -423,6 +472,7 @@
 
                 const startInteract = (e) => {
                     e.preventDefault();
+                    audioEngine.init();
                     this.isInteracting = true;
                     this.processInteraction(getCoords(e));
                 };
@@ -458,8 +508,6 @@
                     this.lastNoteIndex = noteIndex;
                     const noteToPlay = currentStrumNotes[noteIndex];
                     this.audioEngine.playNote(noteToPlay);
-                    
-                    // Trigger visual sparkle effect
                     this.addRipple(coords.x, coords.y);
                 }
             }
@@ -476,7 +524,6 @@
             animate() {
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-                // Render active touch ripples/sparks
                 for (let i = this.ripples.length - 1; i >= 0; i--) {
                     const r = this.ripples[i];
                     this.ctx.beginPath();
@@ -496,10 +543,9 @@
             }
         }
 
-        // Attach UI Listeners
+        // Attach UI Event Listeners
         window.addEventListener('DOMContentLoaded', () => {
-            renderRootButtons();
-            updateCurrentChord();
+            buildMatrixUI();
 
             const strumplate = new StrumplateController(
                 document.getElementById('strumplate-canvas'), 
@@ -538,64 +584,6 @@
                 const val = parseFloat(e.target.value);
                 audioEngine.setCutoff(val);
                 document.getElementById('val-cutoff').textContent = `${val} Hz`;
-            });
-
-            // Chord Quality Selectors
-            const qualityButtons = document.querySelectorAll('.quality-btn');
-            qualityButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    qualityButtons.forEach(b => {
-                        b.classList.remove('bg-vintageAmber', 'text-slate-900');
-                        b.classList.add('bg-slate-200', 'text-slate-700');
-                    });
-                    btn.classList.remove('bg-slate-200', 'text-slate-700');
-                    btn.classList.add('bg-vintageAmber', 'text-slate-900');
-
-                    currentQuality = btn.dataset.quality;
-                    updateCurrentChord();
-                });
-            });
-
-            // Hold Toggle Button
-            const btnHold = document.getElementById('btn-hold');
-            btnHold.addEventListener('click', () => {
-                isHoldActive = !isHoldActive;
-                if (isHoldActive) {
-                    btnHold.textContent = 'ATTIVATO';
-                    btnHold.classList.replace('bg-slate-300', 'bg-vintageAmber');
-                    btnHold.classList.replace('text-slate-700', 'text-slate-900');
-                } else {
-                    btnHold.textContent = 'DISATTIVATO';
-                    btnHold.classList.replace('bg-vintageAmber', 'bg-slate-300');
-                    btnHold.classList.replace('text-slate-900', 'text-slate-700');
-                }
-            });
-
-            // Keyboard Shortcuts Handling
-            window.addEventListener('keydown', (e) => {
-                if (e.repeat) return;
-                
-                // Key to Root note lookup
-                const keyMatch = ROOT_NOTES.find(r => r.key.toLowerCase() === e.key.toLowerCase());
-                if (keyMatch) {
-                    selectRootNote(keyMatch);
-                    return;
-                }
-
-                // Keyboard Quality shortcuts: Q, W, E, R, T
-                const qualityKeys = {
-                    'q': 'maj',
-                    'w': 'min',
-                    'e': '7',
-                    'r': 'maj7',
-                    't': 'm7'
-                };
-
-                const mappedQuality = qualityKeys[e.key.toLowerCase()];
-                if (mappedQuality) {
-                    const targetBtn = document.querySelector(`.quality-btn[data-quality="${mappedQuality}"]`);
-                    if (targetBtn) targetBtn.click();
-                }
             });
         });
     </script>
