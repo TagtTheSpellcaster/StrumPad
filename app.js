@@ -679,7 +679,7 @@ function parseDegreeToChord(degreeStr, keyRootName) {
     if (!clean) return null;
 
     // Riconosce l'eventuale alterazione 'b' e il grado romano di base
-    const match = clean.match(/^(b)?(VII|VI|IV|III|II|V|I|vii|vi|iv|iii|ii|i)/);
+    const match = clean.match(/^(b)?(VII|VI|IV|III|II|V|I|vii|vi|iv|v|iii|ii|i)/);
     if (!match) return null;
 
     const hasFlat = !!match[1];
@@ -783,9 +783,8 @@ function deduceKeyFromFirstStep(patternStr, chordName, selectedRootName) {
 
     // Prova il grado principale.
     const mainMatchToken = mainDegree.match(
-        /^(b?(?:VII|VI|IV|III|II|V|I|vii|vi|iv|iii|ii|i))/
+        /^(b?(?:VII|VI|IV|III|II|V|I|vii|vi|iv|v|iii|ii|i))/
     );
-
     if (mainMatchToken && ROMAN_SEMITONES[mainMatchToken[0]] !== undefined) {
         const offset = ROMAN_SEMITONES[mainMatchToken[0]];
         const tonicIndex = (selectedRootIndex - offset + 12) % 12;
@@ -801,7 +800,7 @@ function deduceKeyFromFirstStep(patternStr, chordName, selectedRootName) {
     // Prova eventuali gradi alternativi.
     for (const subDeg of subDegrees) {
         const subMatchToken = subDeg.match(
-            /^(b?(?:VII|VI|IV|III|II|V|I|vii|vi|iv|iii|ii|i))/
+            /^(b?(?:VII|VI|IV|III|II|V|I|vii|vi|iv|v|iii|ii|i))/
         );
 
         if (subMatchToken && ROMAN_SEMITONES[subMatchToken[0]] !== undefined) {
