@@ -1,5 +1,5 @@
 /**
- * Web Audio API Engine Class for Synth Pluck Voices
+ * Web Audio API Engine Class for StrumPad Synth & Organ Drone Voices
  */
 class WebAudioEngine {
     constructor() {
@@ -9,23 +9,62 @@ class WebAudioEngine {
         this.sustainTime = 1.2;
         this.cutoffFreq = 2200;
         this.initialized = false;
+        this.audioActive = false;
+        this.droneMode = false;
+        this.activeDroneNodes = []; // Keeps track of active organ drone oscillator/gain nodes
     }
 
     init() {
-        if (this.initialized) return;
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        this.ctx = new AudioCtx();
+        if (!this.initialized) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioCtx();
 
-        this.masterGain = this.ctx.createGain();
-        this.masterGain.gain.setValueAtTime(this.volume, this.ctx.currentTime);
-        this.masterGain.connect(this.ctx.destination);
+            this.masterGain = this.ctx.createGain();
+            this.masterGain.gain.setValueAtTime(this.volume, this.ctx.currentTime);
+            this.masterGain.connect(this.ctx.destination);
 
-        this.initialized = true;
+            this.initialized = true;
+        }
+
+        if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume();
+        }
+        this.audioActive = true;
+    }
+
+    setAudioState(active) {
+        this.audioActive = active;
+        if (!active) {
+            this.stopAll();
+            if (this.ctx && this.ctx.state === 'running') {
+                this.ctx.suspend();
+            }
+        } else {
+            this.init();
+        }
+    }
+
+    stopAll() {
+        // Stop and disconnect all active sustained drone organ nodes
+        this.activeDroneNodes.forEach(item => {
+            try {
+                const now = this.ctx ? this.ctx.currentTime : 0;
+                if (item.gain && now) {
+                    item.gain.gain.linearRampToValueAtTime(0.0001, now + 0.08);
+                }
+                setTimeout(() => {
+                    item.oscillators.forEach(osc => {
+                        try { osc.stop(); osc.disconnect(); } catch (e) {}
+                    });
+                }, 100);
+            } catch (e) {}
+        });
+        this.activeDroneNodes = [];
     }
 
     setVolume(val) {
         this.volume = val;
-        if (this.masterGain && this.ctx) {
+        if (this.masterGain && this.ctx && this.audioActive) {
             this.masterGain.gain.linearRampToValueAtTime(this.volume, this.ctx.currentTime + 0.05);
         }
     }
@@ -38,56 +77,112 @@ class WebAudioEngine {
         this.cutoffFreq = val;
     }
 
-    playNote(midiNote) {
-        if (!this.initialized || !this.ctx) return;
-        if (this.ctx.state === 'suspended') {
-            this.ctx.resume();
+    setDroneMode(enabled) {
+        this.droneMode = enabled;
+        if (!enabled) {
+            this.stopAll();
         }
+    }
+
+    playNote(midiNote) {
+        if (!this.audioActive || !this.ctx) return;
 
         const now = this.ctx.currentTime;
         const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
 
-        const osc1 = this.ctx.createOscillator();
-        const osc2 = this.ctx.createOscillator();
+        if (this.droneMode) {
+            // ORGAN DRONE SYNTHESIS (Additive Pipes + Soft Tremolo)
+            const pipeHarmonics = [
+                { mult: 0.5, type: 'sub-octave', vol: 0.25 },
+                { mult: 1.0, type: 'fundamental', vol: 0.35 },
+                { mult: 2.0, type: 'octave', vol: 0.18 },
+                { mult: 3.0, type: 'fifth', vol: 0.08 },
+                { mult: 4.0, type: 'super-octave', vol: 0.04 }
+            ];
 
-        osc1.type = 'sawtooth';
-        osc2.type = 'triangle';
+            const voiceGain = this.ctx.createGain();
+            voiceGain.gain.setValueAtTime(0.0001, now);
+            voiceGain.gain.linearRampToValueAtTime(0.3, now + 0.06); // Smooth organ attack
 
-        osc1.frequency.setValueAtTime(freq, now);
-        osc2.frequency.setValueAtTime(freq * 1.002, now);
+            const filter = this.ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(Math.min(this.cutoffFreq * 1.5, 7000), now);
 
-        const filter = this.ctx.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(this.cutoffFreq, now);
-        filter.frequency.exponentialRampToValueAtTime(100, now + this.sustainTime);
+            const oscList = [];
+            pipeHarmonics.forEach(h => {
+                const osc = this.ctx.createOscillator();
+                osc.type = (h.mult === 1.0 || h.mult === 0.5) ? 'sine' : 'triangle';
+                osc.frequency.setValueAtTime(freq * h.mult, now);
 
-        const voiceGain = this.ctx.createGain();
-        voiceGain.gain.setValueAtTime(0.35, now);
-        voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + this.sustainTime);
+                const hGain = this.ctx.createGain();
+                hGain.gain.value = h.vol;
 
-        osc1.connect(filter);
-        osc2.connect(filter);
-        filter.connect(voiceGain);
-        voiceGain.connect(this.masterGain);
+                osc.connect(hGain);
+                hGain.connect(filter);
+                osc.start(now);
+                oscList.push(osc);
+            });
 
-        osc1.start(now);
-        osc2.start(now);
-        osc1.stop(now + this.sustainTime);
-        osc2.stop(now + this.sustainTime);
+            filter.connect(voiceGain);
+            voiceGain.connect(this.masterGain);
+
+            this.activeDroneNodes.push({
+                oscillators: oscList,
+                gain: voiceGain
+            });
+        } else {
+            // RETRO SYNTH PLUCK VOICE
+            const osc1 = this.ctx.createOscillator();
+            const osc2 = this.ctx.createOscillator();
+
+            osc1.type = 'sawtooth';
+            osc2.type = 'triangle';
+
+            osc1.frequency.setValueAtTime(freq, now);
+            osc2.frequency.setValueAtTime(freq * 1.002, now);
+
+            const filter = this.ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(this.cutoffFreq, now);
+            filter.frequency.exponentialRampToValueAtTime(100, now + this.sustainTime);
+
+            const voiceGain = this.ctx.createGain();
+            voiceGain.gain.setValueAtTime(0.35, now);
+            voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + this.sustainTime);
+
+            osc1.connect(filter);
+            osc2.connect(filter);
+            filter.connect(voiceGain);
+            voiceGain.connect(this.masterGain);
+
+            osc1.start(now);
+            osc2.start(now);
+            osc1.stop(now + this.sustainTime);
+            osc2.stop(now + this.sustainTime);
+        }
     }
 
     strumChord(midiNotes) {
-        if (!this.initialized || !this.ctx) return;
-        const notes = midiNotes.slice(0, 5);
-        notes.forEach((note, idx) => {
-            setTimeout(() => {
-                this.playNote(note);
-            }, idx * 35);
-        });
+        if (!this.audioActive || !this.ctx) return;
+
+        if (this.droneMode) {
+            // In Drone Mode, stop previous drone notes and sustain full new organ chord
+            this.stopAll();
+            const chordNotes = midiNotes.slice(0, 4);
+            chordNotes.forEach(note => this.playNote(note));
+        } else {
+            // In Pluck Mode, arpeggiate notes
+            const notes = midiNotes.slice(0, 5);
+            notes.forEach((note, idx) => {
+                setTimeout(() => {
+                    this.playNote(note);
+                }, idx * 35);
+            });
+        }
     }
 }
 
-// Circolo delle Quinte partire da C (Do)
+// Circle of Fifths order starting strictly from C (Do)
 const CIRCLE_OF_FIFTHS = [
     { name: 'C',  midi: 60 },
     { name: 'G',  midi: 67 },
@@ -103,40 +198,40 @@ const CIRCLE_OF_FIFTHS = [
     { name: 'F',  midi: 65 }
 ];
 
-// Scala CROMATICA ordinata per semitoni dal C per calcolo intervalli
+// Chromatic Scale for intervals
 const CHROMATIC_SCALE = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 
-// 5 Righe della Matrice
+// 5 Matrix Rows
 const MATRIX_ROWS = [
-    { id: 'maj',  label: 'Maggiore',          intervals: [0, 4, 7],     suffix: '',     btnClass: 'row-maj',  badgeStyle: 'bg-amber-200 text-amber-950 border-amber-300' },
-    { id: 'min',  label: 'Minore',            intervals: [0, 3, 7],     suffix: 'm',    btnClass: 'row-min',  badgeStyle: 'bg-sky-200 text-sky-950 border-sky-300' },
-    { id: '7',    label: 'Settima Dominante', intervals: [0, 4, 7, 10], suffix: '7',    btnClass: 'row-7',    badgeStyle: 'bg-rose-200 text-rose-950 border-rose-300' },
-    { id: 'maj7', label: 'Settima Maggiore',  intervals: [0, 4, 7, 11], suffix: 'maj7', btnClass: 'row-maj7', badgeStyle: 'bg-emerald-200 text-emerald-950 border-emerald-300' },
-    { id: 'm7',   label: 'Settima Minore',    intervals: [0, 3, 7, 10], suffix: 'm7',   btnClass: 'row-m7',   badgeStyle: 'bg-purple-200 text-purple-950 border-purple-300' }
+    { id: 'maj',  label: 'Major',             intervals: [0, 4, 7],     suffix: '',     btnClass: 'row-maj',  badgeStyle: 'bg-amber-200 text-amber-950 border-amber-300' },
+    { id: 'min',  label: 'Minor',             intervals: [0, 3, 7],     suffix: 'm',    btnClass: 'row-min',  badgeStyle: 'bg-sky-200 text-sky-950 border-sky-300' },
+    { id: '7',    label: 'Dominant 7th',      intervals: [0, 4, 7, 10], suffix: '7',    btnClass: 'row-7',    badgeStyle: 'bg-rose-200 text-rose-950 border-rose-300' },
+    { id: 'maj7', label: 'Major 7th',         intervals: [0, 4, 7, 11], suffix: 'maj7', btnClass: 'row-maj7', badgeStyle: 'bg-emerald-200 text-emerald-950 border-emerald-300' },
+    { id: 'm7',   label: 'Minor 7th',         intervals: [0, 3, 7, 10], suffix: 'm7',   btnClass: 'row-m7',   badgeStyle: 'bg-purple-200 text-purple-950 border-purple-300' }
 ];
 
-// Tabella Dati Generi, Stili e Progressioni Armoniche
+// Translated Genres, Styles & Progressions Table
 const GENRES_DATA = {
-    "Musica Classica & Tradizionale": {
-        "Giro di Do (Do Maggiore)": "I - vi (I / IV) - ii (IV) - V (bVII / viio)",
-        "Cadenza Semplice / Plagale": "I - IV (ii) - V (bVII / viio) - I (vi)",
-        "Progressione di Pachelbel": "I - V (iii) - vi (I) - iii (V) - IV (ii) - I (vi) - IV (ii) - V (bVII)"
+    "Classical & Traditional": {
+        "Circle of C (Major)": "I - vi (I / IV) - ii (IV) - V (bVII / viio)",
+        "Simple / Plagal Cadence": "I - IV (ii) - V (bVII / viio) - I (vi)",
+        "Pachelbel Progression": "I - V (iii) - vi (I) - iii (V) - IV (ii) - I (vi) - IV (ii) - V (bVII)"
     },
     "Jazz & Dixieland": {
-        "Il \"ii - V - I\" (Maggiore)": "ii7 - V7 (bVII7 / VIIo7) - Imaj7 (vi7 / iii7)",
-        "Il \"ii - V - I\" (Minore)": "iiø7 - V7alt (bVII7) - imin7 (bIIImaj7)",
-        "Turnaround (Anatomia di Rythm)": "Imaj7 - vi7 (bIII7) - ii7 (IVmaj7) - V7 (bVII7)",
+        "Major ii - V - I": "ii7 - V7 (bVII7 / VIIo7) - Imaj7 (vi7 / iii7)",
+        "Minor ii - V - I": "iiø7 - V7alt (bVII7) - imin7 (bIIImaj7)",
+        "Rhythm Turnaround": "Imaj7 - vi7 (bIII7) - ii7 (IVmaj7) - V7 (bVII7)",
         "Dixieland / Ragtime Loop": "I - VI7 (bIII7) - II7 (bVI7) - V7 (bVII7)"
     },
     "Pop & Rock": {
-        "Progressione Pop d'Oro": "I - V (bVII) - vi (I) - IV (ii)",
-        "The \"50s Progression\"": "I - vi (I) - IV (ii) - V (bVII)",
-        "Rock Epico / Mixolidio": "I - bVII (v) - IV (ii) - I (v)",
-        "Andamento Andaluso (Flamenco/Rock)": "vi - V (bVII) - IV (bVI) - III (V7)"
+        "Golden Pop Progression": "I - V (bVII) - vi (I) - IV (ii)",
+        "The '50s Progression": "I - vi (I) - IV (ii) - V (bVII)",
+        "Epic Mixolydian Rock": "I - bVII (v) - IV (ii) - I (v)",
+        "Andalusian Cadence (Flamenco/Rock)": "vi - V (bVII) - IV (bVI) - III (V7)"
     },
     "Country, Folk & Blues": {
-        "Three-Chords Country": "I - IV (ii) - I (vi) - V (bVII)",
-        "Blues Standard (12 Battute)": "I7 - IV7 (ii7) - I7 (vi7) - V7 (bVII7) - IV7 (ii7) - I7 (vi7) - V7 (bVII7)",
+        "Three-Chord Country": "I - IV (ii) - I (vi) - V (bVII)",
+        "Standard Blues (12-Bar)": "I7 - IV7 (ii7) - I7 (vi7) - V7 (bVII7) - IV7 (ii7) - I7 (vi7) - V7 (bVII7)",
         "Bluegrass Breakdown": "I - IV (ii) - V (bVII) - vi (I)"
     },
     "Funk & Disco": {
@@ -155,25 +250,24 @@ const GENRES_DATA = {
         "Church Cadence": "I - bVII (v) - IV (ii) - I (vi)"
     },
     "Latin & Salsa": {
-        "Montuno Standard": "i - bVII (v) - bVI (iiø) - V7 (bVII7)",
+        "Standard Montuno": "i - bVII (v) - bVI (iiø) - V7 (bVII7)",
         "Salsa Clave Loop": "ii7 - V7 (bVII7) - Imaj7 (vi7) - VI7 (bIII7)"
     },
-    "Altri Stili": {
+    "Other Styles": {
         "Reggae Loop": "I - IV (ii)",
         "Bossa Nova / Nu-Jazz": "Imaj7 - bII7 (V7alt) - Imaj7 (vi7)",
         "R&B / Neo-Soul": "IVmaj7 - III7 (bVII7) - vi7 (Imaj7) - Vm7 (I7)"
     }
 };
 
-// Variabili di Stato Globali
+// Global State
 const audio = new WebAudioEngine();
 let selectedChordName = null;
 let currentStrumNotes = calculateNotes(CIRCLE_OF_FIFTHS[0].midi, MATRIX_ROWS[0].intervals);
 
-// Stato dell'assistente progressioni
-let activeProgressionSteps = []; // Array di passi [{ main: 'C', sub: ['Am', 'F'] }, ...]
-let currentProgressionStepIndex = -1; // -1 = in attesa del primo accordo
-let currentKeyRoot = null; // Nota fondamentale della tonalità impostata dall'utente
+let activeProgressionSteps = [];
+let currentProgressionStepIndex = -1;
+let currentKeyRoot = null;
 
 function calculateNotes(rootMidi, intervals) {
     const notes = [];
@@ -200,13 +294,9 @@ function selectChord(rootObj, rowObj) {
         }
     });
 
-    // Gestione della progressione armonica guidata
     handleProgressionStep(selectedChordName, rootObj, rowObj);
 }
 
-/**
- * LOGICA TRADUZIONE GRADI ROMANI IN ACCORDI REALI
- */
 const ROMAN_SEMITONES = {
     'i': 0, 'I': 0,
     'bII': 1, 'bii': 1,
@@ -226,10 +316,8 @@ function parseDegreeToChord(degreeStr, keyRootName) {
     let clean = degreeStr.trim();
     if (!clean) return null;
 
-    // Normalizzazioni per accordi speciali (es. alt, ø, m)
     clean = clean.replace('alt', '').replace('ø', 'm').replace('imin', 'im');
 
-    // Estrai la radice romana (es: "Imaj7" -> degree "I", suffix "maj7")
     const match = clean.match(/^(b[I|V|i|v]+|[I|V|i|v]+|viio|VIIo)/);
     if (!match) return null;
 
@@ -244,7 +332,6 @@ function parseDegreeToChord(degreeStr, keyRootName) {
     const targetSemitone = (keyIndex + ROMAN_SEMITONES[degreeToken]) % 12;
     const targetRoot = CHROMATIC_SCALE[targetSemitone];
 
-    // Determina la qualità (Maiuscolo = Maggiore, Minuscolo = Minore)
     const isMinor = degreeToken === degreeToken.toLowerCase() && degreeToken !== 'I';
 
     let chordQualitySuffix = '';
@@ -260,19 +347,13 @@ function parseDegreeToChord(degreeStr, keyRootName) {
     return targetRoot + chordQualitySuffix;
 }
 
-/**
- * PARSER DELLA STRINGA DELLA PROGRESSIONE
- */
 function parseProgressionPattern(patternStr, keyRootName) {
     if (!patternStr) return [];
 
-    // Split per gli step principali tramite tiretto ' - '
     const rawSteps = patternStr.split(' - ');
     const compiledSteps = [];
 
     rawSteps.forEach(stepText => {
-        // Separa eventuale parte principale e sostitutivi tra parentesi
-        // Es: "I7 (v7)" oppure "vi (I / IV)" oppure "I"
         const parenMatch = stepText.match(/([^\(]+)(?:\(([^\)]+)\))?/);
         if (!parenMatch) return;
 
@@ -301,9 +382,6 @@ function parseProgressionPattern(patternStr, keyRootName) {
     return compiledSteps;
 }
 
-/**
- * GESTORE LOGICA AVANZAMENTO PROGRESSIONE PASSO-PASSO
- */
 function handleProgressionStep(chordName, rootObj, rowObj) {
     const genreSelect = document.getElementById('select-genre');
     const styleSelect = document.getElementById('select-style');
@@ -313,35 +391,28 @@ function handleProgressionStep(chordName, rootObj, rowObj) {
     const patternStr = GENRES_DATA[genreSelect.value][styleSelect.value];
     if (!patternStr) return;
 
-    // STEP 1: Rilevazione Tonalità e Verifiche
     if (currentProgressionStepIndex === -1) {
-        // Calcola progressione ipotetica con la nota premuta come Key
         const candidateSteps = parseProgressionPattern(patternStr, rootObj.name);
         if (!candidateSteps.length) return;
 
         const step1 = candidateSteps[0];
-        
-        // Verifica se l'accordo premuto è compatibile con il Step 1 principale o uno dei suoi sostituti
         const isMainMatch = (chordName === step1.main);
         const isSubMatch = step1.sub.includes(chordName);
 
         if (!isMainMatch && !isSubMatch) {
-            // Non compatibile: riproduce suono normale ma rimane in attesa
             clearHighlights();
             return;
         }
 
-        // Compatibile! Imposta tonalità base e avvia
         currentKeyRoot = rootObj.name;
         activeProgressionSteps = candidateSteps;
-        currentProgressionStepIndex = 0; // Passo 1 completato
+        currentProgressionStepIndex = 0;
 
         updateProgressionChordsDisplay();
-        highlightNextStepOptions(1); // Evidenzia lo STEP 2
+        highlightNextStepOptions(1);
         return;
     }
 
-    // STEP 2, 3, N... Avanzamento della progressione
     const nextExpectedStepIndex = (currentProgressionStepIndex + 1) % activeProgressionSteps.length;
     const expectedStep = activeProgressionSteps[nextExpectedStepIndex];
 
@@ -349,13 +420,10 @@ function handleProgressionStep(chordName, rootObj, rowObj) {
     const isNextSub = expectedStep.sub.includes(chordName);
 
     if (isNextMain || isNextSub) {
-        // L'utente ha premuto l'accordo suggerito! Avanza
         currentProgressionStepIndex = nextExpectedStepIndex;
-        
         const nextStepIndexToHighlight = (currentProgressionStepIndex + 1) % activeProgressionSteps.length;
         highlightNextStepOptions(nextStepIndexToHighlight);
     } else {
-        // Se l'utente preme un accordo fuori sequenza ma compatibile col primo passo della nuova tonalità
         const newCandidateSteps = parseProgressionPattern(patternStr, rootObj.name);
         if (newCandidateSteps.length && (chordName === newCandidateSteps[0].main || newCandidateSteps[0].sub.includes(chordName))) {
             currentKeyRoot = rootObj.name;
@@ -364,7 +432,6 @@ function handleProgressionStep(chordName, rootObj, rowObj) {
             updateProgressionChordsDisplay();
             highlightNextStepOptions(1);
         } else {
-            // Accordo totalmente fuori sequenza: resetta il loop visivo
             resetProgressionState();
         }
     }
@@ -383,11 +450,9 @@ function highlightNextStepOptions(stepIndex) {
 
     const stepInfo = activeProgressionSteps[stepIndex];
 
-    // Evidenzia accordo principale (Alta luminosità)
     const mainBtn = document.querySelector(`.matrix-btn[data-chord="${stepInfo.main}"]`);
     if (mainBtn) mainBtn.classList.add('highlight-main');
 
-    // Evidenzia accordi sostitutivi (Bassa luminosità)
     stepInfo.sub.forEach(subChord => {
         const subBtn = document.querySelector(`.matrix-btn[data-chord="${subChord}"]`);
         if (subBtn) subBtn.classList.add('highlight-sub');
@@ -402,7 +467,7 @@ function updateProgressionChordsDisplay() {
         return s.sub.length ? `${s.main}(${s.sub.join('/')})` : s.main;
     }).join(' - ');
 
-    chordsLabel.textContent = `Accordi [${currentKeyRoot}]: ${formatted}`;
+    chordsLabel.textContent = `Chords [${currentKeyRoot}]: ${formatted}`;
     chordsLabel.classList.remove('hidden');
 }
 
@@ -458,12 +523,9 @@ function createMatrixUI() {
         container.appendChild(rowWrapper);
     });
 
-    document.getElementById('lbl-active-chord').textContent = 'Nessuno';
+    document.getElementById('lbl-active-chord').textContent = 'None';
 }
 
-/**
- * Gestore Caselle Generi, Stili e Progressioni Armoniche
- */
 function initGenresAndStylesUI() {
     const genreSelect = document.getElementById('select-genre');
     const styleSelect = document.getElementById('select-style');
@@ -482,8 +544,8 @@ function initGenresAndStylesUI() {
         const selectedGenre = e.target.value;
         resetProgressionState();
 
-        styleSelect.innerHTML = '<option value="">-- Seleziona Stile --</option>';
-        progressionLabel.textContent = 'Seleziona uno stile';
+        styleSelect.innerHTML = '<option value="">-- Select Style --</option>';
+        progressionLabel.textContent = 'Select a style';
 
         if (selectedGenre && GENRES_DATA[selectedGenre]) {
             styleSelect.disabled = false;
@@ -497,8 +559,8 @@ function initGenresAndStylesUI() {
             });
         } else {
             styleSelect.disabled = true;
-            styleSelect.innerHTML = '<option value="">-- Seleziona Prima un Genere --</option>';
-            progressionLabel.textContent = 'Seleziona un genere e uno stile';
+            styleSelect.innerHTML = '<option value="">-- Select a Genre First --</option>';
+            progressionLabel.textContent = 'Select a genre and style';
         }
     });
 
@@ -510,14 +572,11 @@ function initGenresAndStylesUI() {
         if (selectedGenre && selectedStyle && GENRES_DATA[selectedGenre][selectedStyle]) {
             progressionLabel.textContent = GENRES_DATA[selectedGenre][selectedStyle];
         } else {
-            progressionLabel.textContent = 'Seleziona uno stile';
+            progressionLabel.textContent = 'Select a style';
         }
     });
 }
 
-/**
- * Controller Canvas Strumplate Interattivo
- */
 class StrumplateController {
     constructor(canvas) {
         this.canvas = canvas;
@@ -628,7 +687,7 @@ class StrumplateController {
     }
 }
 
-// Inizializzazione al caricamento DOM
+// DOM Initialization
 window.addEventListener('DOMContentLoaded', () => {
     createMatrixUI();
     initGenresAndStylesUI();
@@ -636,13 +695,28 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const btnPower = document.getElementById('btn-power');
     const powerLed = document.getElementById('power-led');
-    
+    const droneToggle = document.getElementById('toggle-drone');
+
+    // Audio / Stop Toggle Button
     btnPower.addEventListener('click', () => {
-        audio.init();
-        btnPower.textContent = "🔊 Audio Attivo";
-        btnPower.classList.replace('bg-amber-600', 'bg-emerald-600');
-        powerLed.classList.replace('bg-red-600', 'bg-emerald-500');
-        powerLed.classList.replace('shadow-[0_0_8px_#dc2626]', 'shadow-[0_0_10px_#10b981]');
+        if (!audio.audioActive) {
+            audio.setAudioState(true);
+            btnPower.textContent = "🔊 Audio Active (Stop)";
+            btnPower.classList.replace('bg-amber-600', 'bg-emerald-600');
+            powerLed.classList.replace('bg-red-600', 'bg-emerald-500');
+            powerLed.classList.replace('shadow-[0_0_8px_#dc2626]', 'shadow-[0_0_10px_#10b981]');
+        } else {
+            audio.setAudioState(false);
+            btnPower.textContent = "🔈 Audio Inactive";
+            btnPower.classList.replace('bg-emerald-600', 'bg-amber-600');
+            powerLed.classList.replace('bg-emerald-500', 'bg-red-600');
+            powerLed.classList.replace('shadow-[0_0_10px_#10b981]', 'shadow-[0_0_8px_#dc2626]');
+        }
+    });
+
+    // Drone Mode Switch
+    droneToggle.addEventListener('change', (e) => {
+        audio.setDroneMode(e.target.checked);
     });
 
     document.getElementById('slider-volume').addEventListener('input', (e) => {
