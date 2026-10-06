@@ -38,7 +38,6 @@ class WebAudioEngine {
         this.cutoffFreq = val;
     }
 
-    // Synthesize single pluck voice
     playNote(midiNote) {
         if (!this.initialized || !this.ctx) return;
         if (this.ctx.state === 'suspended') {
@@ -48,7 +47,6 @@ class WebAudioEngine {
         const now = this.ctx.currentTime;
         const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
 
-        // Twin oscillators (sawtooth + triangle) for rich retro timbre
         const osc1 = this.ctx.createOscillator();
         const osc2 = this.ctx.createOscillator();
 
@@ -56,20 +54,17 @@ class WebAudioEngine {
         osc2.type = 'triangle';
 
         osc1.frequency.setValueAtTime(freq, now);
-        osc2.frequency.setValueAtTime(freq * 1.002, now); // Warm detune
+        osc2.frequency.setValueAtTime(freq * 1.002, now);
 
-        // Lowpass filter envelope
         const filter = this.ctx.createBiquadFilter();
         filter.type = 'lowpass';
         filter.frequency.setValueAtTime(this.cutoffFreq, now);
         filter.frequency.exponentialRampToValueAtTime(100, now + this.sustainTime);
 
-        // Gain envelope (Pluck decay)
         const voiceGain = this.ctx.createGain();
         voiceGain.gain.setValueAtTime(0.35, now);
         voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + this.sustainTime);
 
-        // Connections
         osc1.connect(filter);
         osc2.connect(filter);
         filter.connect(voiceGain);
@@ -81,7 +76,6 @@ class WebAudioEngine {
         osc2.stop(now + this.sustainTime);
     }
 
-    // Arpeggiate chord instantly on button press
     strumChord(midiNotes) {
         if (!this.initialized || !this.ctx) return;
         const notes = midiNotes.slice(0, 5);
@@ -93,7 +87,7 @@ class WebAudioEngine {
     }
 }
 
-// Circle of Fifths order starting strictly from C (Do)
+// Circolo delle Quinte partire da C (Do)
 const CIRCLE_OF_FIFTHS = [
     { name: 'C',  midi: 60 },
     { name: 'G',  midi: 67 },
@@ -109,7 +103,7 @@ const CIRCLE_OF_FIFTHS = [
     { name: 'F',  midi: 65 }
 ];
 
-// 5 Matrix Row Configurations
+// 5 Righe della Matrice
 const MATRIX_ROWS = [
     { 
         id: 'maj', 
@@ -153,7 +147,57 @@ const MATRIX_ROWS = [
     }
 ];
 
-// Global State Variables
+// Tabella Dati Generi, Stili e Progressioni Armoniche
+const GENRES_DATA = {
+    "Musica Classica & Tradizionale": {
+        "Giro di Do (Do Maggiore)": "I - vi (I / IV) - ii (IV) - V (bVII / viio)",
+        "Cadenza Semplice / Plagale": "I - IV (ii) - V (bVII / viio) - I (vi)",
+        "Progressione di Pachelbel": "I - V (iii) - vi (I) - iii (V) - IV (ii) - I (vi) - IV (ii) - V (bVII)"
+    },
+    "Jazz & Dixieland": {
+        "Il \"ii - V - I\" (Maggiore)": "ii7 - V7 (bVII7 / VIIo7) - Imaj7 (vi7 / iii7)",
+        "Il \"ii - V - I\" (Minore)": "iiø7 - V7alt (bVII7) - imin7 (bIIImaj7)",
+        "Turnaround (Anatomia di Rythm)": "Imaj7 - vi7 (bIII7) - ii7 (IVmaj7) - V7 (bVII7)",
+        "Dixieland / Ragtime Loop": "I - VI7 (bIII7) - II7 (bVI7) - V7 (bVII7)"
+    },
+    "Pop & Rock": {
+        "Progressione Pop d'Oro": "I - V (bVII) - vi (I) - IV (ii)",
+        "The \"50s Progression\"": "I - vi (I) - IV (ii) - V (bVII)",
+        "Rock Epico / Mixolidio": "I - bVII (v) - IV (ii) - I (v)",
+        "Andamento Andaluso (Flamenco/Rock)": "vi - V (bVII) - IV (bVI) - III (V7)"
+    },
+    "Country, Folk & Blues": {
+        "Three-Chords Country": "I - IV (ii) - I (vi) - V (bVII)",
+        "Blues Standard (12 Battute)": "I7 - IV7 (ii7) - I7 (vi7) - V7 (bVII7) - IV7 (ii7) - I7 (vi7) - V7 (bVII7)",
+        "Bluegrass Breakdown": "I - IV (ii) - V (bVII) - vi (I)"
+    },
+    "Funk & Disco": {
+        "Classic Funk Groove": "i7 - IV7 (bVIImaj7)",
+        "Disco Vamp": "ii7 - V7 (bVII7)",
+        "Funky Turnaround": "i7 - bVII7 (IV7) - bVI7 (iiø7) - V7alt (bVII7)"
+    },
+    "Heavy Metal & Hard Rock": {
+        "Power Metal Loop": "i - bVI (iv) - bVII (v) - i (v)",
+        "Epic Metal Aeolian": "i - bVII (iv) - bVI (iiø) - bVII (v)",
+        "Phrygian Metal Drive": "i - bII (vii) - i (v)"
+    },
+    "Gospel & Soul": {
+        "Gospel Plagal Cascade": "I - I7 (v7) - IV (ii) - iv (bVII7)",
+        "Soul Preacher": "I - vi7 (bIII7) - IVmaj7 (ii7) - V7 (bVII7)",
+        "Church Cadence": "I - bVII (v) - IV (ii) - I (vi)"
+    },
+    "Latin & Salsa": {
+        "Montuno Standard": "i - bVII (v) - bVI (iiø) - V7 (bVII7)",
+        "Salsa Clave Loop": "ii7 - V7 (bVII7) - Imaj7 (vi7) - VI7 (bIII7)"
+    },
+    "Altri Stili": {
+        "Reggae Loop": "I - IV (ii)",
+        "Bossa Nova / Nu-Jazz": "Imaj7 - bII7 (V7alt) - Imaj7 (vi7)",
+        "R&B / Neo-Soul": "IVmaj7 - III7 (bVII7) - vi7 (Imaj7) - Vm7 (I7)"
+    }
+};
+
+// Variabili di Stato Globali
 const audio = new WebAudioEngine();
 let selectedChordName = null;
 let currentStrumNotes = calculateNotes(CIRCLE_OF_FIFTHS[0].midi, MATRIX_ROWS[0].intervals);
@@ -231,7 +275,63 @@ function createMatrixUI() {
 }
 
 /**
- * Interactive Canvas Strumplate Controller
+ * Gestore Caselle Generi, Stili e Progressioni Armoniche
+ */
+function initGenresAndStylesUI() {
+    const genreSelect = document.getElementById('select-genre');
+    const styleSelect = document.getElementById('select-style');
+    const progressionLabel = document.getElementById('lbl-progression');
+
+    if (!genreSelect || !styleSelect || !progressionLabel) return;
+
+    // Popola selettore Generi
+    Object.keys(GENRES_DATA).forEach(genre => {
+        const opt = document.createElement('option');
+        opt.value = genre;
+        opt.textContent = genre;
+        genreSelect.appendChild(opt);
+    });
+
+    // Evento Cambio Genere
+    genreSelect.addEventListener('change', (e) => {
+        const selectedGenre = e.target.value;
+        
+        // Reset selettore Stile
+        styleSelect.innerHTML = '<option value="">-- Seleziona Stile --</option>';
+        progressionLabel.textContent = 'Seleziona uno stile';
+
+        if (selectedGenre && GENRES_DATA[selectedGenre]) {
+            styleSelect.disabled = false;
+            const stylesObj = GENRES_DATA[selectedGenre];
+            
+            Object.keys(stylesObj).forEach(styleName => {
+                const opt = document.createElement('option');
+                opt.value = styleName;
+                opt.textContent = styleName;
+                styleSelect.appendChild(opt);
+            });
+        } else {
+            styleSelect.disabled = true;
+            styleSelect.innerHTML = '<option value="">-- Seleziona Prima un Genere --</option>';
+            progressionLabel.textContent = 'Seleziona un genere e uno stile';
+        }
+    });
+
+    // Evento Cambio Stile
+    styleSelect.addEventListener('change', (e) => {
+        const selectedGenre = genreSelect.value;
+        const selectedStyle = e.target.value;
+
+        if (selectedGenre && selectedStyle && GENRES_DATA[selectedGenre][selectedStyle]) {
+            progressionLabel.textContent = GENRES_DATA[selectedGenre][selectedStyle];
+        } else {
+            progressionLabel.textContent = 'Seleziona uno stile';
+        }
+    });
+}
+
+/**
+ * Controller Canvas Strumplate Interattivo
  */
 class StrumplateController {
     constructor(canvas) {
@@ -343,9 +443,10 @@ class StrumplateController {
     }
 }
 
-// Initialization on DOM Ready
+// Inizializzazione al caricamento DOM
 window.addEventListener('DOMContentLoaded', () => {
     createMatrixUI();
+    initGenresAndStylesUI();
     const strumplate = new StrumplateController(document.getElementById('strum-canvas'));
 
     const btnPower = document.getElementById('btn-power');
