@@ -48,7 +48,7 @@ body {
     border-radius: 10px;
 }
 
-/* Slider Verticali Cross-Browser */
+/* Slider Verticali Standard Cross-Browser (ADSR) */
 .slider-vertical-container {
     display: flex;
     flex-direction: column;
@@ -71,6 +71,27 @@ body {
     -webkit-appearance: slider-vertical; /* WebKit / Chrome / Safari vertical orientation */
     width: 14px;
     height: 60px;
+    background: #c2b8a3;
+    border-radius: 6px;
+    outline: none;
+    cursor: pointer;
+    accent-color: #b45309;
+}
+
+/* Slider Verticale Allungato Specifico per Master Volume */
+.vertical-slider-wrapper-master {
+    height: 120px; /* Wrapper ad altezza estesa */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.v-range-master {
+    writing-mode: vertical-lr;
+    direction: rtl;
+    -webkit-appearance: slider-vertical;
+    width: 16px;
+    height: 120px; /* Slider ad altezza estesa */
     background: #c2b8a3;
     border-radius: 6px;
     outline: none;
