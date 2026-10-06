@@ -9,9 +9,10 @@ class WebAudioEngine {
         this.sustainTime = 1.2;
         this.cutoffFreq = 2200;
         this.initialized = false;
-        this.audioActive = false; // Starts OFF by default
+        this.audioActive = false; // Tassativamente OFF all'avvio
         this.droneMode = false;
         this.activeDroneNodes = [];
+        this.scheduledTimeouts = []; // Registro dei timeout arpeggiati per cancellazione immediata
     }
 
     init() {
@@ -36,8 +37,10 @@ class WebAudioEngine {
         this.audioActive = active;
         if (!active) {
             this.stopAll();
-            if (this.ctx && this.ctx.state === 'running') {
-                this.ctx.suspend();
+            if (this.ctx) {
+                try {
+                    this.ctx.suspend();
+                } catch (e) {}
             }
         } else {
             this.init();
@@ -45,17 +48,19 @@ class WebAudioEngine {
     }
 
     stopAll() {
+        // Cancella tutti i timeout per note arpeggiate in coda
+        this.scheduledTimeouts.forEach(t => clearTimeout(t));
+        this.scheduledTimeouts = [];
+
+        // Interrompe e scollega immediatamente tutti i nodi organo/drone attivi
         this.activeDroneNodes.forEach(item => {
             try {
-                const now = this.ctx ? this.ctx.currentTime : 0;
-                if (item.gain && now) {
-                    item.gain.gain.linearRampToValueAtTime(0.0001, now + 0.08);
+                if (item.gain) {
+                    item.gain.gain.setValueAtTime(0.0001, this.ctx ? this.ctx.currentTime : 0);
                 }
-                setTimeout(() => {
-                    item.oscillators.forEach(osc => {
-                        try { osc.stop(); osc.disconnect(); } catch (e) {}
-                    });
-                }, 100);
+                item.oscillators.forEach(osc => {
+                    try { osc.stop(); osc.disconnect(); } catch (e) {}
+                });
             } catch (e) {}
         });
         this.activeDroneNodes = [];
@@ -84,6 +89,7 @@ class WebAudioEngine {
     }
 
     playNote(midiNote) {
+        // TASSATIVO: Se l'audio è OFF, nessun suono viene riprodotto
         if (!this.audioActive || !this.ctx) return;
 
         const now = this.ctx.currentTime;
@@ -162,6 +168,7 @@ class WebAudioEngine {
     }
 
     strumChord(midiNotes) {
+        // TASSATIVO: Se l'audio è OFF, nessun suono viene riprodotto
         if (!this.audioActive || !this.ctx) return;
 
         if (this.droneMode) {
@@ -171,9 +178,12 @@ class WebAudioEngine {
         } else {
             const notes = midiNotes.slice(0, 5);
             notes.forEach((note, idx) => {
-                setTimeout(() => {
-                    this.playNote(note);
+                const t = setTimeout(() => {
+                    if (this.audioActive) {
+                        this.playNote(note);
+                    }
                 }, idx * 35);
+                this.scheduledTimeouts.push(t);
             });
         }
     }
@@ -507,7 +517,10 @@ function createMatrixUI() {
 
             const handlePress = (e) => {
                 e.preventDefault();
-                audio.init();
+                // Tassativo: audio.init() viene chiamato ma le note suonano solo se audioActive è vero
+                if (audio.audioActive) {
+                    audio.init();
+                }
                 selectChord(root, row);
                 audio.strumChord(currentStrumNotes);
             };
@@ -607,7 +620,9 @@ class StrumplateController {
 
         const start = (e) => {
             e.preventDefault();
-            audio.init();
+            if (audio.audioActive) {
+                audio.init();
+            }
             this.isInteracting = true;
             this.triggerAt(getPos(e));
         };
@@ -694,6 +709,9 @@ window.addEventListener('DOMContentLoaded', () => {
     const audioStateLbl = document.getElementById('lbl-audio-state');
     const powerLed = document.getElementById('power-led');
     const droneToggle = document.getElementById('toggle-drone');
+
+    // Tassativo: assicura che il toggle sia deselezionato (OFF) all'avvio
+    audioToggle.checked = false;
 
     // Master Audio Switch Event (OFF by default)
     audioToggle.addEventListener('change', (e) => {
