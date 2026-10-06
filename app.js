@@ -1,5 +1,5 @@
 /**
- * Web Audio API Engine Class for StrumPad Synth & Organ Drone Voices
+ * Web Audio API Engine Class for StrumPad Synth with Full ADSR Envelopes
  */
 class WebAudioEngine {
     constructor() {
@@ -8,16 +8,16 @@ class WebAudioEngine {
         this.volume = 0.8;
         this.cutoffFreq = 2200;
         this.initialized = false;
-        this.audioActive = false; // OFF by default
+        this.audioActive = false; // Tassativamente OFF all'avvio
         this.droneMode = false;
         this.activeDroneNodes = [];
         this.scheduledTimeouts = [];
 
         // ADSR Envelope Parameters
-        this.attackTime = 0.10;  // Seconds
-        this.decayTime = 0.40;   // Seconds
-        this.sustainLevel = 0.70; // 0.0 to 1.0 ratio
-        this.releaseTime = 1.20;  // Seconds
+        this.attackTime = 0.10;
+        this.decayTime = 0.50;
+        this.sustainLevel = 0.60;
+        this.releaseTime = 1.20;
     }
 
     init() {
@@ -80,18 +80,18 @@ class WebAudioEngine {
         this.cutoffFreq = val;
     }
 
-    setAdsr(attack, decay, sustain, release) {
-        this.attackTime = attack;
-        this.decayTime = decay;
-        this.sustainLevel = sustain;
-        this.releaseTime = release;
-    }
-
     setDroneMode(enabled) {
         this.droneMode = enabled;
         if (!enabled) {
             this.stopAll();
         }
+    }
+
+    setAdsr(attack, decay, sustain, release) {
+        this.attackTime = attack;
+        this.decayTime = decay;
+        this.sustainLevel = sustain;
+        this.releaseTime = release;
     }
 
     playNote(midiNote) {
@@ -103,16 +103,16 @@ class WebAudioEngine {
         if (this.droneMode) {
             // ORGAN DRONE SYNTHESIS
             const pipeHarmonics = [
-                { mult: 0.5, type: 'sub-octave', vol: 0.25 },
-                { mult: 1.0, type: 'fundamental', vol: 0.35 },
-                { mult: 2.0, type: 'octave', vol: 0.18 },
-                { mult: 3.0, type: 'fifth', vol: 0.08 },
-                { mult: 4.0, type: 'super-octave', vol: 0.04 }
+                { mult: 0.5, vol: 0.25 },
+                { mult: 1.0, vol: 0.35 },
+                { mult: 2.0, vol: 0.18 },
+                { mult: 3.0, vol: 0.08 },
+                { mult: 4.0, vol: 0.04 }
             ];
 
             const voiceGain = this.ctx.createGain();
             voiceGain.gain.setValueAtTime(0.0001, now);
-            voiceGain.gain.linearRampToValueAtTime(0.3, now + 0.06);
+            voiceGain.gain.linearRampToValueAtTime(0.3, now + Math.max(0.05, this.attackTime));
 
             const filter = this.ctx.createBiquadFilter();
             filter.type = 'lowpass';
@@ -141,7 +141,7 @@ class WebAudioEngine {
                 gain: voiceGain
             });
         } else {
-            // RETRO SYNTH VOICE WITH DYNAMIC ADSR ENVELOPE
+            // RETRO SYNTH VOICE WITH ADSR ENVELOPE
             const osc1 = this.ctx.createOscillator();
             const osc2 = this.ctx.createOscillator();
 
@@ -154,35 +154,39 @@ class WebAudioEngine {
             // Filter Envelope
             const filter = this.ctx.createBiquadFilter();
             filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(100, now);
+            filter.frequency.setValueAtTime(200, now);
             filter.frequency.linearRampToValueAtTime(this.cutoffFreq, now + this.attackTime);
-            filter.frequency.linearRampToValueAtTime(100 + (this.cutoffFreq - 100) * this.sustainLevel, now + this.attackTime + this.decayTime);
+            filter.frequency.exponentialRampToValueAtTime(
+                Math.max(100, this.cutoffFreq * this.sustainLevel), 
+                now + this.attackTime + this.decayTime
+            );
 
             // Gain ADSR Envelope
             const voiceGain = this.ctx.createGain();
             const peakGain = 0.4;
-            const sustainGain = peakGain * this.sustainLevel;
+            const sustainGain = Math.max(0.0001, peakGain * this.sustainLevel);
 
             voiceGain.gain.setValueAtTime(0.0001, now);
-            // Attack phase
+            // Attack
             voiceGain.gain.linearRampToValueAtTime(peakGain, now + this.attackTime);
-            // Decay phase
-            voiceGain.gain.linearRampToValueAtTime(Math.max(0.0001, sustainGain), now + this.attackTime + this.decayTime);
-            // Release phase (auto-released after decay for plucks)
-            const releaseStart = now + this.attackTime + this.decayTime + 0.1;
-            voiceGain.gain.setValueAtTime(Math.max(0.0001, sustainGain), releaseStart);
-            voiceGain.gain.exponentialRampToValueAtTime(0.0001, releaseStart + this.releaseTime);
+            // Decay
+            voiceGain.gain.exponentialRampToValueAtTime(sustainGain, now + this.attackTime + this.decayTime);
+
+            const noteDuration = this.attackTime + this.decayTime + 0.2;
+            // Release
+            voiceGain.gain.setValueAtTime(sustainGain, now + noteDuration);
+            voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + noteDuration + this.releaseTime);
 
             osc1.connect(filter);
             osc2.connect(filter);
             filter.connect(voiceGain);
             voiceGain.connect(this.masterGain);
 
-            const noteDuration = this.attackTime + this.decayTime + 0.1 + this.releaseTime;
             osc1.start(now);
             osc2.start(now);
-            osc1.stop(now + noteDuration);
-            osc2.stop(now + noteDuration);
+            const totalTime = noteDuration + this.releaseTime + 0.1;
+            osc1.stop(now + totalTime);
+            osc2.stop(now + totalTime);
         }
     }
 
@@ -207,6 +211,119 @@ class WebAudioEngine {
     }
 }
 
+/**
+ * Renderizzatore Grafico CRT Anni '70 del Monitor ADSR
+ */
+class AdsrCanvasRenderer {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+    }
+
+    resize() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        this.canvas.width = rect.width;
+        this.canvas.height = rect.height;
+    }
+
+    draw(attack, decay, sustain, release) {
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+        const ctx = this.ctx;
+
+        // 1. Sfondo Nero Profondo MonitorCRT
+        ctx.fillStyle = '#020803';
+        ctx.fillRect(0, 0, width, height);
+
+        // 2. Griglia Verde Scuro Oscilloscopio Anni '70
+        ctx.strokeStyle = 'rgba(0, 60, 20, 0.4)';
+        ctx.lineWidth = 1;
+
+        const gridStepX = width / 10;
+        for (let x = 0; x < width; x += gridStepX) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, height);
+            ctx.stroke();
+        }
+
+        const gridStepY = height / 6;
+        for (let y = 0; y < height; y += gridStepY) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(width, y);
+            ctx.stroke();
+        }
+
+        // Calcolo Punti Curva ADSR
+        const padding = 16;
+        const drawW = width - (padding * 2);
+        const drawH = height - (padding * 2);
+
+        const totalRelativeTime = attack + decay + 1.0 + release;
+        const attackW = (attack / totalRelativeTime) * drawW;
+        const decayW = (decay / totalRelativeTime) * drawW;
+        const sustainW = (1.0 / totalRelativeTime) * drawW;
+        const releaseW = (release / totalRelativeTime) * drawW;
+
+        const x0 = padding;
+        const y0 = height - padding;
+
+        const x1 = x0 + attackW;
+        const y1 = padding; // Peak
+
+        const x2 = x1 + decayW;
+        const y2 = height - padding - (sustain * drawH); // Sustain Level
+
+        const x3 = x2 + sustainW;
+        const y3 = y2;
+
+        const x4 = x3 + releaseW;
+        const y4 = height - padding;
+
+        // 3. Bagliore di Fondo al Fosforo
+        ctx.beginPath();
+        ctx.moveTo(x0, y0);
+        ctx.lineTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineTo(x3, y3);
+        ctx.lineTo(x4, y4);
+        ctx.lineTo(x4, y0);
+        ctx.closePath();
+
+        const grad = ctx.createLinearGradient(0, padding, 0, height - padding);
+        grad.addColorStop(0, 'rgba(0, 255, 102, 0.25)');
+        grad.addColorStop(1, 'rgba(0, 255, 102, 0.0)');
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // 4. Traccia Verde Neon Brillante
+        ctx.beginPath();
+        ctx.moveTo(x0, y0);
+        ctx.lineTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineTo(x3, y3);
+        ctx.lineTo(x4, y4);
+
+        ctx.strokeStyle = '#00ff66';
+        ctx.lineWidth = 3;
+        ctx.shadowColor = '#00ff66';
+        ctx.shadowBlur = 10;
+        ctx.stroke();
+        ctx.shadowBlur = 0; // Reset blur
+
+        // 5. Punti di Incontro / Nodi
+        [ {x: x1, y: y1}, {x: x2, y: y2}, {x: x3, y: y3} ].forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+        });
+    }
+}
+
 // Circle of Fifths order starting strictly from C (Do)
 const CIRCLE_OF_FIFTHS = [
     { name: 'C',  midi: 60 },
@@ -223,8 +340,10 @@ const CIRCLE_OF_FIFTHS = [
     { name: 'F',  midi: 65 }
 ];
 
+// Chromatic Scale for intervals
 const CHROMATIC_SCALE = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 
+// 5 Matrix Rows
 const MATRIX_ROWS = [
     { id: 'maj',  label: 'Major',             intervals: [0, 4, 7],     suffix: '',     btnClass: 'row-maj',  badgeStyle: 'bg-amber-200 text-amber-950 border-amber-300' },
     { id: 'min',  label: 'Minor',             intervals: [0, 3, 7],     suffix: 'm',    btnClass: 'row-min',  badgeStyle: 'bg-sky-200 text-sky-950 border-sky-300' },
@@ -233,6 +352,7 @@ const MATRIX_ROWS = [
     { id: 'm7',   label: 'Minor 7th',         intervals: [0, 3, 7, 10], suffix: 'm7',   btnClass: 'row-m7',   badgeStyle: 'bg-purple-200 text-purple-950 border-purple-300' }
 ];
 
+// Translated Genres, Styles & Progressions Table
 const GENRES_DATA = {
     "Classical & Traditional": {
         "Circle of C (Major)": "I - vi (I / IV) - ii (IV) - V (bVII / viio)",
@@ -601,141 +721,54 @@ function initGenresAndStylesUI() {
     });
 }
 
-/**
- * Green Phosphor Real-time ADSR Canvas Renderer
- */
-class AdsrCanvasRenderer {
-    constructor(canvas, audioEngine) {
-        this.canvas = canvas;
-        this.ctx = canvas.getContext('2d');
-        this.audioEngine = audioEngine;
-
-        this.resize();
-        window.addEventListener('resize', () => this.resize());
-        this.draw();
-    }
-
-    resize() {
-        const rect = this.canvas.parentElement.getBoundingClientRect();
-        this.canvas.width = rect.width;
-        this.canvas.height = rect.height;
-        this.draw();
-    }
-
-    draw() {
-        const w = this.canvas.width;
-        const h = this.canvas.height;
-        const ctx = this.ctx;
-
-        ctx.clearRect(0, 0, w, h);
-
-        const margin = 20;
-        const plotW = w - (margin * 2);
-        const plotH = h - (margin * 2);
-        const baseline = h - margin;
-
-        // Draw Background Phosphor Grid
-        ctx.strokeStyle = 'rgba(0, 255, 102, 0.15)';
-        ctx.lineWidth = 1;
-        
-        for (let x = margin; x <= w - margin; x += plotW / 8) {
-            ctx.beginPath();
-            ctx.moveTo(x, margin);
-            ctx.lineTo(x, baseline);
-            ctx.stroke();
-        }
-        for (let y = margin; y <= baseline; y += plotH / 4) {
-            ctx.beginPath();
-            ctx.moveTo(margin, y);
-            ctx.lineTo(w - margin, y);
-            ctx.stroke();
-        }
-
-        // ADSR Envelope Curve Coordinates
-        const a = this.audioEngine.attackTime;
-        const d = this.audioEngine.decayTime;
-        const s = this.audioEngine.sustainLevel;
-        const r = this.audioEngine.releaseTime;
-
-        const totalTime = Math.max(0.5, a + d + 0.8 + r); // Fixed time scaling window
-
-        const x0 = margin;
-        const y0 = baseline;
-
-        const xA = x0 + (a / totalTime) * plotW;
-        const yA = margin; // Peak
-
-        const xD = xA + (d / totalTime) * plotW;
-        const yD = baseline - (s * plotH);
-
-        const xS = xD + (0.8 / totalTime) * plotW; // Sustain hold length
-        const yS = yD;
-
-        const xR = xS + (r / totalTime) * plotW;
-        const yR = baseline;
-
-        // Fill Envelope Area with Glowing Green Gradient
-        const grad = ctx.createLinearGradient(0, margin, 0, baseline);
-        grad.addColorStop(0, 'rgba(0, 255, 102, 0.35)');
-        grad.addColorStop(1, 'rgba(0, 255, 102, 0.02)');
-
-        ctx.beginPath();
-        ctx.moveTo(x0, y0);
-        ctx.lineTo(xA, yA);
-        ctx.lineTo(xD, yD);
-        ctx.lineTo(xS, yS);
-        ctx.lineTo(xR, yR);
-        ctx.closePath();
-        ctx.fillStyle = grad;
-        ctx.fill();
-
-        // Draw Bright Neon Green Outer Line
-        ctx.beginPath();
-        ctx.moveTo(x0, y0);
-        ctx.lineTo(xA, yA);
-        ctx.lineTo(xD, yD);
-        ctx.lineTo(xS, yS);
-        ctx.lineTo(xR, yR);
-        ctx.strokeStyle = '#00ff66';
-        ctx.lineWidth = 2.5;
-        ctx.shadowColor = '#00ff66';
-        ctx.shadowBlur = 8;
-        ctx.stroke();
-        ctx.shadowBlur = 0; // Reset shadow
-
-        // Draw Control Point Dots
-        const points = [
-            { x: xA, y: yA, label: 'A' },
-            { x: xD, y: yD, label: 'D' },
-            { x: xS, y: yS, label: 'S' },
-            { x: xR, y: yR, label: 'R' }
-        ];
-
-        ctx.fillStyle = '#88ffb3';
-        points.forEach(p => {
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
-            ctx.fill();
-        });
-    }
-}
-
 // DOM Initialization
 window.addEventListener('DOMContentLoaded', () => {
     createMatrixUI();
     initGenresAndStylesUI();
 
-    const adsrCanvas = document.getElementById('adsr-canvas');
-    const adsrRenderer = new AdsrCanvasRenderer(adsrCanvas, audio);
+    const adsrRenderer = new AdsrCanvasRenderer(document.getElementById('adsr-canvas'));
 
     const audioToggle = document.getElementById('toggle-audio');
     const audioStateLbl = document.getElementById('lbl-audio-state');
     const powerLed = document.getElementById('power-led');
     const droneToggle = document.getElementById('toggle-drone');
 
+    // ADSR Sliders Elements
+    const slAttack = document.getElementById('slider-attack');
+    const slDecay = document.getElementById('slider-decay');
+    const slSustain = document.getElementById('slider-sustain');
+    const slRelease = document.getElementById('slider-release');
+
+    const lblAttack = document.getElementById('lbl-attack');
+    const lblDecay = document.getElementById('lbl-decay');
+    const lblSustain = document.getElementById('lbl-sustain');
+    const lblRelease = document.getElementById('lbl-release');
+
+    function updateAdsr() {
+        const a = parseFloat(slAttack.value);
+        const d = parseFloat(slDecay.value);
+        const s = parseFloat(slSustain.value);
+        const r = parseFloat(slRelease.value);
+
+        lblAttack.textContent = `${a.toFixed(2)}s`;
+        lblDecay.textContent = `${d.toFixed(2)}s`;
+        lblSustain.textContent = `${Math.round(s * 100)}%`;
+        lblRelease.textContent = `${r.toFixed(2)}s`;
+
+        audio.setAdsr(a, d, s, r);
+        adsrRenderer.draw(a, d, s, r);
+    }
+
+    slAttack.addEventListener('input', updateAdsr);
+    slDecay.addEventListener('input', updateAdsr);
+    slSustain.addEventListener('input', updateAdsr);
+    slRelease.addEventListener('input', updateAdsr);
+
+    // Initial ADSR Draw
+    updateAdsr();
+
     audioToggle.checked = false;
 
-    // Master Audio Switch Event
     audioToggle.addEventListener('change', (e) => {
         const isEnabled = e.target.checked;
         audio.setAudioState(isEnabled);
@@ -751,7 +784,6 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Drone Mode Switch Event
     droneToggle.addEventListener('change', (e) => {
         audio.setDroneMode(e.target.checked);
     });
@@ -766,34 +798,4 @@ window.addEventListener('DOMContentLoaded', () => {
         audio.setCutoff(val);
         document.getElementById('lbl-cutoff').textContent = `${val} Hz`;
     });
-
-    // ADSR Sliders Bindings & Dynamic Redraw
-    const sliderA = document.getElementById('slider-attack');
-    const sliderD = document.getElementById('slider-decay');
-    const sliderS = document.getElementById('slider-sustain');
-    const sliderR = document.getElementById('slider-release');
-
-    function updateAdsrFromSliders() {
-        const aVal = parseFloat(sliderA.value) / 100;  // 0.01s - 2.0s
-        const dVal = parseFloat(sliderD.value) / 100;  // 0.05s - 3.0s
-        const sVal = parseFloat(sliderS.value) / 100;  // 0.0 - 1.0
-        const rVal = parseFloat(sliderR.value) / 100;  // 0.05s - 5.0s
-
-        audio.setAdsr(aVal, dVal, sVal, rVal);
-
-        document.getElementById('lbl-attack').textContent = `${aVal.toFixed(2)}s`;
-        document.getElementById('lbl-decay').textContent = `${dVal.toFixed(2)}s`;
-        document.getElementById('lbl-sustain').textContent = `${Math.round(sVal * 100)}%`;
-        document.getElementById('lbl-release').textContent = `${rVal.toFixed(2)}s`;
-
-        adsrRenderer.draw();
-    }
-
-    sliderA.addEventListener('input', updateAdsrFromSliders);
-    sliderD.addEventListener('input', updateAdsrFromSliders);
-    sliderS.addEventListener('input', updateAdsrFromSliders);
-    sliderR.addEventListener('input', updateAdsrFromSliders);
-
-    // Initial draw sync
-    updateAdsrFromSliders();
 });
