@@ -114,7 +114,7 @@
                 </div>
             </div>
 
-            <!-- Right Panel: Synthesis, Filters, LFO & Master Volume -->
+            <!-- Right Panel: Synthesis Engine & Master Output -->
             <div class="lg:col-span-8 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col gap-3 justify-between">
                 
                 <div class="flex justify-between items-center border-b border-slate-300 pb-1">
@@ -124,7 +124,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
                     
-                    <!-- LEFT COLUMN (4 cols): ADSR Panel (50% Width relative to 8-col layout) -->
+                    <!-- COLUMN 1 (4 cols): ADSR Panel (50% Width relative to synth section) -->
                     <div class="md:col-span-4 bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col gap-2">
                         <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">ADSR Envelope Generator</span>
                         
@@ -169,116 +169,111 @@
                         </div>
                     </div>
 
-                    <!-- CENTER-RIGHT COLUMN (6 cols): Waveform (Top) + Filters (Bottom) -->
-                    <div class="md:col-span-6 flex flex-col gap-3">
+                    <!-- COLUMN 2 (3 cols): Waveform (Top) + Filters (Bottom) Stack in Single-Column Layout -->
+                    <div class="md:col-span-3 flex flex-col gap-3">
                         
-                        <!-- Waveform Selector Panel -->
-                        <div class="bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col gap-2">
-                            <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">Oscillator Waveform</span>
-                            <div class="grid grid-cols-2 gap-2 pt-1">
-                                <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-800">
+                        <!-- Waveform Selector Panel (Single Column) -->
+                        <div class="bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col gap-1.5">
+                            <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">Waveform</span>
+                            <div class="flex flex-col gap-1 pt-0.5">
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-800">
                                     <input type="radio" name="waveform" value="sawtooth" checked class="accent-amber-800 cursor-pointer">
                                     <span>Sawtooth</span>
                                 </label>
 
-                                <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-800">
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-800">
                                     <input type="radio" name="waveform" value="square" class="accent-amber-800 cursor-pointer">
                                     <span>Square</span>
                                 </label>
 
-                                <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-800">
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-800">
                                     <input type="radio" name="waveform" value="triangle" class="accent-amber-800 cursor-pointer">
                                     <span>Triangle</span>
                                 </label>
 
-                                <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-800">
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-800">
                                     <input type="radio" name="waveform" value="sine" class="accent-amber-800 cursor-pointer">
                                     <span>Sine</span>
                                 </label>
                             </div>
                         </div>
 
-                        <!-- Filter Controls Panel (Positioned UNDER Waveform) -->
-                        <div class="bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col gap-2">
-                            <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">Filter Controls</span>
+                        <!-- Filter Controls Panel (Single Column Stacked Under Waveform) -->
+                        <div class="bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col gap-1.5">
+                            <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">Filter</span>
                             
-                            <div class="flex items-center justify-between gap-4 pt-1">
-                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-800">
+                            <div class="flex items-center justify-between gap-1 pt-0.5">
+                                <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800">
                                     <input type="radio" name="filter-type" value="lowpass" checked class="accent-amber-800 cursor-pointer">
                                     <span>Low-pass</span>
                                 </label>
-                                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-800">
+                                <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800">
                                     <input type="radio" name="filter-type" value="highpass" class="accent-amber-800 cursor-pointer">
                                     <span>High-pass</span>
                                 </label>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-3 pt-1">
+                            <div class="flex flex-col gap-1.5 pt-1">
                                 <div>
-                                    <div class="flex justify-between text-[10px] font-semibold mb-1">
+                                    <div class="flex justify-between text-[10px] font-semibold mb-0.5">
                                         <span>Cutoff</span>
                                         <span id="lbl-cutoff" class="font-mono text-slate-700">2200 Hz</span>
                                     </div>
-                                    <input type="range" id="slider-cutoff" min="100" max="8000" value="2200" class="w-full h-2 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
+                                    <input type="range" id="slider-cutoff" min="100" max="8000" value="2200" class="w-full h-1.5 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                                 </div>
                                 <div>
-                                    <div class="flex justify-between text-[10px] font-semibold mb-1">
+                                    <div class="flex justify-between text-[10px] font-semibold mb-0.5">
                                         <span>Resonance</span>
                                         <span id="lbl-resonance" class="font-mono text-slate-700">1.0</span>
                                     </div>
-                                    <input type="range" id="slider-resonance" min="0.1" max="15.0" step="0.1" value="1.0" class="w-full h-2 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
+                                    <input type="range" id="slider-resonance" min="0.1" max="15.0" step="0.1" value="1.0" class="w-full h-1.5 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                                 </div>
                             </div>
                         </div>
 
                     </div>
 
-                    <!-- LFO PANEL (Placed to the RIGHT of Waveform / Filter stack) & MASTER VOLUME (Far Right) -->
-                    <div class="md:col-span-2 flex flex-col sm:flex-row md:flex-col gap-3">
+                    <!-- COLUMN 3 (3 cols): LFO Panel -->
+                    <div class="md:col-span-3 bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col gap-2 justify-between">
+                        <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">LFO Modulation</span>
                         
-                        <!-- LFO Panel -->
-                        <div class="bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col gap-2 flex-grow">
-                            <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">LFO Modulation</span>
-                            
-                            <div>
-                                <div class="flex justify-between text-[10px] font-semibold mb-0.5">
-                                    <span>LFO Rate</span>
-                                    <span id="lbl-lfo-rate" class="font-mono text-slate-700">5.0 Hz</span>
-                                </div>
-                                <input type="range" id="slider-lfo-rate" min="0.5" max="15.0" step="0.1" value="5.0" class="w-full h-1.5 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
+                        <div>
+                            <div class="flex justify-between text-[10px] font-semibold mb-0.5">
+                                <span>LFO Rate</span>
+                                <span id="lbl-lfo-rate" class="font-mono text-slate-700">5.0 Hz</span>
                             </div>
-
-                            <div>
-                                <div class="flex justify-between text-[10px] font-semibold mb-0.5">
-                                    <span>LFO Depth</span>
-                                    <span id="lbl-lfo-depth" class="font-mono text-slate-700">0%</span>
-                                </div>
-                                <input type="range" id="slider-lfo-depth" min="0" max="100" value="0" class="w-full h-1.5 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
-                            </div>
-
-                            <div class="flex flex-col gap-1 pt-1 border-t border-slate-300">
-                                <label class="inline-flex items-center justify-between cursor-pointer text-[10px] font-semibold text-slate-800">
-                                    <span>Vibrato</span>
-                                    <input type="checkbox" id="toggle-vibrato" class="accent-amber-800 cursor-pointer">
-                                </label>
-                                <label class="inline-flex items-center justify-between cursor-pointer text-[10px] font-semibold text-slate-800">
-                                    <span>Tremolo</span>
-                                    <input type="checkbox" id="toggle-tremolo" class="accent-amber-800 cursor-pointer">
-                                </label>
-                            </div>
+                            <input type="range" id="slider-lfo-rate" min="0.5" max="15.0" step="0.1" value="5.0" class="w-full h-1.5 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                         </div>
 
-                        <!-- Master Volume Vertical Slider Panel (Far Right) -->
-                        <div class="bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col items-center justify-between shrink-0 h-full">
-                            <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1 text-center w-full">Master Vol</span>
-                            
-                            <div class="vertical-slider-wrapper my-2">
-                                <input type="range" id="slider-volume" min="0" max="100" value="80" class="v-range">
+                        <div>
+                            <div class="flex justify-between text-[10px] font-semibold mb-0.5">
+                                <span>LFO Depth</span>
+                                <span id="lbl-lfo-depth" class="font-mono text-slate-700">0%</span>
                             </div>
-
-                            <span id="lbl-volume" class="text-[10px] font-mono font-bold text-amber-950">80%</span>
+                            <input type="range" id="slider-lfo-depth" min="0" max="100" value="0" class="w-full h-1.5 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                         </div>
 
+                        <div class="flex flex-col gap-1 pt-1 border-t border-slate-300">
+                            <label class="inline-flex items-center justify-between cursor-pointer text-[10px] font-semibold text-slate-800">
+                                <span>Vibrato</span>
+                                <input type="checkbox" id="toggle-vibrato" class="accent-amber-800 cursor-pointer">
+                            </label>
+                            <label class="inline-flex items-center justify-between cursor-pointer text-[10px] font-semibold text-slate-800">
+                                <span>Tremolo</span>
+                                <input type="checkbox" id="toggle-tremolo" class="accent-amber-800 cursor-pointer">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- COLUMN 4 (2 cols): Master Volume (Strictly Right side inside the panel) -->
+                    <div class="md:col-span-2 bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col items-center justify-between h-full">
+                        <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1 text-center w-full">Master Vol</span>
+                        
+                        <div class="vertical-slider-wrapper my-auto">
+                            <input type="range" id="slider-volume" min="0" max="100" value="80" class="v-range">
+                        </div>
+
+                        <span id="lbl-volume" class="text-[10px] font-mono font-bold text-amber-950">80%</span>
                     </div>
 
                 </div>
