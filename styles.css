@@ -319,8 +319,8 @@
 }
 
 /* ADSR and Master Volume are exactly 408px high. */
-.synth-controls-grid > .md\\:col-span-4,
-.synth-controls-grid > .md\\:col-span-2 {
+.synth-controls-grid > :first-child,
+.synth-controls-grid > :last-child {
     height: 408px;
 }
 
