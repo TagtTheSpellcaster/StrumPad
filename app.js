@@ -244,7 +244,8 @@ class WebAudioEngine {
 
                 if (this.vibratoEnabled) {
                     const vibratoGain = this.ctx.createGain();
-                    vibratoGain.gain.setValueAtTime(this.lfoDepth * 12.0, now);
+                    // Modulazione proporzionale alla frequenza della nota (proporzione relativa in Hz)
+                    vibratoGain.gain.setValueAtTime((this.lfoDepth / 100) * 0.03 * freq, now);
                     lfo.connect(vibratoGain);
                     vibratoGain.connect(osc1.frequency);
                     vibratoGain.connect(osc2.frequency);
