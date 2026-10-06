@@ -1,20 +1,18 @@
 /**
- * Web Audio API Engine Class for StrumPad Synth with Waveform Selector & ADSR Envelopes
+ * Web Audio API Engine Class for StrumPad Synth with ADSR & Custom Waveforms
  */
 class WebAudioEngine {
     constructor() {
         this.ctx = null;
         this.masterGain = null;
         this.volume = 0.8;
-        this.cutoffFreq = 2200;
+        this.cutoffFreq = 2200; // Cutoff ripristinato
         this.initialized = false;
-        this.audioActive = false; // Off by default
+        this.audioActive = false; // Tassativamente OFF all'avvio
         this.droneMode = false;
+        this.waveform = 'sawtooth'; // Forma d'onda selezionabile
         this.activeDroneNodes = [];
         this.scheduledTimeouts = [];
-
-        // Waveform Selector ('square', 'sawtooth', 'triangle', 'sine')
-        this.waveform = 'sawtooth';
 
         // ADSR Envelope Parameters
         this.attackTime = 0.10;
@@ -83,17 +81,15 @@ class WebAudioEngine {
         this.cutoffFreq = val;
     }
 
-    setWaveform(type) {
-        if (['square', 'sawtooth', 'triangle', 'sine'].includes(type)) {
-            this.waveform = type;
-        }
-    }
-
     setDroneMode(enabled) {
         this.droneMode = enabled;
         if (!enabled) {
             this.stopAll();
         }
+    }
+
+    setWaveform(type) {
+        this.waveform = type;
     }
 
     setAdsr(attack, decay, sustain, release) {
@@ -130,7 +126,7 @@ class WebAudioEngine {
             const oscList = [];
             pipeHarmonics.forEach(h => {
                 const osc = this.ctx.createOscillator();
-                osc.type = (h.mult === 1.0 || h.mult === 0.5) ? this.waveform : 'sine';
+                osc.type = (h.mult === 1.0 || h.mult === 0.5) ? 'sine' : 'triangle';
                 osc.frequency.setValueAtTime(freq * h.mult, now);
 
                 const hGain = this.ctx.createGain();
@@ -154,14 +150,14 @@ class WebAudioEngine {
             const osc1 = this.ctx.createOscillator();
             const osc2 = this.ctx.createOscillator();
 
+            // Applicazione della forma d'onda selezionata
             osc1.type = this.waveform;
-            // Slightly detune secondary oscillator for rich vintage texture
-            osc2.type = this.waveform === 'sine' ? 'triangle' : this.waveform;
+            osc2.type = (this.waveform === 'sine') ? 'triangle' : this.waveform;
 
             osc1.frequency.setValueAtTime(freq, now);
             osc2.frequency.setValueAtTime(freq * 1.002, now);
 
-            // Filter Envelope
+            // Filter Envelope collegato alla frequenza di Cutoff impostata
             const filter = this.ctx.createBiquadFilter();
             filter.type = 'lowpass';
             filter.frequency.setValueAtTime(200, now);
@@ -177,13 +173,10 @@ class WebAudioEngine {
             const sustainGain = Math.max(0.0001, peakGain * this.sustainLevel);
 
             voiceGain.gain.setValueAtTime(0.0001, now);
-            // Attack
             voiceGain.gain.linearRampToValueAtTime(peakGain, now + this.attackTime);
-            // Decay
             voiceGain.gain.exponentialRampToValueAtTime(sustainGain, now + this.attackTime + this.decayTime);
 
             const noteDuration = this.attackTime + this.decayTime + 0.2;
-            // Release
             voiceGain.gain.setValueAtTime(sustainGain, now + noteDuration);
             voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + noteDuration + this.releaseTime);
 
@@ -282,10 +275,10 @@ class AdsrCanvasRenderer {
         const y0 = height - padding;
 
         const x1 = x0 + attackW;
-        const y1 = padding; // Peak
+        const y1 = padding;
 
         const x2 = x1 + decayW;
-        const y2 = height - padding - (sustain * drawH); // Sustain Level
+        const y2 = height - padding - (sustain * drawH);
 
         const x3 = x2 + sustainW;
         const y3 = y2;
@@ -322,9 +315,9 @@ class AdsrCanvasRenderer {
         ctx.shadowColor = '#00ff66';
         ctx.shadowBlur = 10;
         ctx.stroke();
-        ctx.shadowBlur = 0; // Reset blur
+        ctx.shadowBlur = 0;
 
-        // 5. Punti di Incontro / Nodi
+        // 5. Punti Nodi
         [ {x: x1, y: y1}, {x: x2, y: y2}, {x: x3, y: y3} ].forEach(p => {
             ctx.beginPath();
             ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
@@ -362,7 +355,7 @@ const MATRIX_ROWS = [
     { id: 'm7',   label: 'Minor 7th',         intervals: [0, 3, 7, 10], suffix: 'm7',   btnClass: 'row-m7',   badgeStyle: 'bg-purple-200 text-purple-950 border-purple-300' }
 ];
 
-// Genres, Styles & Progressions Table
+// Translated Genres, Styles & Progressions Table
 const GENRES_DATA = {
     "Classical & Traditional": {
         "Circle of C (Major)": "I - vi (I / IV) - ii (IV) - V (bVII / viio)",
@@ -743,16 +736,6 @@ window.addEventListener('DOMContentLoaded', () => {
     const powerLed = document.getElementById('power-led');
     const droneToggle = document.getElementById('toggle-drone');
 
-    // Waveform Radio Buttons Listener
-    const waveRadios = document.querySelectorAll('input[name="waveform"]');
-    waveRadios.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                audio.setWaveform(e.target.value);
-            }
-        });
-    });
-
     // ADSR Sliders Elements
     const slAttack = document.getElementById('slider-attack');
     const slDecay = document.getElementById('slider-decay');
@@ -787,6 +770,13 @@ window.addEventListener('DOMContentLoaded', () => {
     // Initial ADSR Draw
     updateAdsr();
 
+    // Gestore del cambio di Forma d'Onda
+    document.querySelectorAll('input[name="waveform"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            audio.setWaveform(e.target.value);
+        });
+    });
+
     audioToggle.checked = false;
 
     audioToggle.addEventListener('change', (e) => {
@@ -813,6 +803,7 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('lbl-volume').textContent = `${e.target.value}%`;
     });
 
+    // Controllo frequenza di Cutoff ripristinato ed attivo
     document.getElementById('slider-cutoff').addEventListener('input', (e) => {
         const val = parseFloat(e.target.value);
         audio.setCutoff(val);
