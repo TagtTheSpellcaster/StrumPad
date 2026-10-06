@@ -8,7 +8,7 @@ body {
     touch-action: manipulation;
 }
 
-/* Scrollbar personalizzata per la matrice di bottoni */
+/* Custom Scrollbar for matrix overflow on small screens */
 ::-webkit-scrollbar {
     height: 8px;
 }
@@ -21,53 +21,57 @@ body {
     border-radius: 4px;
 }
 
-/* Contenitore Display CRT a Fosfori Verdi */
+/* 1970s Green Phosphor CRT Display Frame (ONLY monitor is pitch black) */
 .crt-container {
-    background-color: #051408;
-    border: 3px solid #1c3b22;
+    background-color: #020803; /* Nero profondo oscilloscopio */
+    border: 4px solid #1a2e1d;
+    border-radius: 18px;
     box-shadow: 
-        inset 0 0 15px rgba(0, 255, 102, 0.15),
-        inset 0 0 30px rgba(0, 0, 0, 0.8),
-        0 4px 8px rgba(0, 0, 0, 0.3);
+        inset 0 0 12px rgba(0, 255, 102, 0.2),
+        inset 0 0 25px rgba(0, 0, 0, 0.95),
+        0 4px 10px rgba(0, 0, 0, 0.5);
     position: relative;
+    overflow: hidden;
 }
 
-/* Rigature e scansione CRT */
+/* Linee di scansione CRT anni '70 per il monitor */
 .crt-container::before {
     content: "";
     position: absolute;
     inset: 0;
     background: linear-gradient(
         rgba(18, 16, 16, 0) 50%, 
-        rgba(0, 0, 0, 0.25) 50%
+        rgba(0, 0, 0, 0.4) 50%
     );
     background-size: 100% 4px;
     pointer-events: none;
     z-index: 5;
+    border-radius: 14px;
 }
 
-/* Slider Verticali Personalizzati */
+/* Slider Verticali Compatti */
 .slider-vertical-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     height: 100%;
+    justify-content: center;
 }
 
-.range-vertical {
+.range-vertical-compact {
     writing-mode: bt-lr; /* IE/Edge */
     -webkit-appearance: slider-vertical; /* WebKit */
-    width: 16px;
-    height: 120px;
+    width: 14px;
+    height: 80px; /* Altezza ridotta e compatta */
     background: #c2b8a3;
-    border-radius: 8px;
+    border-radius: 6px;
     outline: none;
     cursor: pointer;
-    accent-color: #d97706;
+    accent-color: #b45309;
 }
 
-/* Bottoni Matrice 3D Quadrati */
+/* 3D Compact Square Matrix Button */
 .matrix-btn {
     position: relative;
     width: 42px;
@@ -92,7 +96,7 @@ body {
     box-shadow: 0 1px 0 rgba(0,0,0,0.3), 0 2px 3px rgba(0,0,0,0.2) !important;
 }
 
-/* Colori Pastello per Fila */
+/* Pastel Row Color Themes */
 .row-maj { background-color: #fce3b8; border-color: #d1a566; }
 .row-maj:hover { background-color: #ffecc9; }
 
@@ -108,7 +112,7 @@ body {
 .row-m7 { background-color: #e0cced; border-color: #a485b8; }
 .row-m7:hover { background-color: #ebdcf5; }
 
-/* Rettangolino LED Verde centrato in basso */
+/* Rectangular Green LED centered at bottom */
 .btn-led {
     width: 12px;
     height: 4px;
@@ -127,7 +131,7 @@ body {
     border-color: #88ffb3 !important;
 }
 
-/* Evidenziazione Progressioni Armoniche */
+/* Harmonic Progression Highlights */
 .highlight-main {
     outline: 3px solid #06b6d4 !important;
     outline-offset: 2px;
