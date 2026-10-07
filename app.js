@@ -660,6 +660,9 @@ const audio = new WebAudioEngine();
 let selectedChordName = null;
 let currentStrumNotes = calculateNotes(CIRCLE_OF_FIFTHS[0].midi, MATRIX_ROWS[0].intervals);
 
+let smoothVoicingEnabled = false;
+let previousVoicing = null;
+
 let activeProgressionSteps = [];
 let currentProgressionStepIndex = -1;
 let currentKeyRoot = null;
@@ -674,9 +677,116 @@ function calculateNotes(rootMidi, intervals) {
     return notes.sort((a, b) => a - b);
 }
 
+function calculateSmoothVoicing(rootMidi, intervals, previousNotes) {
+    const baseNotes = intervals
+        .map(interval => rootMidi + interval)
+        .sort((a, b) => a - b);
+
+    // Primo accordo, oppure cambio di tipo di accordo:
+    // usa la posizione fondamentale.
+    if (!previousNotes || previousNotes.length !== baseNotes.length) {
+        return baseNotes;
+    }
+
+    const candidates = [];
+    const voiceCount = baseNotes.length;
+
+    // Genera tutte le inversioni possibili.
+    for (let inversion = 0; inversion < voiceCount; inversion++) {
+        const inversionNotes = [
+            ...baseNotes.slice(inversion),
+            ...baseNotes
+                .slice(0, inversion)
+                .map(note => note + 12)
+        ];
+
+        // Prova diversi registri.
+        for (let shift = -36; shift <= 36; shift += 12) {
+            const candidate = inversionNotes
+                .map(note => note + shift)
+                .sort((a, b) => a - b);
+
+            let totalMovement = 0;
+            let stationaryVoices = 0;
+
+            for (let i = 0; i < voiceCount; i++) {
+                const movement =
+                    Math.abs(
+                        candidate[i] -
+                        previousNotes[i]
+                    );
+
+                totalMovement += movement;
+
+                if (movement === 0) {
+                    stationaryVoices++;
+                }
+            }
+
+            const span =
+                candidate[voiceCount - 1] -
+                candidate[0];
+
+            const bassMovement =
+                Math.abs(
+                    candidate[0] -
+                    previousNotes[0]
+                );
+
+            candidates.push({
+                notes: candidate,
+                totalMovement,
+                stationaryVoices,
+                span,
+                bassMovement
+            });
+        }
+    }
+
+    // Ordine di preferenza:
+    // 1. minor movimento complessivo
+    // 2. maggior numero di note comuni
+    // 3. voicing più compatto
+    // 4. minor movimento del basso
+    candidates.sort((a, b) => {
+        if (a.totalMovement !== b.totalMovement) {
+            return a.totalMovement -
+                   b.totalMovement;
+        }
+
+        if (a.stationaryVoices !== b.stationaryVoices) {
+            return b.stationaryVoices -
+                   a.stationaryVoices;
+        }
+
+        if (a.span !== b.span) {
+            return a.span - b.span;
+        }
+
+        return a.bassMovement -
+               b.bassMovement;
+    });
+
+    return candidates[0].notes;
+}
+
 function selectChord(rootObj, rowObj) {
     selectedChordName = `${rootObj.name}${rowObj.suffix}`;
-    currentStrumNotes = calculateNotes(rootObj.midi, rowObj.intervals);
+    
+    if (smoothVoicingEnabled) {
+        currentStrumNotes = calculateSmoothVoicing(
+            rootObj.midi,
+            rowObj.intervals,
+            previousVoicing
+        );
+
+        previousVoicing = [...currentStrumNotes];
+    } else {
+        currentStrumNotes = calculateNotes(
+            rootObj.midi,
+            rowObj.intervals
+        );
+    }
 
     document.getElementById('lbl-active-chord').textContent = selectedChordName;
 
@@ -1090,6 +1200,20 @@ window.addEventListener('DOMContentLoaded', () => {
     const arpToggle = document.getElementById('toggle-arp');
     const sliderSpeed = document.getElementById('slider-speed');
     const lblSpeed = document.getElementById('lbl-speed');
+
+    const smoothVoicingToggle = document.getElementById('toggle-smooth-voicing');
+
+    if (smoothVoicingToggle) {
+        smoothVoicingToggle.checked = false;
+
+        smoothVoicingToggle.addEventListener('change', (e) => {
+            smoothVoicingEnabled = e.target.checked;
+
+            // Quando si cambia modalità,
+            // si ricomincia una nuova catena di voice leading.
+            previousVoicing = null;
+        });
+    }
 
     function updateSpeedLimits() {
         if (arpToggle.checked) {
