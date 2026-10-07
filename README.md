@@ -1,6 +1,6 @@
 # StrumPad
 
-[![Version](https://img.shields.io/badge/version-1.3.3-blue.svg)](https://github.com/TagtTheSpellcaster/StrumPad)
+[![Version](https://img.shields.io/badge/version-1.4.5-blue.svg)](https://github.com/TagtTheSpellcaster/StrumPad)
 [![License](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Web Audio API](https://img.shields.io/badge/Web%20Audio%20API-Native-8B5CF6.svg)](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
@@ -8,7 +8,7 @@
 
 **▶ [Launch StrumPad](https://tagtthespellcaster.github.io/StrumPad/)**
 
-**StrumPad v1.3.3** is a browser-based, vintage-style **chord machine and analog-modeled synthesizer** designed for playing chords, exploring harmonic progressions, and experimenting with sound.
+**StrumPad v1.4.5** is a browser-based, vintage-style **chord machine and analog-modeled synthesizer** designed for playing chords, exploring harmonic progressions, and experimenting with sound.
 
 Its main purpose is harmonic exploration: select a musical style, choose a progression, establish the key by playing its first chord, and then follow the visual guidance provided by the **Harmonic Progression Assistant**.
 
@@ -16,7 +16,7 @@ StrumPad combines:
 
 - an interactive **Circle of Fifths chord matrix**
 - several performance modes and voice-leading optimization
-- an analog-style synthesis engine with integrated octave transposition
+- a dual-oscillator analog-style synthesis engine with integrated octave transposition
 - eight instrument presets
 - a **Harmonic Progression Assistant**
 
@@ -70,13 +70,17 @@ When playing through a harmonic progression with **Smooth Voice Leading** enable
 
 ---
 
-### Analog Synthesis Engine
+### Dual-Oscillator Analog Synthesis Engine
 
-StrumPad uses the **Web Audio API** for real-time sound generation.
+StrumPad uses the **Web Audio API** for real-time sound generation through a dual-oscillator architecture.
 
 The synthesis engine provides:
 
-- Sawtooth, Square, Triangle, and Sine waveforms
+- **Oscillator 1 (Main Waveform)** — selectable Sawtooth, Square, Triangle, and Sine waveforms.
+- **Oscillator 2 ("Andrea's Osc2")** — an independent secondary oscillator featuring:
+  - Independent waveform selection (Sawtooth, Square, Triangle, Sine).
+  - Fine-grained pitch **Detune** adjustable in cents (range: -50 to +50 cents).
+  - Dedicated **Osc2 Mix** control to adjust the balance between the primary and secondary oscillators.
 - Low-pass and High-pass filters
 - Adjustable Cutoff frequency
 - Adjustable Resonance
