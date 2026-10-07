@@ -678,20 +678,21 @@ function calculateNotes(rootMidi, intervals) {
     return notes.sort((a, b) => a - b);
 }
 
-function calculateSmoothVoicing(rootMidi, intervals, previousNotes) {
+function calculateSmoothVoicing(rootMidi, intervals, previousNotes, targetCount = 4) {
     const baseNotes = intervals
         .map(interval => rootMidi + interval)
         .sort((a, b) => a - b);
 
-    // Se non c'è un voicing precedente, usa la disposizione standard di calculateNotes
+    // Se non c'è un voicing precedente, genera le note tramite calculateNotes
     if (!previousNotes) {
-        return calculateNotes(rootMidi, intervals);
+        const fullNotes = calculateNotes(rootMidi, intervals);
+        return fullNotes.slice(0, targetCount);
     }
 
     const candidates = [];
     const voiceCount = baseNotes.length;
 
-    // Genera tutte le inversioni possibili.
+    // Genera tutte le inversioni possibili per la struttura base
     for (let inversion = 0; inversion < voiceCount; inversion++) {
         const inversionNotes = [
             ...baseNotes.slice(inversion),
@@ -700,41 +701,26 @@ function calculateSmoothVoicing(rootMidi, intervals, previousNotes) {
                 .map(note => note + 12)
         ];
 
-        // Prova diversi registri.
+        // Prova diversi registri
         for (let shift = -36; shift <= 36; shift += 12) {
-            const candidate = inversionNotes
+            const candidateBase = inversionNotes
                 .map(note => note + shift)
                 .sort((a, b) => a - b);
 
             let totalMovement = 0;
             let stationaryVoices = 0;
 
-            for (let i = 0; i < Math.min(voiceCount, previousNotes.length); i++) {
-                const movement =
-                    Math.abs(
-                        candidate[i] -
-                        previousNotes[i]
-                    );
-
+            for (let i = 0; i < Math.min(candidateBase.length, previousNotes.length); i++) {
+                const movement = Math.abs(candidateBase[i] - previousNotes[i]);
                 totalMovement += movement;
-
-                if (movement === 0) {
-                    stationaryVoices++;
-                }
+                if (movement === 0) stationaryVoices++;
             }
 
-            const span =
-                candidate[voiceCount - 1] -
-                candidate[0];
-
-            const bassMovement =
-                Math.abs(
-                    candidate[0] -
-                    previousNotes[0]
-                );
+            const span = candidateBase[candidateBase.length - 1] - candidateBase[0];
+            const bassMovement = Math.abs(candidateBase[0] - previousNotes[0]);
 
             candidates.push({
-                notes: candidate,
+                notes: candidateBase,
                 totalMovement,
                 stationaryVoices,
                 span,
@@ -743,41 +729,44 @@ function calculateSmoothVoicing(rootMidi, intervals, previousNotes) {
         }
     }
 
-    // Ordine di preferenza:
-    // 1. minor movimento complessivo
-    // 2. maggior numero di note comuni
-    // 3. voicing più compatto
-    // 4. minor movimento del basso
+    // Ordina i candidati in base al criterio di voice leading
     candidates.sort((a, b) => {
-        if (a.totalMovement !== b.totalMovement) {
-            return a.totalMovement -
-                   b.totalMovement;
-        }
-
-        if (a.stationaryVoices !== b.stationaryVoices) {
-            return b.stationaryVoices -
-                   a.stationaryVoices;
-        }
-
-        if (a.span !== b.span) {
-            return a.span - b.span;
-        }
-
-        return a.bassMovement -
-               b.bassMovement;
+        if (a.totalMovement !== b.totalMovement) return a.totalMovement - b.totalMovement;
+        if (a.stationaryVoices !== b.stationaryVoices) return b.stationaryVoices - a.stationaryVoices;
+        if (a.span !== b.span) return a.span - b.span;
+        return a.bassMovement - b.bassMovement;
     });
 
-    return candidates[0].notes;
+    const bestBase = candidates[0].notes;
+
+    // Estende il voicing base fino a raggiungere targetCount note aggiungendo le ottave superiori
+    const extendedNotes = [...bestBase];
+    let idx = 0;
+    while (extendedNotes.length < targetCount) {
+        extendedNotes.push(extendedNotes[idx] + 12);
+        idx++;
+    }
+
+    return extendedNotes.sort((a, b) => a - b);
 }
 
 function selectChord(rootObj, rowObj) {
     selectedChordName = `${rootObj.name}${rowObj.suffix}`;
     
     if (smoothVoicingEnabled) {
+        // Determina il numero target di note in base alla modalità attiva
+        let targetCount = 4;
+        if (audio.arpMode) {
+            targetCount = 6;
+        } else if (audio.strumMode) {
+            targetCount = 5;
+        }
+
         currentStrumNotes = calculateSmoothVoicing(
             rootObj.midi,
             rowObj.intervals,
-            previousVoicing
+            previousVoicing,
+            targetCount
         );
 
         previousVoicing = [...currentStrumNotes];
@@ -1332,11 +1321,11 @@ window.addEventListener('DOMContentLoaded', () => {
         const filterType = checkedRadio ? checkedRadio.value : 'lowpass';
         const cutoff = parseFloat(sliderCutoff.value);
         const resonance = parseFloat(sliderResonance.value);
-        const octaveVal = parseInt(sliderOctave.value, 10);
+        const octaveVal = sliderOctave ? parseInt(sliderOctave.value, 10) : 0;
 
         lblCutoff.textContent = `${cutoff} Hz`;
         lblResonance.textContent = resonance.toFixed(1);
-        lblOctave.textContent = octaveVal > 0 ? `+${octaveVal}` : `${octaveVal}`;
+        if (lblOctave) lblOctave.textContent = octaveVal > 0 ? `+${octaveVal}` : `${octaveVal}`;
 
         audio.setFilter(filterType, cutoff, resonance);
         audio.setOctaveOffset(octaveVal * 12);
@@ -1387,6 +1376,12 @@ window.addEventListener('DOMContentLoaded', () => {
         if (filterRadio) filterRadio.checked = true;
         sliderCutoff.value = preset.cutoff;
         sliderResonance.value = preset.resonance;
+        
+        // Octave Offset
+        const presetOctave = (preset.octaveOffset || 0) / 12;
+        if (sliderOctave) sliderOctave.value = presetOctave;
+        if (lblOctave) lblOctave.textContent = presetOctave > 0 ? `+${presetOctave}` : `${presetOctave}`;
+        
         updateFilters();
 
         // ADSR
@@ -1403,11 +1398,6 @@ window.addEventListener('DOMContentLoaded', () => {
         toggleTremolo.checked = preset.tremolo;
         updateLfo();
 
-        // Octave Offset
-        const presetOctave = (preset.octaveOffset || 0) / 12;
-        if (sliderOctave) sliderOctave.value = presetOctave;
-        if (lblOctave) lblOctave.textContent = presetOctave > 0 ? `+${presetOctave}` : `${presetOctave}`;
-        audio.setOctaveOffset(preset.octaveOffset || 0);
         // Visual Selection Highlight
         const presetButtons = document.querySelectorAll('.preset-btn');
         presetButtons.forEach(btn => {
@@ -1431,26 +1421,34 @@ window.addEventListener('DOMContentLoaded', () => {
     loadPreset('PIANO');
 
     // Audio Power Switch (Inizializzato su ON)
-    audioToggle.checked = true;
-    audio.setAudioState(true);
-    audioStateLbl.textContent = "Audio ON";
-    powerLed.classList.replace('bg-red-600', 'bg-emerald-500');
-    powerLed.classList.replace('shadow-[0_0_8px_#dc2626]', 'shadow-[0_0_10px_#10b981]');
-
-    audioToggle.addEventListener('change', (e) => {
-        const isEnabled = e.target.checked;
-        audio.setAudioState(isEnabled);
-
-        if (isEnabled) {
-            audioStateLbl.textContent = "Audio ON";
+    if (audioToggle) {
+        audioToggle.checked = true;
+        audio.setAudioState(true);
+        if (audioStateLbl) audioStateLbl.textContent = "Audio ON";
+        if (powerLed) {
             powerLed.classList.replace('bg-red-600', 'bg-emerald-500');
             powerLed.classList.replace('shadow-[0_0_8px_#dc2626]', 'shadow-[0_0_10px_#10b981]');
-        } else {
-            audioStateLbl.textContent = "Audio OFF";
-            powerLed.classList.replace('bg-emerald-500', 'bg-red-600');
-            powerLed.classList.replace('shadow-[0_0_10px_#10b981]', 'shadow-[0_0_8px_#dc2626]');
         }
-    });
+
+        audioToggle.addEventListener('change', (e) => {
+            const isEnabled = e.target.checked;
+            audio.setAudioState(isEnabled);
+
+            if (isEnabled) {
+                if (audioStateLbl) audioStateLbl.textContent = "Audio ON";
+                if (powerLed) {
+                    powerLed.classList.replace('bg-red-600', 'bg-emerald-500');
+                    powerLed.classList.replace('shadow-[0_0_8px_#dc2626]', 'shadow-[0_0_10px_#10b981]');
+                }
+            } else {
+                if (audioStateLbl) audioStateLbl.textContent = "Audio OFF";
+                if (powerLed) {
+                    powerLed.classList.replace('bg-emerald-500', 'bg-red-600');
+                    powerLed.classList.replace('shadow-[0_0_10px_#10b981]', 'shadow-[0_0_8px_#dc2626]');
+                }
+            }
+        });
+    }
 
     // Master Volume Vertical Slider
     document.getElementById('slider-volume').addEventListener('input', (e) => {
