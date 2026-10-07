@@ -22,7 +22,7 @@
     <!-- Header Panel -->
     <header class="bg-panelBg border-2 border-chassisDark rounded-2xl p-3 flex flex-wrap items-center justify-between gap-3 shadow-inner">
         <div class="flex items-center gap-3">
-            <h1 class="text-xl sm:text-2xl font-black uppercase tracking-widest text-amber-950 font-mono">StrumPad <span class="text-xs text-amber-800 font-sans tracking-normal">v1.3.2</span></h1>
+            <h1 class="text-xl sm:text-2xl font-black uppercase tracking-widest text-amber-950 font-mono">StrumPad <span class="text-xs text-amber-800 font-sans tracking-normal">v1.4.2</span></h1>
             <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-amber-200/80 text-amber-950 border border-amber-400/60 px-2 py-0.5 rounded-md shadow-sm">Vintage Chord Machine</span>
         </div>
 
@@ -105,7 +105,7 @@
             </div>
         </div>
 
-        <!-- Synthesis Engine Deck (4 COLUMNS LAYOUT) -->
+        <!-- Synthesis Engine Deck -->
         <div class="lg:col-span-8 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col gap-3">
             <div class="flex justify-between items-center border-b border-slate-300 pb-1">
                 <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Synthesis Engine & Master Output</h2>
@@ -151,11 +151,11 @@
                 <!-- COLUMN 2: Waveforms (Osc1 & Andrea's Osc2) -->
                 <div class="md:col-span-3 flex flex-col justify-between gap-2">
                     <!-- Osc 1 Waveform -->
-                    <div class="bg-amber-50/70 px-2.5 py-2 rounded-xl border-2 border-chassisDark flex flex-col gap-1">
+                    <div class="bg-amber-50/70 p-2 rounded-xl border-2 border-chassisDark flex flex-col gap-1">
                         <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-0.5">Waveform</span>
                         <div class="grid grid-cols-2 gap-x-1.5 gap-y-1 pt-0.5">
                             <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
-                                <span class="inline-flex items-center gap-0.5"><input type="radio" name="waveform" value="sawtooth" checked class="accent-amber-800 cursor-pointer">Saw</span>
+                                <span class="inline-flex items-center gap-0.5"><input type="radio" name="waveform" value="sawtooth" checked class="accent-amber-800 cursor-pointer">Sawtooth</span>
                                 <span class="font-mono text-[10px]">∿</span>
                             </label>
                             <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
@@ -174,24 +174,36 @@
                     </div>
 
                     <!-- Andrea's Osc2 Panel -->
-                    <div class="bg-amber-100/80 border-2 border-amber-800/40 p-2 rounded-xl flex flex-col gap-1.5 shadow-sm flex-1 justify-between">
-                        <div class="flex justify-between items-center border-b border-amber-800/30 pb-0.5">
-                            <span class="text-[10px] font-bold uppercase tracking-wide text-amber-950 font-mono">Andrea's Osc2</span>
-                            <span id="lbl-osc2-detune" class="font-mono text-[9px] font-bold text-amber-900">+3 Cents</span>
+                    <div class="bg-amber-50/70 p-2 rounded-xl border-2 border-chassisDark flex flex-col gap-1 justify-between">
+                        <div class="flex justify-between items-center border-b border-slate-300 pb-0.5">
+                            <span class="text-[10px] font-bold uppercase text-slate-700">Andrea's Osc2</span>
+                            <span id="lbl-osc2-detune" class="font-mono text-[8px] font-bold text-slate-600">+3 Cents</span>
                         </div>
-                        <div class="flex items-center justify-between gap-1 text-[9px] font-semibold">
-                            <label class="inline-flex items-center gap-0.5 cursor-pointer"><input type="radio" name="osc2-waveform" value="sawtooth" checked class="accent-amber-800">Saw</label>
-                            <label class="inline-flex items-center gap-0.5 cursor-pointer"><input type="radio" name="osc2-waveform" value="square" class="accent-amber-800">Sqr</label>
-                            <label class="inline-flex items-center gap-0.5 cursor-pointer"><input type="radio" name="osc2-waveform" value="triangle" class="accent-amber-800">Tri</label>
-                            <label class="inline-flex items-center gap-0.5 cursor-pointer"><input type="radio" name="osc2-waveform" value="sine" class="accent-amber-800">Sin</label>
+                        <div class="grid grid-cols-2 gap-x-1.5 gap-y-1 pt-0.5">
+                            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
+                                <span class="inline-flex items-center gap-0.5"><input type="radio" name="osc2-waveform" value="sawtooth" checked class="accent-amber-800 cursor-pointer">Sawtooth</span>
+                                <span class="font-mono text-[10px]">∿</span>
+                            </label>
+                            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
+                                <span class="inline-flex items-center gap-0.5"><input type="radio" name="osc2-waveform" value="square" class="accent-amber-800 cursor-pointer">Square</span>
+                                <span class="font-mono text-[10px]">⎍</span>
+                            </label>
+                            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
+                                <span class="inline-flex items-center gap-0.5"><input type="radio" name="osc2-waveform" value="triangle" class="accent-amber-800 cursor-pointer">Triangle</span>
+                                <span class="font-mono text-[10px]">⋀</span>
+                            </label>
+                            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
+                                <span class="inline-flex items-center gap-0.5"><input type="radio" name="osc2-waveform" value="sine" class="accent-amber-800 cursor-pointer">Sine</span>
+                                <span class="font-mono text-[10px]">〜</span>
+                            </label>
                         </div>
-                        <div class="flex flex-col gap-1">
+                        <div class="flex flex-col gap-0.5 mt-0.5 border-t border-slate-200 pt-1">
                             <div>
-                                <div class="flex justify-between text-[9px] font-semibold"><span>Detune</span><span id="val-osc2-detune" class="font-mono text-slate-700">+3</span></div>
+                                <div class="flex justify-between text-[8px] font-semibold"><span>Detune</span><span id="val-osc2-detune" class="font-mono text-slate-700">+3</span></div>
                                 <input type="range" id="slider-osc2-detune" min="-50" max="50" value="3" step="1" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                             </div>
                             <div>
-                                <div class="flex justify-between text-[9px] font-semibold"><span>Osc2 Mix</span><span id="lbl-osc2-mix" class="font-mono text-slate-700">60%</span></div>
+                                <div class="flex justify-between text-[8px] font-semibold"><span>Osc2 Mix</span><span id="lbl-osc2-mix" class="font-mono text-slate-700">60%</span></div>
                                 <input type="range" id="slider-osc2-mix" min="0" max="100" value="60" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                             </div>
                         </div>
@@ -267,8 +279,10 @@
                 <!-- COLUMN 4: Dedicated High-Excursion Vertical Master Volume -->
                 <div class="md:col-span-2 bg-amber-100/90 border-2 border-chassisDark rounded-xl p-2 flex flex-col items-center justify-between h-full">
                     <span class="text-[10px] font-bold uppercase text-slate-800 font-mono tracking-wider">Master Vol</span>
-                    <div class="vertical-slider-wrapper-master relative flex-1 flex items-center justify-center py-2">
+                    <div class="vertical-slider-wrapper-master relative flex-1 flex flex-col items-center justify-between py-1">
+                        <span class="text-[14px] text-slate-700 leading-none">🔊</span>
                         <input type="range" id="slider-volume" min="0" max="100" value="80" class="v-range-master">
+                        <span class="text-[9px] text-slate-500 leading-none">🔈</span>
                     </div>
                     <span id="lbl-volume" class="font-mono text-xs font-bold text-amber-950">80%</span>
                 </div>
@@ -329,4 +343,4 @@
 
 </div>
 
-<script src="app.js?v=1.3.2"></script>
+<script src="app.js?v=1.4.2"></script>
