@@ -149,66 +149,72 @@
                 </div>
 
                 <!-- COLUMN 2: Waveforms (Osc1 & Andrea's Osc2) -->
-                <div class="md:col-span-3 flex flex-col justify-between gap-2">
-                    <!-- Osc 1 Waveform -->
-                    <div class="bg-amber-50/70 p-2 rounded-xl border-2 border-chassisDark flex flex-col gap-1">
-                        <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-0.5">Waveform</span>
-                        <div class="grid grid-cols-2 gap-x-1.5 gap-y-1 pt-0.5">
-                            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
-                                <span class="inline-flex items-center gap-0.5"><input type="radio" name="waveform" value="sawtooth" checked class="accent-amber-800 cursor-pointer">Sawtooth</span>
-                                <span class="font-mono text-[10px]">∿</span>
-                            </label>
-                            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
-                                <span class="inline-flex items-center gap-0.5"><input type="radio" name="waveform" value="square" class="accent-amber-800 cursor-pointer">Square</span>
-                                <span class="font-mono text-[10px]">⎍</span>
-                            </label>
-                            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
-                                <span class="inline-flex items-center gap-0.5"><input type="radio" name="waveform" value="triangle" class="accent-amber-800 cursor-pointer">Triangle</span>
-                                <span class="font-mono text-[10px]">⋀</span>
-                            </label>
-                            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
-                                <span class="inline-flex items-center gap-0.5"><input type="radio" name="waveform" value="sine" class="accent-amber-800 cursor-pointer">Sine</span>
-                                <span class="font-mono text-[10px]">〜</span>
-                            </label>
-                        </div>
-                    </div>
+<div class="md:col-span-3 flex flex-col justify-between gap-3">
+    
+    <!-- Osc 1 Waveform Panel -->
+    <div class="bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col gap-2">
+        <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">Waveform</span>
+        <div class="flex flex-col gap-1.5 pt-0.5">
+            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
+                <span class="inline-flex items-center gap-1.5"><input type="radio" name="waveform" value="sawtooth" checked class="accent-amber-800 cursor-pointer">Sawtooth</span>
+                <span class="font-mono text-[10px]">∿</span>
+            </label>
+            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
+                <span class="inline-flex items-center gap-1.5"><input type="radio" name="waveform" value="square" class="accent-amber-800 cursor-pointer">Square</span>
+                <span class="font-mono text-[10px]">⎍</span>
+            </label>
+            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
+                <span class="inline-flex items-center gap-1.5"><input type="radio" name="waveform" value="triangle" class="accent-amber-800 cursor-pointer">Triangle</span>
+                <span class="font-mono text-[10px]">⋀</span>
+            </label>
+            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
+                <span class="inline-flex items-center gap-1.5"><input type="radio" name="waveform" value="sine" class="accent-amber-800 cursor-pointer">Sine</span>
+                <span class="font-mono text-[10px]">〜</span>
+            </label>
+        </div>
+    </div>
 
-                    <!-- Andrea's Osc2 Panel (Aumentata altezza e spaziatura verticale) -->
-                    <div class="bg-amber-50/70 p-2.5 rounded-xl border-2 border-chassisDark flex flex-col gap-2 flex-1">
-                        <div class="flex justify-between items-center border-b border-slate-300 pb-1">
-                            <span class="text-[10px] font-bold uppercase text-slate-700">Andrea's Osc2</span>
-                            <span id="lbl-osc2-detune" class="font-mono text-[8px] font-bold text-slate-600">+3 Cents</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-x-1.5 gap-y-1 py-0.5">
-                            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
-                                <span class="inline-flex items-center gap-0.5"><input type="radio" name="osc2-waveform" value="sawtooth" checked class="accent-amber-800 cursor-pointer">Sawtooth</span>
-                                <span class="font-mono text-[10px]">∿</span>
-                            </label>
-                            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
-                                <span class="inline-flex items-center gap-0.5"><input type="radio" name="osc2-waveform" value="square" class="accent-amber-800 cursor-pointer">Square</span>
-                                <span class="font-mono text-[10px]">⎍</span>
-                            </label>
-                            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
-                                <span class="inline-flex items-center gap-0.5"><input type="radio" name="osc2-waveform" value="triangle" class="accent-amber-800 cursor-pointer">Triangle</span>
-                                <span class="font-mono text-[10px]">⋀</span>
-                            </label>
-                            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
-                                <span class="inline-flex items-center gap-0.5"><input type="radio" name="osc2-waveform" value="sine" class="accent-amber-800 cursor-pointer">Sine</span>
-                                <span class="font-mono text-[10px]">〜</span>
-                            </label>
-                        </div>
-                        <div class="flex flex-col gap-1.5 border-t border-slate-200 pt-2 mt-auto">
-                            <div class="flex flex-col gap-0.5">
-                                <div class="flex justify-between text-[8px] font-semibold"><span>Detune</span><span id="val-osc2-detune" class="font-mono text-slate-700">+3</span></div>
-                                <input type="range" id="slider-osc2-detune" min="-50" max="50" value="3" step="1" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
-                            </div>
-                            <div class="flex flex-col gap-0.5">
-                                <div class="flex justify-between text-[8px] font-semibold"><span>Osc2 Mix</span><span id="lbl-osc2-mix" class="font-mono text-slate-700">60%</span></div>
-                                <input type="range" id="slider-osc2-mix" min="0" max="100" value="60" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- Andrea's Osc2 Panel -->
+    <div class="bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col gap-2.5 flex-1 justify-between">
+        <div class="flex justify-between items-center border-b border-slate-300 pb-1">
+            <span class="text-[10px] font-bold uppercase text-slate-700">Andrea's Osc2</span>
+            <span id="lbl-osc2-detune" class="font-mono text-[8px] font-bold text-slate-600">+3 Cents</span>
+        </div>
+        
+        <!-- Forme d'onda incolonnate verticalmente -->
+        <div class="flex flex-col gap-1.5 py-0.5">
+            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
+                <span class="inline-flex items-center gap-1.5"><input type="radio" name="osc2-waveform" value="sawtooth" checked class="accent-amber-800 cursor-pointer">Sawtooth</span>
+                <span class="font-mono text-[10px]">∿</span>
+            </label>
+            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
+                <span class="inline-flex items-center gap-1.5"><input type="radio" name="osc2-waveform" value="square" class="accent-amber-800 cursor-pointer">Square</span>
+                <span class="font-mono text-[10px]">⎍</span>
+            </label>
+            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
+                <span class="inline-flex items-center gap-1.5"><input type="radio" name="osc2-waveform" value="triangle" class="accent-amber-800 cursor-pointer">Triangle</span>
+                <span class="font-mono text-[10px]">⋀</span>
+            </label>
+            <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
+                <span class="inline-flex items-center gap-1.5"><input type="radio" name="osc2-waveform" value="sine" class="accent-amber-800 cursor-pointer">Sine</span>
+                <span class="font-mono text-[10px]">〜</span>
+            </label>
+        </div>
+
+        <!-- Slider con maggiore spaziatura verticale dalle etichette -->
+        <div class="flex flex-col gap-2.5 border-t border-slate-200 pt-2.5 mt-auto">
+            <div class="flex flex-col gap-1">
+                <div class="flex justify-between text-[8px] font-semibold mb-0.5"><span>Detune</span><span id="val-osc2-detune" class="font-mono text-slate-700">+3</span></div>
+                <input type="range" id="slider-osc2-detune" min="-50" max="50" value="3" step="1" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
+            </div>
+            <div class="flex flex-col gap-1">
+                <div class="flex justify-between text-[8px] font-semibold mb-0.5"><span>Osc2 Mix</span><span id="lbl-osc2-mix" class="font-mono text-slate-700">60%</span></div>
+                <input type="range" id="slider-osc2-mix" min="0" max="100" value="60" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
+            </div>
+        </div>
+    </div>
+
+</div>
 
                 <!-- COLUMN 3: Filter, LFO & Presets -->
                 <div class="md:col-span-4 flex flex-col justify-between gap-2">
