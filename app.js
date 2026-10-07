@@ -1458,75 +1458,61 @@ function createMatrixUI() {
 // ============================================================
 
 function initGenresAndStylesUI() {
-    const genreSelect =
-        document.getElementById('genre-select');
+    const genreSelect = document.getElementById('select-genre');
+    const styleSelect = document.getElementById('select-style');
+    const progressionLabel = document.getElementById('lbl-progression');
 
-    const styleSelect =
-        document.getElementById('style-select');
-
-    const progressionInput =
-        document.getElementById('progression-input');
-
-    if (!genreSelect || !styleSelect) {
-        return;
-    }
-
-    genreSelect.innerHTML = '';
+    if (!genreSelect || !styleSelect || !progressionLabel) return;
 
     Object.keys(GENRES_DATA).forEach(genre => {
-        const option =
-            document.createElement('option');
-
-        option.value = genre;
-        option.textContent = genre;
-
-        genreSelect.appendChild(option);
+        const opt = document.createElement('option');
+        opt.value = genre;
+        opt.textContent = genre;
+        genreSelect.appendChild(opt);
     });
 
-    function populateStyles() {
-        const genre = genreSelect.value;
-        const styles = GENRES_DATA[genre] || {};
+    genreSelect.addEventListener('change', (e) => {
+        const selectedGenre = e.target.value;
+        resetProgressionState();
 
-        styleSelect.innerHTML = '';
+        styleSelect.innerHTML = '<option value="">-- Select Style --</option>';
+        progressionLabel.textContent = 'Select a style';
 
-        Object.keys(styles).forEach(style => {
-            const option =
-                document.createElement('option');
+        if (selectedGenre && GENRES_DATA[selectedGenre]) {
+            styleSelect.disabled = false;
 
-            option.value = style;
-            option.textContent = style;
+            const stylesObj = GENRES_DATA[selectedGenre];
 
-            styleSelect.appendChild(option);
-        });
+            Object.keys(stylesObj).forEach(styleName => {
+                const opt = document.createElement('option');
+                opt.value = styleName;
+                opt.textContent = styleName;
+                styleSelect.appendChild(opt);
+            });
+        } else {
+            styleSelect.disabled = true;
+            styleSelect.innerHTML = '<option value="">-- Select a Genre First --</option>';
+            progressionLabel.textContent = 'Select a genre and style';
+        }
+    });
+
+    styleSelect.addEventListener('change', (e) => {
+        const selectedGenre = genreSelect.value;
+        const selectedStyle = e.target.value;
+
+        resetProgressionState();
 
         if (
-            styleSelect.options.length &&
-            progressionInput
+            selectedGenre &&
+            selectedStyle &&
+            GENRES_DATA[selectedGenre][selectedStyle]
         ) {
-            progressionInput.value =
-                styles[styleSelect.value] || '';
+            progressionLabel.textContent =
+                GENRES_DATA[selectedGenre][selectedStyle];
+        } else {
+            progressionLabel.textContent = 'Select a style';
         }
-    }
-
-    genreSelect.addEventListener(
-        'change',
-        populateStyles
-    );
-
-    styleSelect.addEventListener(
-        'change',
-        () => {
-            const genre = genreSelect.value;
-            const style = styleSelect.value;
-
-            if (progressionInput) {
-                progressionInput.value =
-                    GENRES_DATA[genre]?.[style] || '';
-            }
-        }
-    );
-
-    populateStyles();
+    });
 }
 
 
