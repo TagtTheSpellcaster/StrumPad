@@ -60,11 +60,12 @@
         <!-- Main Controls Panel -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             
-            <!-- Performance Modes -->
+<!-- Performance Modes -->
             <div class="lg:col-span-4 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col justify-between gap-4">
                 <div class="flex flex-col gap-3">
                     <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600 border-b border-slate-300 pb-1">Performance Modes</h2>
                     
+                    <!-- Drone Mode -->
                     <div class="flex items-center justify-between py-1">
                         <div class="flex flex-col">
                             <span class="text-xs font-bold text-slate-700">Drone Mode</span>
@@ -76,6 +77,19 @@
                         </label>
                     </div>
 
+                    <!-- Smooth Voicing -->
+                    <div class="flex items-center justify-between py-1 border-t border-slate-300">
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold text-slate-700">Smooth Voicing</span>
+                            <span class="text-[10px] text-slate-500">Voice Leading Transition</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggle-smooth-voicing" class="sr-only peer">
+                            <div class="w-11 h-6 bg-chassisDark peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-700"></div>
+                        </label>
+                    </div>
+
+                    <!-- Strum Mode -->
                     <div class="flex items-center justify-between py-1 border-t border-slate-300">
                         <div class="flex flex-col">
                             <span class="text-xs font-bold text-slate-700">Strum Mode</span>
@@ -87,6 +101,7 @@
                         </label>
                     </div>
 
+                    <!-- Arpeggiator -->
                     <div class="flex items-center justify-between py-1 border-t border-slate-300">
                         <div class="flex flex-col">
                             <span class="text-xs font-bold text-slate-700">Arpeggiator</span>
