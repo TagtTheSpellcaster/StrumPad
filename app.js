@@ -18,7 +18,12 @@ class WebAudioEngine {
         this.arpMode = false;
         this.speedDelayMs = 35;
 
+        // Osc1 & Andrea's Osc2 Waveforms and Parameters
         this.waveform = 'sawtooth';
+        this.osc2Waveform = 'sawtooth';
+        this.osc2DetuneCents = 3;
+        this.osc2Mix = 0.6; // 60% mix
+
         this.activeDroneNodes = [];
         this.scheduledTimeouts = [];
 
@@ -88,7 +93,6 @@ class WebAudioEngine {
     }
 
     setVolume(val) {
-        // Conversione non lineare percettiva: 0 -> 0, 100 -> 1.0, curva esponenziale x^1.5
         const normalized = Math.max(0, Math.min(100, val)) / 100;
         this.volume = normalized === 0 ? 0 : Math.pow(normalized, 1.5);
 
@@ -141,6 +145,12 @@ class WebAudioEngine {
 
     setWaveform(type) {
         this.waveform = type;
+    }
+
+    setOsc2Parameters(waveform, detuneCents, mixVal) {
+        if (waveform) this.osc2Waveform = waveform;
+        if (detuneCents !== undefined) this.osc2DetuneCents = detuneCents;
+        if (mixVal !== undefined) this.osc2Mix = Math.max(0, Math.min(1, mixVal));
     }
 
     setOctaveOffset(offset) {
@@ -202,14 +212,21 @@ class WebAudioEngine {
                 gain: voiceGain
             });
         } else {
+            // Osc1 (Main)
             const osc1 = this.ctx.createOscillator();
-            const osc2 = this.ctx.createOscillator();
-
             osc1.type = this.waveform;
-            osc2.type = (this.waveform === 'sine') ? 'triangle' : this.waveform;
-
             osc1.frequency.setValueAtTime(freq, now);
-            osc2.frequency.setValueAtTime(freq * 1.002, now);
+
+            // Andrea's Osc2 (With Detune and Mix)
+            const osc2 = this.ctx.createOscillator();
+            osc2.type = this.osc2Waveform;
+            
+            // Frequenza con detune preciso espresso in Cents
+            const detunedFreq = freq * Math.pow(2, this.osc2DetuneCents / 1200);
+            osc2.frequency.setValueAtTime(detunedFreq, now);
+
+            const osc2GainNode = this.ctx.createGain();
+            osc2GainNode.gain.setValueAtTime(this.osc2Mix, now);
 
             const filter = this.ctx.createBiquadFilter();
             filter.type = this.filterType;
@@ -244,7 +261,6 @@ class WebAudioEngine {
 
                 if (this.vibratoEnabled) {
                     const vibratoGain = this.ctx.createGain();
-                    // Modulazione proporzionale alla frequenza della nota (proporzione relativa in Hz)
                     vibratoGain.gain.setValueAtTime((this.lfoDepth / 100) * 0.03 * freq, now);
                     lfo.connect(vibratoGain);
                     vibratoGain.connect(osc1.frequency);
@@ -263,7 +279,10 @@ class WebAudioEngine {
             }
 
             osc1.connect(filter);
-            osc2.connect(filter);
+            
+            osc2.connect(osc2GainNode);
+            osc2GainNode.connect(filter);
+
             filter.connect(voiceGain);
             voiceGain.connect(this.masterGain);
 
@@ -411,14 +430,14 @@ const SYNTH_PRESETS = {
     PIANO: {
         waveform: 'triangle',
         filterType: 'lowpass',
-        cutoff: 6025,      // 75% Cutoff range (100 - 8000 Hz)
-        resonance: 1.2,     // 8% Resonance range (0.1 - 15.0 Q)
-        attack: 0.01,       // 0% Attack
-        decay: 1.05,        // 35% Decay range (0.05 - 3.0s)
-        sustain: 0.20,      // 20% Sustain
-        release: 1.00,      // 20% Release range (0.05 - 5.0s)
-        lfoRate: 0.5,       // 0% Rate
-        lfoDepth: 0,        // 0% Depth
+        cutoff: 6025,
+        resonance: 1.2,
+        attack: 0.01,
+        decay: 1.05,
+        sustain: 0.20,
+        release: 1.00,
+        lfoRate: 0.5,
+        lfoDepth: 0,
         vibrato: false,
         tremolo: false,
         octaveOffset: 0
@@ -426,12 +445,12 @@ const SYNTH_PRESETS = {
     GUITAR: {
         waveform: 'sawtooth',
         filterType: 'lowpass',
-        cutoff: 5235,      // 65% Cutoff range
-        resonance: 1.2,     // 8% Resonance range
-        attack: 0.01,       // 0% Attack
-        decay: 0.75,        // 25% Decay range
-        sustain: 0.15,      // 15% Sustain
-        release: 1.00,      // 20% Release range
+        cutoff: 5235,
+        resonance: 1.2,
+        attack: 0.01,
+        decay: 0.75,
+        sustain: 0.15,
+        release: 1.00,
         lfoRate: 0.5,
         lfoDepth: 0,
         vibrato: false,
@@ -451,7 +470,7 @@ const SYNTH_PRESETS = {
         lfoDepth: 0,
         vibrato: false,
         tremolo: false,
-        octaveOffset: -12   // Trasposizione di -1 ottava (-12 semitoni)
+        octaveOffset: -12
     },
     ORGAN: {
         waveform: 'square',
@@ -683,7 +702,6 @@ function calculateSmoothVoicing(rootMidi, intervals, previousNotes, targetCount 
         .map(interval => rootMidi + interval)
         .sort((a, b) => a - b);
 
-    // Se non c'è un voicing precedente, genera le note tramite calculateNotes
     if (!previousNotes) {
         const fullNotes = calculateNotes(rootMidi, intervals);
         return fullNotes.slice(0, targetCount);
@@ -692,7 +710,6 @@ function calculateSmoothVoicing(rootMidi, intervals, previousNotes, targetCount 
     const candidates = [];
     const voiceCount = baseNotes.length;
 
-    // Genera tutte le inversioni possibili per la struttura base
     for (let inversion = 0; inversion < voiceCount; inversion++) {
         const inversionNotes = [
             ...baseNotes.slice(inversion),
@@ -701,7 +718,6 @@ function calculateSmoothVoicing(rootMidi, intervals, previousNotes, targetCount 
                 .map(note => note + 12)
         ];
 
-        // Prova diversi registri
         for (let shift = -36; shift <= 36; shift += 12) {
             const candidateBase = inversionNotes
                 .map(note => note + shift)
@@ -729,7 +745,6 @@ function calculateSmoothVoicing(rootMidi, intervals, previousNotes, targetCount 
         }
     }
 
-    // Ordina i candidati in base al criterio di voice leading
     candidates.sort((a, b) => {
         if (a.totalMovement !== b.totalMovement) return a.totalMovement - b.totalMovement;
         if (a.stationaryVoices !== b.stationaryVoices) return b.stationaryVoices - a.stationaryVoices;
@@ -739,7 +754,6 @@ function calculateSmoothVoicing(rootMidi, intervals, previousNotes, targetCount 
 
     const bestBase = candidates[0].notes;
 
-    // Estende il voicing base fino a raggiungere targetCount note aggiungendo le ottave superiori
     const extendedNotes = [...bestBase];
     let idx = 0;
     while (extendedNotes.length < targetCount) {
@@ -754,7 +768,6 @@ function selectChord(rootObj, rowObj) {
     selectedChordName = `${rootObj.name}${rowObj.suffix}`;
     
     if (smoothVoicingEnabled) {
-        // Determina il numero target di note in base alla modalità attiva
         let targetCount = 4;
         if (audio.arpMode) {
             targetCount = 6;
@@ -809,7 +822,6 @@ function parseDegreeToChord(degreeStr, keyRootName) {
     let clean = degreeStr.trim();
     if (!clean) return null;
 
-    // Riconosce l'eventuale alterazione 'b' e il grado romano di base
     const match = clean.match(/^(b)?(VII|VI|IV|III|II|V|I|vii|vi|iv|v|iii|ii|i)/);
     if (!match) return null;
 
@@ -817,7 +829,6 @@ function parseDegreeToChord(degreeStr, keyRootName) {
     const baseRoman = match[2];
     const rest = clean.slice(match[0].length).trim();
 
-    // Mappatura dei gradi romani naturali ai semitoni rispetto alla tonica
     const NATURAL_ROMAN_SEMITONES = {
         'I': 0,   'i': 0,
         'II': 2,  'ii': 2,
@@ -842,7 +853,6 @@ function parseDegreeToChord(degreeStr, keyRootName) {
 
     let chordQualitySuffix = '';
 
-    // Gestione notazioni per Diminished e Diminished 7th (es. °7, ° , dim7, dim)
     if (rest === '°7' || rest === 'dim7') {
         chordQualitySuffix = 'dim7';
     } else if (rest === '°' || rest === 'dim') {
@@ -912,7 +922,6 @@ function deduceKeyFromFirstStep(patternStr, chordName, selectedRootName) {
     const selectedRootIndex = CHROMATIC_SCALE.indexOf(selectedRootName);
     if (selectedRootIndex === -1) return selectedRootName;
 
-    // Prova il grado principale.
     const mainMatchToken = mainDegree.match(
         /^(b?(?:VII|VI|IV|III|II|V|I|vii|vi|iv|v|iii|ii|i))/
     );
@@ -928,7 +937,6 @@ function deduceKeyFromFirstStep(patternStr, chordName, selectedRootName) {
         }
     }
 
-    // Prova eventuali gradi alternativi.
     for (const subDeg of subDegrees) {
         const subMatchToken = subDeg.match(
             /^(b?(?:VII|VI|IV|III|II|V|I|vii|vi|iv|v|iii|ii|i))/
@@ -960,7 +968,6 @@ function handleProgressionStep(chordName, rootObj, rowObj) {
     if (!patternStr) return;
 
     if (currentProgressionStepIndex === -1) {
-        // Deduce la tonalità di riferimento a partire dall'accordo iniziale premuto
         const deducedKey = deduceKeyFromFirstStep(patternStr, chordName, rootObj.name);
         const candidateSteps = parseProgressionPattern(patternStr, deducedKey);
         if (!candidateSteps.length) return;
@@ -978,7 +985,6 @@ function handleProgressionStep(chordName, rootObj, rowObj) {
         activeProgressionSteps = candidateSteps;
         currentProgressionStepIndex = 0;
 
-        // Memorizza il voicing fondamentale del primo accordo
         initialProgressionVoicing = [...currentStrumNotes];
 
         updateProgressionChordsDisplay();
@@ -993,7 +999,6 @@ function handleProgressionStep(chordName, rootObj, rowObj) {
     const isNextSub = expectedStep.sub.includes(chordName);
 
     if (isNextMain || isNextSub) {
-        // Se la progressione è terminata e sta per ricominciare dallo step 0
         if (nextExpectedStepIndex === 0) {
             previousVoicing = initialProgressionVoicing ? [...initialProgressionVoicing] : null;
         }
@@ -1009,7 +1014,6 @@ function handleProgressionStep(chordName, rootObj, rowObj) {
             activeProgressionSteps = newCandidateSteps;
             currentProgressionStepIndex = 0;
             
-            // Memorizza il nuovo voicing iniziale
             initialProgressionVoicing = [...currentStrumNotes];
 
             updateProgressionChordsDisplay();
@@ -1069,7 +1073,6 @@ function createMatrixUI() {
     if (!container) return;
     container.innerHTML = '';
 
-    // 1. Rigenera l'intestazione Vintage Anni '70 per le note in cima alle colonne
     const headerRowWrapper = document.createElement('div');
     headerRowWrapper.className = 'flex items-center gap-3 mb-1';
 
@@ -1090,7 +1093,6 @@ function createMatrixUI() {
     headerRowWrapper.appendChild(headerBtnGrid);
     container.appendChild(headerRowWrapper);
 
-    // 2. Genera le 7 righe della matrice di accordi
     MATRIX_ROWS.forEach(row => {
         const rowWrapper = document.createElement('div');
         rowWrapper.className = 'flex items-center gap-3';
@@ -1210,9 +1212,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
         smoothVoicingToggle.addEventListener('change', (e) => {
             smoothVoicingEnabled = e.target.checked;
-
-            // Quando si cambia modalità,
-            // si ricomincia una nuova catena di voice leading.
             previousVoicing = null;
             initialProgressionVoicing = null;
         });
@@ -1301,12 +1300,37 @@ window.addEventListener('DOMContentLoaded', () => {
     slSustain.addEventListener('input', updateAdsr);
     slRelease.addEventListener('input', updateAdsr);
 
-    // Waveform Radio Buttons
+    // Osc1 Waveform Radio Buttons
     document.querySelectorAll('input[name="waveform"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
             audio.setWaveform(e.target.value);
         });
     });
+
+    // Andrea's Osc2 Controls
+    const sliderOsc2Detune = document.getElementById('slider-osc2-detune');
+    const sliderOsc2Mix = document.getElementById('slider-osc2-mix');
+    const valOsc2Detune = document.getElementById('val-osc2-detune');
+    const lblOsc2DetuneHeader = document.getElementById('lbl-osc2-detune');
+    const lblOsc2Mix = document.getElementById('lbl-osc2-mix');
+
+    function updateOsc2() {
+        const checkedRadio = document.querySelector('input[name="osc2-waveform"]:checked');
+        const wave = checkedRadio ? checkedRadio.value : 'sawtooth';
+        const detuneCents = parseInt(sliderOsc2Detune.value, 10);
+        const mixPercent = parseInt(sliderOsc2Mix.value, 10);
+
+        const detuneStr = detuneCents > 0 ? `+${detuneCents}` : `${detuneCents}`;
+        valOsc2Detune.textContent = detuneStr;
+        if (lblOsc2DetuneHeader) lblOsc2DetuneHeader.textContent = `${detuneStr} Cents`;
+        lblOsc2Mix.textContent = `${mixPercent}%`;
+
+        audio.setOsc2Parameters(wave, detuneCents, mixPercent / 100);
+    }
+
+    document.querySelectorAll('input[name="osc2-waveform"]').forEach(radio => radio.addEventListener('change', updateOsc2));
+    if (sliderOsc2Detune) sliderOsc2Detune.addEventListener('input', updateOsc2);
+    if (sliderOsc2Mix) sliderOsc2Mix.addEventListener('input', updateOsc2);
 
     // Filter & Octave Controls
     const sliderCutoff = document.getElementById('slider-cutoff');
@@ -1419,6 +1443,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Default Load PIANO Preset on Startup
     loadPreset('PIANO');
+    updateOsc2();
 
     // Audio Power Switch (Inizializzato su ON)
     if (audioToggle) {
