@@ -885,17 +885,45 @@ function calculateSmoothVoicing(rootMidi, intervals, previousNotes, targetCount 
     return extendedNotes.sort((a, b) => a - b);
 }
 
+function updateSmoothVoicingUIState() {
+    const genreSelect = document.getElementById('select-genre');
+    const styleSelect = document.getElementById('select-style');
+    const toggleSmooth = document.getElementById('toggle-smooth-voicing');
+    const wrapperSmooth = document.getElementById('wrapper-smooth-voicing');
+
+    const isValidSelection = genreSelect && styleSelect && genreSelect.value !== "" && styleSelect.value !== "";
+
+    if (isValidSelection) {
+        if (toggleSmooth) toggleSmooth.disabled = false;
+        if (wrapperSmooth) {
+            wrapperSmooth.classList.remove('opacity-50', 'pointer-events-none');
+        }
+    } else {
+        if (toggleSmooth) {
+            toggleSmooth.disabled = true;
+            toggleSmooth.checked = false;
+            smoothVoicingEnabled = false;
+        }
+        if (wrapperSmooth) {
+            wrapperSmooth.classList.add('opacity-50', 'pointer-events-none');
+        }
+    }
+}
+
 function selectChord(rootObj, rowObj) {
     selectedChordName = `${rootObj.name}${rowObj.suffix}`;
-    
-    if (smoothVoicingEnabled) {
+
+    // Valutiamo lo step di progressione PRIMA per capire se questo accordo fa parte della sequenza
+    const isProgressionStepValid = handleProgressionStep(selectedChordName, rootObj, rowObj);
+
+    // Smooth Voicing si applica SOLO se l'opzione è attiva E l'accordo fa parte della progressione armonica
+    if (smoothVoicingEnabled && isProgressionStepValid) {
         currentStrumNotes = calculateSmoothVoicing(
             rootObj.midi,
             rowObj.intervals,
             previousVoicing,
             4
         );
-
         previousVoicing = [...currentStrumNotes];
     } else {
         currentStrumNotes = calculateNotes(
@@ -914,8 +942,6 @@ function selectChord(rootObj, rowObj) {
             btn.classList.remove('active');
         }
     });
-
-    handleProgressionStep(selectedChordName, rootObj, rowObj);
 }
 
 const ROMAN_SEMITONES = {
@@ -1076,15 +1102,16 @@ function handleProgressionStep(chordName, rootObj, rowObj) {
     const genreSelect = document.getElementById('select-genre');
     const styleSelect = document.getElementById('select-style');
 
-    if (!genreSelect.value || !styleSelect.value) return;
+    if (!genreSelect.value || !styleSelect.value) return false;
 
     const patternStr = GENRES_DATA[genreSelect.value][styleSelect.value];
-    if (!patternStr) return;
+    if (!patternStr) return false;
 
+    // Se non siamo ancora partiti con la progressione
     if (currentProgressionStepIndex === -1) {
         const deducedKey = deduceKeyFromFirstStep(patternStr, chordName, rootObj.name);
         const candidateSteps = parseProgressionPattern(patternStr, deducedKey);
-        if (!candidateSteps.length) return;
+        if (!candidateSteps.length) return false;
 
         const step1 = candidateSteps[0];
         const isMainMatch = (chordName === step1.main);
@@ -1092,20 +1119,19 @@ function handleProgressionStep(chordName, rootObj, rowObj) {
 
         if (!isMainMatch && !isSubMatch) {
             clearHighlights();
-            return;
+            return false;
         }
 
         currentKeyRoot = deducedKey;
         activeProgressionSteps = candidateSteps;
         currentProgressionStepIndex = 0;
 
-        initialProgressionVoicing = [...currentStrumNotes];
-
         updateProgressionChordsDisplay();
         highlightNextStepOptions(1);
-        return;
+        return true;
     }
 
+    // Se la progressione è già attiva, verifichiamo se l'accordo premuto è quello atteso al punto successivo
     const nextExpectedStepIndex = (currentProgressionStepIndex + 1) % activeProgressionSteps.length;
     const expectedStep = activeProgressionSteps[nextExpectedStepIndex];
 
@@ -1120,20 +1146,23 @@ function handleProgressionStep(chordName, rootObj, rowObj) {
         currentProgressionStepIndex = nextExpectedStepIndex;
         const nextStepIndexToHighlight = (currentProgressionStepIndex + 1) % activeProgressionSteps.length;
         highlightNextStepOptions(nextStepIndexToHighlight);
+        return true;
     } else {
+        // Se non è il passo successivo, verifichiamo se per caso è un riavvio su uno Step 1 con una nuova tonalità
         const newDeducedKey = deduceKeyFromFirstStep(patternStr, chordName, rootObj.name);
         const newCandidateSteps = parseProgressionPattern(patternStr, newDeducedKey);
         if (newCandidateSteps.length && (chordName === newCandidateSteps[0].main || newCandidateSteps[0].sub.includes(chordName))) {
             currentKeyRoot = newDeducedKey;
             activeProgressionSteps = newCandidateSteps;
             currentProgressionStepIndex = 0;
-            
-            initialProgressionVoicing = [...currentStrumNotes];
 
             updateProgressionChordsDisplay();
             highlightNextStepOptions(1);
+            return true;
         } else {
-            resetProgressionState();
+            // Accordo "fuori pista" / variante non in sequenza:
+            // La progressione non avanza e non si resetta, ma la funzione ritorna false
+            return false;
         }
     }
 }
@@ -1177,6 +1206,7 @@ function resetProgressionState() {
     currentKeyRoot = null;
     activeProgressionSteps = [];
     initialProgressionVoicing = null;
+    previousVoicing = null;
     clearHighlights();
     const chordsLabel = document.getElementById('lbl-progression-chords');
     if (chordsLabel) chordsLabel.classList.add('hidden');
@@ -1286,6 +1316,8 @@ function initGenresAndStylesUI() {
             styleSelect.innerHTML = '<option value="">-- Select a Genre First --</option>';
             progressionLabel.textContent = 'Select a genre and style';
         }
+
+        updateSmoothVoicingUIState();
     });
 
     styleSelect.addEventListener('change', (e) => {
@@ -1298,6 +1330,8 @@ function initGenresAndStylesUI() {
         } else {
             progressionLabel.textContent = 'Select a style';
         }
+
+        updateSmoothVoicingUIState();
     });
 }
 
@@ -1338,6 +1372,8 @@ window.addEventListener('DOMContentLoaded', () => {
             initialProgressionVoicing = null;
         });
     }
+
+    updateSmoothVoicingUIState();
 
     droneToggle.addEventListener('change', (e) => {
         const enabled = e.target.checked;
