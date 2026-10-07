@@ -233,16 +233,18 @@
                                 <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800"><input type="radio" name="filter-type" value="lowpass" checked class="accent-amber-800 cursor-pointer"><span>Low-pass</span></label>
                                 <label class="inline-flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-slate-800"><input type="radio" name="filter-type" value="highpass" class="accent-amber-800 cursor-pointer"><span>High-pass</span></label>
                             </div>
-                            <div class="flex flex-col gap-0.5">
-                                <div>
-                                    <div class="flex justify-between text-[10px] font-semibold"><span>Cutoff</span><span id="lbl-cutoff" class="font-mono text-slate-700">2200 Hz</span></div>
-                                    <input type="range" id="slider-cutoff" min="100" max="8000" value="2200" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
+                            <div class="flex flex-col">
+                                <div class="flex flex-col gap-0.5">
+                                    <div>
+                                        <div class="flex justify-between text-[10px] font-semibold"><span>Cutoff</span><span id="lbl-cutoff" class="font-mono text-slate-700">2200 Hz</span></div>
+                                        <input type="range" id="slider-cutoff" min="100" max="8000" value="2200" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-[10px] font-semibold"><span>Resonance</span><span id="lbl-resonance" class="font-mono text-slate-700">1.0</span></div>
+                                        <input type="range" id="slider-resonance" min="0.1" max="15.0" step="0.1" value="1.0" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
+                                    </div>
                                 </div>
-                                <div>
-                                    <div class="flex justify-between text-[10px] font-semibold"><span>Resonance</span><span id="lbl-resonance" class="font-mono text-slate-700">1.0</span></div>
-                                    <input type="range" id="slider-resonance" min="0.1" max="15.0" step="0.1" value="1.0" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
-                                </div>
-                                <div>
+                                <div class="mt-1.5 mb-0.5">
                                     <div class="flex justify-between text-[10px] font-semibold"><span>Octave</span><span id="lbl-octave" class="font-mono text-slate-700">0</span></div>
                                     <input type="range" id="slider-octave" min="-2" max="2" step="1" value="0" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                                 </div>
