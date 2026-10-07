@@ -1001,6 +1001,12 @@ function handleProgressionStep(chordName, rootObj, rowObj) {
     const isNextSub = expectedStep.sub.includes(chordName);
 
     if (isNextMain || isNextSub) {
+        // Se la progressione completa il ciclo e torna al primo accordo (step 0),
+        // azzeriamo previousVoicing per ancorare nuovamente il primo accordo al registro fondamentale.
+        if (nextExpectedStepIndex === 0) {
+            previousVoicing = null;
+        }
+
         currentProgressionStepIndex = nextExpectedStepIndex;
         const nextStepIndexToHighlight = (currentProgressionStepIndex + 1) % activeProgressionSteps.length;
         highlightNextStepOptions(nextStepIndexToHighlight);
