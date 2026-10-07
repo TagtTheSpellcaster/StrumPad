@@ -1,6 +1,6 @@
 # StrumPad
 
-[![Version](https://img.shields.io/badge/version-1.4.5-blue.svg)](https://github.com/TagtTheSpellcaster/StrumPad)
+[![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)](https://github.com/TagtTheSpellcaster/StrumPad)
 [![License](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Web Audio API](https://img.shields.io/badge/Web%20Audio%20API-Native-8B5CF6.svg)](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
@@ -8,7 +8,7 @@
 
 **▶ [Launch StrumPad](https://tagtthespellcaster.github.io/StrumPad/)**
 
-**StrumPad v1.4.5** is a browser-based, vintage-style **chord machine and analog-modeled synthesizer** designed for playing chords, exploring harmonic progressions, and experimenting with sound.
+**StrumPad v1.5.0** is a browser-based, vintage-style **chord machine and analog-modeled synthesizer** designed for playing chords, exploring harmonic progressions, and experimenting with sound.
 
 Its main purpose is harmonic exploration: select a musical style, choose a progression, establish the key by playing its first chord, and then follow the visual guidance provided by the **Harmonic Progression Assistant**.
 
@@ -16,6 +16,7 @@ StrumPad combines:
 
 - an interactive **Circle of Fifths chord matrix**
 - several performance modes and voice-leading optimization
+- a fully configurable, continuous **Cyclic Arpeggiator System**
 - a dual-oscillator analog-style synthesis engine with integrated octave transposition
 - eight instrument presets
 - a **Harmonic Progression Assistant**
@@ -52,21 +53,40 @@ The currently selected chord is displayed in the **Selected Chord** indicator.
 
 ### Performance Modes & Voice Leading
 
-StrumPad provides four performance toggles to control chord behavior and voice movement:
+StrumPad provides performance toggles to control chord behavior and voice movement:
 
 - **Drone Mode** — sustains the selected chord with an organ-like sound using additional harmonics.
 - **Strum Mode** — plays the notes of a chord sequentially to simulate a guitar-style strum.
-- **Arpeggiator** — plays chord notes sequentially in an ascending pattern.
+- **Arpeggiator** — activates a continuous, real-time configurable arpeggiator engine.
 - **Smooth Voice Leading** — dynamically calculates chord inversions to minimize total movement between consecutive voices, favoring common notes and compact spans.
 
 When none of the rhythm/arpeggio modes is active, the chord is played as a simultaneous chord.
 
-The **Strum / Arp Speed** control determines the delay between notes in Strum Mode and the Arpeggiator.
+The **Speed** control determines the step delay between notes (in milliseconds) for Strum Mode and the Arpeggiator.
 
-Only one main performance mode (Drone, Strum, or Arpeggio) can be active at a time, while **Smooth Voice Leading** can be combined with any mode.
+Only one main performance mode (Drone, Strum, or Arpeggiator) can be active at a time, while **Smooth Voice Leading** can be combined with any mode.
 
 #### Automatic Voice Leading Reset
 When playing through a harmonic progression with **Smooth Voice Leading** enabled, StrumPad automatically anchors the first chord of a new cycle back to its original fundamental voicing as soon as the **Harmonic Progression Assistant** completes the sequence and restarts from step 1. This prevents cumulative octave drift over repeated cycles.
+
+---
+
+### Configurable Cyclic Arpeggiator Engine
+
+StrumPad v1.5.0 features a dedicated, continuous **Arpeggiator Engine** that transforms chord voicings into dynamic, repeating pitch patterns.
+
+Key parameters include:
+
+- **Patterns**:
+  - **Up** — plays notes from lowest to highest pitch.
+  - **Down** — plays notes from highest to lowest pitch.
+  - **Up & Down** — plays ascending then descending, smoothly bouncing without repeating boundary notes.
+  - **Down & Up** — plays descending then ascending without boundary repetition.
+  - **Random** — selects random notes from the chord set across the configured octave span without immediate note duplication.
+- **Octave Extension (1 to 4 Octaves)** — extends the base chord voicing across 1, 2, 3, or 4 octaves.
+- **Rate / Metric Accents (4/4, 3/4, 6/8)** — establishes a rhythmic pulse by applying perceptual gain accents to metric downbeats (e.g., strong accents on beat 1 in 4/4 and 3/4, or primary/secondary accents on beats 1 and 4 in 6/8) without affecting note speed.
+- **Real-Time Responsiveness** — changing chords, patterns, octaves, speed, or metric rates updates the sequence seamlessly on the next step without interrupting the cycle or causing audio glitches.
+- **Voice Leading Integration** — respects active **Smooth Voice Leading** inversions directly as the harmonic base for the arpeggio sequence.
 
 ---
 
