@@ -16,7 +16,10 @@ class WebAudioEngine {
         this.droneMode = false;
         this.strumMode = false;
         this.arpMode = false;
-        this.speedDelayMs = 150;
+
+        // Independent Speeds
+        this.strumSpeedMs = 35; // Strum Speed (10-80 ms)
+        this.arpSpeedMs = 150;  // Arp Speed (50-400 ms)
 
         // Arpeggiator Config (Default: 1 Octave)
         this.arpPattern = 'up'; // 'up', 'down', 'updown', 'downup', 'random'
@@ -146,12 +149,16 @@ class WebAudioEngine {
     setArpMode(enabled) {
         if (this.droneMode) return;
         this.arpMode = enabled;
-        // Spegne i timer e il ciclo: resta in attesa del primo bottone accordo
+        // Spegne i timer e il ciclo: resta in attesa della pressione del primo accordo
         this.stopArp();
     }
 
     setSpeedDelay(ms) {
-        this.speedDelayMs = ms;
+        this.strumSpeedMs = ms;
+    }
+
+    setArpSpeed(ms) {
+        this.arpSpeedMs = ms;
     }
 
     setArpConfig(pattern, octaves, rate) {
@@ -330,16 +337,15 @@ class WebAudioEngine {
     updateArpNotes() {
         if (!currentStrumNotes || !currentStrumNotes.length) return;
 
-        // Note base dell'accordo (4 note fondamentali)
+        // Base voicing notes (4 notes standard or smooth voicing output)
         const baseVoicing = currentStrumNotes.slice(0, 4);
         let expanded = [];
 
-        // Estensione sulle ottave selezionate
         for (let oct = 0; oct < this.arpOctaves; oct++) {
             baseVoicing.forEach(n => expanded.push(n + (oct * 12)));
         }
 
-        // Ordinamento e RIMOZIONE DUPLICATI (es. Do5 ripetuto tra le ottave)
+        // RIMOZIONE DUPLICATI TRA OTTAVE (Set)
         const sortedAsc = [...new Set(expanded)].sort((a, b) => a - b);
         const sortedDesc = [...sortedAsc].reverse();
 
@@ -410,7 +416,7 @@ class WebAudioEngine {
 
         this.arpTimer = setTimeout(() => {
             this.runArpCycle();
-        }, this.speedDelayMs);
+        }, this.arpSpeedMs);
     }
 
     strumChord(midiNotes) {
@@ -421,11 +427,9 @@ class WebAudioEngine {
             const chordNotes = midiNotes.slice(0, 4);
             chordNotes.forEach(note => this.playNote(note));
         } else if (this.arpMode) {
-            // Aggiorna le note dell'arpeggio per il nuovo accordo selezionato
+            // Aggiorna le note dell'arpeggio
             this.updateArpNotes();
-            
-            // Fa partire il ciclo continuo SOLO se non è già in esecuzione!
-            // Se è già in esecuzione, continua indefinitamente con le nuove note aggiornate.
+            // Fa partire il ciclo continuo SOLO se non è già in esecuzione
             if (!this.arpTimer) {
                 this.startArp();
             }
@@ -436,7 +440,7 @@ class WebAudioEngine {
                     if (this.audioActive) {
                         this.playNote(note);
                     }
-                }, idx * this.speedDelayMs);
+                }, idx * this.strumSpeedMs);
                 this.scheduledTimeouts.push(t);
             });
         } else {
@@ -1312,8 +1316,12 @@ window.addEventListener('DOMContentLoaded', () => {
     const droneToggle = document.getElementById('toggle-drone');
     const strumToggle = document.getElementById('toggle-strum');
     const arpToggle = document.getElementById('toggle-arp');
-    const sliderSpeed = document.getElementById('slider-speed');
-    const lblSpeed = document.getElementById('lbl-speed');
+    
+    // Sliders Velocità separati
+    const sliderStrumSpeed = document.getElementById('slider-strum-speed');
+    const lblStrumSpeed = document.getElementById('lbl-strum-speed');
+    const sliderArpSpeed = document.getElementById('slider-speed');
+    const lblArpSpeed = document.getElementById('lbl-speed');
 
     const selectArpPattern = document.getElementById('select-arp-pattern');
     const selectArpOctaves = document.getElementById('select-arp-octaves');
@@ -1360,11 +1368,21 @@ window.addEventListener('DOMContentLoaded', () => {
         audio.setArpMode(enabled);
     });
 
-    sliderSpeed.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value, 10);
-        lblSpeed.textContent = `${val} ms`;
-        audio.setSpeedDelay(val);
-    });
+    if (sliderStrumSpeed) {
+        sliderStrumSpeed.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value, 10);
+            if (lblStrumSpeed) lblStrumSpeed.textContent = `${val} ms`;
+            audio.setSpeedDelay(val);
+        });
+    }
+
+    if (sliderArpSpeed) {
+        sliderArpSpeed.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value, 10);
+            if (lblArpSpeed) lblArpSpeed.textContent = `${val} ms`;
+            audio.setArpSpeed(val);
+        });
+    }
 
     const updateArpSettings = () => {
         audio.setArpConfig(
