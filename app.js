@@ -405,7 +405,6 @@ class AdsrCanvasRenderer {
         });
     }
 }
-
 // 8 Sound Presets Definitions mapped to UI/Synth Engine ranges
 const SYNTH_PRESETS = {
     PIANO: {
@@ -529,231 +528,8 @@ const SYNTH_PRESETS = {
         octaveOffset: 0
     }
 };
-// ============================================================
-// ADSP Canvas Renderer
-// ============================================================
 
-class AdsrCanvasRenderer {
-    constructor(canvas, synth) {
-        this.canvas = canvas;
-        this.ctx = canvas.getContext('2d');
-        this.synth = synth;
-        this.animationId = null;
-    }
-
-    draw() {
-        const canvas = this.canvas;
-        const ctx = this.ctx;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        const w = canvas.width;
-        const h = canvas.height;
-
-        const attack = this.synth.attack;
-        const decay = this.synth.decay;
-        const sustain = this.synth.sustain;
-        const release = this.synth.release;
-
-        const totalTime = attack + decay + 1.2 + release;
-
-        const x0 = 10;
-        const yBottom = h - 10;
-        const yTop = 10;
-
-        const usableW = w - 20;
-        const usableH = h - 20;
-
-        const xAttack = x0 + (attack / totalTime) * usableW;
-        const xDecay = xAttack + (decay / totalTime) * usableW;
-        const xSustain = xDecay + (1.2 / totalTime) * usableW;
-        const xRelease = xSustain + (release / totalTime) * usableW;
-
-        const ySustain = yBottom - sustain * usableH;
-
-        ctx.beginPath();
-        ctx.moveTo(x0, yBottom);
-        ctx.lineTo(xAttack, yTop);
-        ctx.lineTo(xDecay, ySustain);
-        ctx.lineTo(xSustain, ySustain);
-        ctx.lineTo(xRelease, yBottom);
-        ctx.strokeStyle = '#78350f';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.fillStyle = '#78350f';
-        ctx.font = '9px sans-serif';
-
-        ctx.fillText('A', xAttack - 3, yTop + 9);
-        ctx.fillText('D', xDecay - 3, ySustain - 5);
-        ctx.fillText('S', xSustain / 2 + xDecay / 2 - 3, ySustain - 5);
-        ctx.fillText('R', xRelease - 3, yBottom - 2);
-
-        this.animationId = requestAnimationFrame(() => this.draw());
-    }
-
-    start() {
-        if (!this.animationId) {
-            this.draw();
-        }
-    }
-
-    stop() {
-        if (this.animationId) {
-            cancelAnimationFrame(this.animationId);
-            this.animationId = null;
-        }
-    }
-}
-
-
-// ============================================================
-// SYNTH PRESETS
-// ============================================================
-
-const SYNTH_PRESETS = {
-    PIANO: {
-        osc1: 'triangle',
-        osc2: 'sine',
-        osc1Level: 0.80,
-        osc2Level: 0.20,
-        attack: 0.005,
-        decay: 0.35,
-        sustain: 0.35,
-        release: 0.60,
-        filterType: 'lowpass',
-        filterFreq: 4200,
-        filterQ: 0.7,
-        lfoRate: 5.5,
-        lfoDepth: 2,
-        octaveOffset: 0
-    },
-
-    GUITAR: {
-        osc1: 'triangle',
-        osc2: 'sawtooth',
-        osc1Level: 0.72,
-        osc2Level: 0.18,
-        attack: 0.005,
-        decay: 0.45,
-        sustain: 0.22,
-        release: 0.55,
-        filterType: 'lowpass',
-        filterFreq: 3200,
-        filterQ: 0.8,
-        lfoRate: 5,
-        lfoDepth: 1.5,
-        octaveOffset: 0
-    },
-
-    BASS: {
-        osc1: 'sawtooth',
-        osc2: 'square',
-        osc1Level: 0.72,
-        osc2Level: 0.18,
-        attack: 0.01,
-        decay: 0.35,
-        sustain: 0.45,
-        release: 0.40,
-        filterType: 'lowpass',
-        filterFreq: 900,
-        filterQ: 1.0,
-        lfoRate: 4,
-        lfoDepth: 1,
-        octaveOffset: -12
-    },
-
-    ORGAN: {
-        osc1: 'sine',
-        osc2: 'square',
-        osc1Level: 0.65,
-        osc2Level: 0.25,
-        attack: 0.03,
-        decay: 0.10,
-        sustain: 0.90,
-        release: 0.20,
-        filterType: 'lowpass',
-        filterFreq: 5000,
-        filterQ: 0.5,
-        lfoRate: 5,
-        lfoDepth: 0.5,
-        octaveOffset: 0
-    },
-
-    STRINGS: {
-        osc1: 'sawtooth',
-        osc2: 'triangle',
-        osc1Level: 0.52,
-        osc2Level: 0.35,
-        attack: 0.35,
-        decay: 0.45,
-        sustain: 0.72,
-        release: 1.20,
-        filterType: 'lowpass',
-        filterFreq: 2600,
-        filterQ: 0.6,
-        lfoRate: 5.2,
-        lfoDepth: 1.5,
-        octaveOffset: 0
-    },
-
-    BRASS: {
-        osc1: 'sawtooth',
-        osc2: 'square',
-        osc1Level: 0.62,
-        osc2Level: 0.25,
-        attack: 0.08,
-        decay: 0.25,
-        sustain: 0.68,
-        release: 0.35,
-        filterType: 'lowpass',
-        filterFreq: 2300,
-        filterQ: 1.2,
-        lfoRate: 5,
-        lfoDepth: 1,
-        octaveOffset: 0
-    },
-
-    PAD: {
-        osc1: 'sawtooth',
-        osc2: 'triangle',
-        osc1Level: 0.42,
-        osc2Level: 0.38,
-        attack: 0.65,
-        decay: 0.60,
-        sustain: 0.75,
-        release: 1.80,
-        filterType: 'lowpass',
-        filterFreq: 1900,
-        filterQ: 0.5,
-        lfoRate: 0.8,
-        lfoDepth: 2,
-        octaveOffset: 0
-    },
-
-    LEAD: {
-        osc1: 'sawtooth',
-        osc2: 'square',
-        osc1Level: 0.68,
-        osc2Level: 0.20,
-        attack: 0.015,
-        decay: 0.18,
-        sustain: 0.72,
-        release: 0.30,
-        filterType: 'lowpass',
-        filterFreq: 3500,
-        filterQ: 1.4,
-        lfoRate: 5.8,
-        lfoDepth: 2.5,
-        octaveOffset: 0
-    }
-};
-
-
-// ============================================================
-// CHORD MATRIX
-// ============================================================
-
+// Circle of Fifths order starting strictly from C (Do)
 const CIRCLE_OF_FIFTHS = [
     { name: 'C',  midi: 60 },
     { name: 'G',  midi: 67 },
@@ -769,73 +545,78 @@ const CIRCLE_OF_FIFTHS = [
     { name: 'F',  midi: 65 }
 ];
 
+// Chromatic Scale for intervals
 const CHROMATIC_SCALE = [
     'C', 'Db', 'D', 'Eb', 'E', 'F',
     'F#', 'G', 'Ab', 'A', 'Bb', 'B'
 ];
 
+// 7 Matrix Rows (Inclusi Diminished e Diminished 7th)
 const MATRIX_ROWS = [
     {
         id: 'maj',
         label: 'Major',
         intervals: [0, 4, 7],
         suffix: '',
-        quality: 'major'
+        btnClass: 'row-maj',
+        badgeStyle: 'bg-amber-200 text-amber-950 border-amber-300'
     },
     {
         id: 'min',
         label: 'Minor',
         intervals: [0, 3, 7],
         suffix: 'm',
-        quality: 'minor'
+        btnClass: 'row-min',
+        badgeStyle: 'bg-sky-200 text-sky-950 border-sky-300'
     },
     {
         id: '7',
         label: 'Dominant 7th',
         intervals: [0, 4, 7, 10],
         suffix: '7',
-        quality: 'dominant'
+        btnClass: 'row-7',
+        badgeStyle: 'bg-rose-200 text-rose-950 border-rose-300'
     },
     {
         id: 'maj7',
         label: 'Major 7th',
         intervals: [0, 4, 7, 11],
         suffix: 'maj7',
-        quality: 'major7'
+        btnClass: 'row-maj7',
+        badgeStyle: 'bg-emerald-200 text-emerald-950 border-emerald-300'
     },
     {
         id: 'm7',
         label: 'Minor 7th',
         intervals: [0, 3, 7, 10],
         suffix: 'm7',
-        quality: 'minor7'
+        btnClass: 'row-m7',
+        badgeStyle: 'bg-purple-200 text-purple-950 border-purple-300'
     },
     {
         id: 'dim',
         label: 'Diminished',
         intervals: [0, 3, 6],
         suffix: 'dim',
-        quality: 'diminished'
+        btnClass: 'row-dim',
+        badgeStyle: 'bg-stone-200 text-stone-900 border-stone-300'
     },
     {
         id: 'dim7',
         label: 'Diminished 7th',
         intervals: [0, 3, 6, 9],
         suffix: 'dim7',
-        quality: 'diminished7'
+        btnClass: 'row-dim7',
+        badgeStyle: 'bg-slate-200 text-slate-900 border-slate-300'
     }
 ];
 
-
-// ============================================================
-// PROGRESSION / GENRE DATA
-// ============================================================
-
+// Genres & Styles Table
 const GENRES_DATA = {
     "Classical & Traditional": {
         "Circle Progression": "I - vi (I / IV) - ii (IV) - V (bVII)",
         "Simple Cadence": "I - IV (ii) - V (bVII) - I (vi)",
-        "Pachelbel": "I - V (iii) - vi (IV) - iii (V) - IV (ii) - I (vi) - IV (ii) - V (bVII)",
+        "Pachelbel": "I - V (iii) - vi (I) - iii (V) - IV (ii) - I (vi) - IV (ii) - V (bVII)",
         "Diminished Cadence": "I - vii° (V) - I",
         "Romanesca": "I - V (vi) - vi (IV) - III (I) - IV (ii) - I (vi) - IV (ii) - V (bVII)",
         "Andalusian Classical": "i - bVII (v) - bVI (iv) - V (bVII)"
@@ -863,7 +644,7 @@ const GENRES_DATA = {
 
     "Country & Folk": {
         "Country Three-Chord": "I - IV (ii) - I (vi) - V (bVII)",
-        "Twelve-Bar Country": "I7 - I7 (IV7) - IV7 (I7) - IV7 - I7 (vi7) - I7 - V7 (bVII7) - IV7 (ii7) - I7 - V7 (bVII7)",
+        "Twelve-Bar Country": "I7 - I7 (IV7) - IV7 (I7) - IV7 - I7 (vi7) - I7 - V7 (IV7) - IV7 (ii7) - I7 - V7 (bVII7)",
         "Country Waltz": "I - IV (vi) - I - V (IV) - I - IV (ii) - V (bVII) - I",
         "Country Ballad": "I - vi (IV) - IV (ii) - V (bVII)",
         "Bluegrass Breakdown": "I - IV (ii) - V (bVII) - I (vi)",
@@ -924,47 +705,26 @@ const GENRES_DATA = {
         "Cinematic": "i - bVI (iv) - III (bVII) - bVII (v)"
     }
 };
+
+// Global State
+const audio = new WebAudioEngine();
+let selectedChordName = null;
+let currentStrumNotes = calculateNotes(
+    CIRCLE_OF_FIFTHS[0].midi,
+    MATRIX_ROWS[0].intervals
+);
+
+let activeProgressionSteps = [];
+let currentProgressionStepIndex = -1;
+let currentKeyRoot = null;
+
 // ============================================================
-// GLOBAL STATE
+// SMOOTH VOICE LEADING
 // ============================================================
 
-let selectedChordName = '';
-let currentStrumNotes = [];
-let progressionSteps = [];
-let progressionCurrentIndex = 0;
-let progressionKey = null;
-let progressionMode = null;
-
-// Smooth Voice Leading
 let smoothVoicingEnabled = false;
 let previousVoicing = null;
 
-
-// ============================================================
-// CHORD CALCULATION
-// ============================================================
-
-function calculateNotes(rootMidi, intervals) {
-    const notes = [];
-
-    for (let octave = -1; octave <= 2; octave++) {
-        for (let interval of intervals) {
-            notes.push(rootMidi + interval + (octave * 12));
-        }
-    }
-
-    return notes.sort((a, b) => a - b);
-}
-
-
-/**
- * Calculates the closest practical inversion/register of the next chord
- * relative to the previously played voicing.
- *
- * The chord itself never changes: only inversion and octave placement do.
- * The algorithm minimizes total voice movement, then prefers common tones,
- * then a compact voicing and a small bass movement.
- */
 function calculateSmoothVoicing(rootMidi, intervals, previousNotes) {
     const baseNotes = intervals
         .map(interval => rootMidi + interval)
@@ -977,7 +737,6 @@ function calculateSmoothVoicing(rootMidi, intervals, previousNotes) {
     const candidates = [];
     const voiceCount = baseNotes.length;
 
-    // Generate every inversion, then move it through a reasonable register.
     for (let inversion = 0; inversion < voiceCount; inversion++) {
         const inversionNotes = [
             ...baseNotes.slice(inversion),
@@ -993,7 +752,9 @@ function calculateSmoothVoicing(rootMidi, intervals, previousNotes) {
             let stationaryVoices = 0;
 
             for (let i = 0; i < voiceCount; i++) {
-                const movement = Math.abs(candidate[i] - previousNotes[i]);
+                const movement = Math.abs(
+                    candidate[i] - previousNotes[i]
+                );
 
                 totalMovement += movement;
 
@@ -1002,8 +763,15 @@ function calculateSmoothVoicing(rootMidi, intervals, previousNotes) {
                 }
             }
 
-            const span = candidate[voiceCount - 1] - candidate[0];
-            const bassMovement = Math.abs(candidate[0] - previousNotes[0]);
+            const span =
+                candidate[voiceCount - 1] -
+                candidate[0];
+
+            const bassMovement =
+                Math.abs(
+                    candidate[0] -
+                    previousNotes[0]
+                );
 
             candidates.push({
                 notes: candidate,
@@ -1016,58 +784,77 @@ function calculateSmoothVoicing(rootMidi, intervals, previousNotes) {
     }
 
     candidates.sort((a, b) => {
-        // Primary criterion: minimum total voice movement.
         if (a.totalMovement !== b.totalMovement) {
             return a.totalMovement - b.totalMovement;
         }
 
-        // Secondary criterion: preserve common tones.
         if (a.stationaryVoices !== b.stationaryVoices) {
             return b.stationaryVoices - a.stationaryVoices;
         }
 
-        // Tertiary criterion: prefer a compact voicing.
         if (a.span !== b.span) {
             return a.span - b.span;
         }
 
-        // Final criterion: keep the bass as close as possible.
         return a.bassMovement - b.bassMovement;
     });
 
     return candidates[0].notes;
 }
 
+function calculateNotes(rootMidi, intervals) {
+    const notes = [];
 
-// ============================================================
-// CHORD SELECTION
-// ============================================================
-
-function selectChord(rootObj, rowObj) {
-    selectedChordName = `${rootObj.name}${rowObj.suffix}`;
-
-    if (smoothVoicingEnabled) {
-        currentStrumNotes = calculateSmoothVoicing(
-            rootObj.midi,
-            rowObj.intervals,
-            previousVoicing
-        );
-
-        previousVoicing = [...currentStrumNotes];
-    } else {
-        currentStrumNotes = calculateNotes(
-            rootObj.midi,
-            rowObj.intervals
-        );
+    for (let octave = -1; octave <= 2; octave++) {
+        for (let interval of intervals) {
+            notes.push(
+                rootMidi +
+                interval +
+                (octave * 12)
+            );
+        }
     }
 
-    document.getElementById('lbl-active-chord').textContent =
+    return notes.sort((a, b) => a - b);
+}
+
+function selectChord(rootObj, rowObj) {
+    selectedChordName =
+        `${rootObj.name}${rowObj.suffix}`;
+
+    if (smoothVoicingEnabled) {
+        currentStrumNotes =
+            calculateSmoothVoicing(
+                rootObj.midi,
+                rowObj.intervals,
+                previousVoicing
+            );
+
+        previousVoicing =
+            [...currentStrumNotes];
+    } else {
+        currentStrumNotes =
+            calculateNotes(
+                rootObj.midi,
+                rowObj.intervals
+            );
+    }
+
+    document.getElementById(
+        'lbl-active-chord'
+    ).textContent =
         selectedChordName;
 
-    const allBtns = document.querySelectorAll('.matrix-btn');
+    const allBtns =
+        document.querySelectorAll(
+            '.matrix-btn'
+        );
 
     allBtns.forEach(btn => {
-        if (btn.dataset.chord === selectedChordName) {
+        if (
+            btn.dataset.chord ===
+            selectedChordName
+        ) {
             btn.classList.add('active');
         } else {
             btn.classList.remove('active');
@@ -1080,1001 +867,1423 @@ function selectChord(rootObj, rowObj) {
         rowObj
     );
 }
-
-
 // ============================================================
 // PROGRESSION PARSER
 // ============================================================
 
 const ROMAN_SEMITONES = {
     'I': 0,
-    'bII': 1,
     'II': 2,
-    'bIII': 3,
     'III': 4,
     'IV': 5,
-    'bV': 6,
     'V': 7,
-    'bVI': 8,
     'VI': 9,
-    'bVII': 10,
     'VII': 11
 };
 
-
-function parseDegreeToChord(token, keyMidi) {
+function parseDegreeToChord(token, keyRootMidi) {
     if (!token) return null;
 
     let cleanToken = token.trim();
 
-    cleanToken = cleanToken.replace(
-        /[()]/g,
-        ''
+    const match = cleanToken.match(
+        /^([b#]?)([ivIV]+)(maj7|m7|7|dim7|dim)?$/
     );
 
-    let quality = 'maj';
+    if (!match) return null;
 
-    if (cleanToken.includes('dim7')) {
-        quality = 'dim7';
-    } else if (cleanToken.includes('dim')) {
-        quality = 'dim';
-    } else if (cleanToken.includes('maj7')) {
-        quality = 'maj7';
-    } else if (cleanToken.includes('m7')) {
-        quality = 'm7';
-    } else if (cleanToken.includes('7')) {
-        quality = '7';
-    } else if (/^[ivIV]+$/.test(cleanToken)) {
-        quality = cleanToken === cleanToken.toUpperCase()
-            ? 'maj'
-            : 'min';
-    }
+    const accidental = match[1];
+    const roman = match[2];
+    const quality = match[3] || '';
 
-    const degreeMatch = cleanToken.match(
-        /^(b?)([ivIV]+)/
-    );
+    const upperRoman = roman.toUpperCase();
 
-    if (!degreeMatch) {
+    if (!ROMAN_SEMITONES.hasOwnProperty(upperRoman)) {
         return null;
     }
 
-    const accidental = degreeMatch[1] || '';
-    const roman = degreeMatch[2].toUpperCase();
+    let midi =
+        keyRootMidi +
+        ROMAN_SEMITONES[upperRoman];
 
-    const degree = `${accidental}${roman}`;
-
-    if (!(degree in ROMAN_SEMITONES)) {
-        return null;
+    if (accidental === 'b') {
+        midi -= 1;
+    } else if (accidental === '#') {
+        midi += 1;
     }
 
-    const semitone = ROMAN_SEMITONES[degree];
+    const rootPitchClass =
+        ((midi % 12) + 12) % 12;
 
-    const rootMidi = keyMidi + semitone;
-    const rootName = CHROMATIC_SCALE[
-        ((rootMidi % 12) + 12) % 12
-    ];
+    const rootName =
+        CHROMATIC_SCALE[rootPitchClass];
 
-    const row = MATRIX_ROWS.find(
-        item => item.id === quality
-    );
+    let suffix = '';
 
-    if (!row) {
-        return null;
+    if (quality) {
+        suffix = quality;
+    } else if (roman === roman.toLowerCase()) {
+        suffix = 'm';
     }
+
+    const rowObj =
+        MATRIX_ROWS.find(
+            row => row.suffix === suffix
+        );
+
+    if (!rowObj) return null;
 
     return {
-        rootMidi,
         rootName,
-        quality,
-        row,
-        degree,
-        token: cleanToken
+        rootMidi: midi,
+        suffix,
+        rowObj,
+        chordName: `${rootName}${suffix}`
     };
 }
 
+function parseProgressionPattern(pattern) {
+    if (!pattern) return [];
 
-function parseProgressionPattern(pattern, keyMidi) {
-    if (!pattern || typeof pattern !== 'string') {
-        return [];
-    }
-
-    const tokens = pattern
+    return pattern
         .split('-')
-        .map(token => token.trim())
-        .filter(Boolean);
+        .map(part => {
+            const cleanPart =
+                part
+                    .trim()
+                    .replace(/\([^)]*\)/g, '')
+                    .trim();
 
-    return tokens
-        .map(token => {
-            const alternatives = [];
-
-            const mainMatch = token.match(
-                /^([^(]+)(?:\(([^)]+)\))?$/
-            );
-
-            if (!mainMatch) {
-                return null;
-            }
-
-            const mainToken = mainMatch[1].trim();
-            const alternativeText = mainMatch[2];
-
-            const mainChord = parseDegreeToChord(
-                mainToken,
-                keyMidi
-            );
-
-            if (!mainChord) {
-                return null;
-            }
-
-            if (alternativeText) {
-                alternativeText
-                    .split('/')
-                    .map(item => item.trim())
-                    .filter(Boolean)
-                    .forEach(alternative => {
-                        const parsed = parseDegreeToChord(
-                            alternative,
-                            keyMidi
-                        );
-
-                        if (parsed) {
-                            alternatives.push(parsed);
-                        }
-                    });
-            }
-
-            return {
-                main: mainChord,
-                alternatives
-            };
+            return cleanPart;
         })
         .filter(Boolean);
 }
 
-
 function deduceKeyFromFirstStep(pattern) {
-    if (!pattern || typeof pattern !== 'string') {
-        return null;
-    }
+    if (!pattern) return null;
 
-    const firstToken = pattern
-        .split('-')[0]
-        .trim();
-
-    const cleaned = firstToken
-        .replace(/\([^)]*\)/g, '')
-        .trim();
-
-    const match = cleaned.match(
-        /^(b?)([ivIV]+)/
+    const match = pattern.match(
+        /^([b#]?)([ivIV]+)/
     );
 
-    if (!match) {
+    if (!match) return null;
+
+    const accidental = match[1];
+    const roman = match[2].toUpperCase();
+
+    if (!ROMAN_SEMITONES.hasOwnProperty(roman)) {
         return null;
     }
 
-    return 60;
+    const offset =
+        ROMAN_SEMITONES[roman];
+
+    let midi =
+        60 - offset;
+
+    if (accidental === 'b') {
+        midi += 1;
+    } else if (accidental === '#') {
+        midi -= 1;
+    }
+
+    return midi;
 }
-
-
-// ============================================================
-// PROGRESSION HANDLING
-// ============================================================
 
 function handleProgressionStep(
     chordName,
     rootObj,
     rowObj
 ) {
-    if (!progressionSteps.length) {
+    if (
+        !activeProgressionSteps ||
+        activeProgressionSteps.length === 0
+    ) {
         return;
     }
 
-    const currentStep =
-        progressionSteps[progressionCurrentIndex];
-
-    if (!currentStep) {
-        return;
-    }
-
-    const matchesMain =
-        currentStep.main &&
-        `${currentStep.main.rootName}${currentStep.main.row.suffix}` ===
-        chordName;
-
-    const matchesAlternative =
-        currentStep.alternatives &&
-        currentStep.alternatives.some(
-            alternative =>
-                `${alternative.rootName}${alternative.row.suffix}` ===
-                chordName
+    const clickedIndex =
+        activeProgressionSteps.findIndex(
+            step =>
+                step.chordName === chordName
         );
 
-    if (matchesMain || matchesAlternative) {
-        progressionCurrentIndex++;
+    if (clickedIndex === -1) {
+        return;
+    }
 
-        if (
-            progressionCurrentIndex >=
-            progressionSteps.length
-        ) {
-            progressionCurrentIndex = 0;
-        }
+    if (
+        clickedIndex ===
+        currentProgressionStepIndex + 1
+    ) {
+        currentProgressionStepIndex =
+            clickedIndex;
 
         highlightNextStepOptions();
+
         updateProgressionChordsDisplay();
     }
 }
 
-
 function highlightNextStepOptions() {
-    const allBtns = document.querySelectorAll(
-        '.matrix-btn'
-    );
+    const nextIndex =
+        currentProgressionStepIndex + 1;
 
-    allBtns.forEach(btn => {
-        btn.classList.remove(
-            'progression-next',
-            'progression-option'
-        );
-    });
+    document
+        .querySelectorAll('.matrix-btn')
+        .forEach(btn => {
+            btn.classList.remove(
+                'progression-next'
+            );
+        });
 
-    if (!progressionSteps.length) {
+    if (
+        nextIndex < 0 ||
+        nextIndex >= activeProgressionSteps.length
+    ) {
         return;
     }
 
-    const currentStep =
-        progressionSteps[progressionCurrentIndex];
+    const nextStep =
+        activeProgressionSteps[nextIndex];
 
-    if (!currentStep) {
-        return;
-    }
+    if (!nextStep) return;
 
-    const targetChords = [];
+    const nextChordName =
+        nextStep.chordName;
 
-    if (currentStep.main) {
-        targetChords.push(
-            `${currentStep.main.rootName}${currentStep.main.row.suffix}`
-        );
-    }
-
-    currentStep.alternatives.forEach(alternative => {
-        targetChords.push(
-            `${alternative.rootName}${alternative.row.suffix}`
-        );
-    });
-
-    allBtns.forEach(btn => {
-        const chord = btn.dataset.chord;
-
-        if (targetChords.includes(chord)) {
-            btn.classList.add('progression-option');
-        }
-
-        if (
-            currentStep.main &&
-            chord ===
-            `${currentStep.main.rootName}${currentStep.main.row.suffix}`
-        ) {
-            btn.classList.add('progression-next');
-        }
-    });
+    document
+        .querySelectorAll('.matrix-btn')
+        .forEach(btn => {
+            if (
+                btn.dataset.chord ===
+                nextChordName
+            ) {
+                btn.classList.add(
+                    'progression-next'
+                );
+            }
+        });
 }
-
 
 function updateProgressionChordsDisplay() {
-    const display = document.getElementById(
-        'progression-chords'
-    );
+    const container =
+        document.getElementById(
+            'progression-chords'
+        );
 
-    if (!display) {
-        return;
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    activeProgressionSteps.forEach(
+        (step, index) => {
+            const span =
+                document.createElement('span');
+
+            span.className =
+                'progression-chord';
+
+            if (
+                index ===
+                currentProgressionStepIndex
+            ) {
+                span.classList.add('current');
+            }
+
+            if (
+                index <
+                currentProgressionStepIndex
+            ) {
+                span.classList.add('played');
+            }
+
+            span.textContent =
+                step.chordName;
+
+            container.appendChild(span);
+
+            if (
+                index <
+                activeProgressionSteps.length - 1
+            ) {
+                const separator =
+                    document.createElement('span');
+
+                separator.className =
+                    'progression-separator';
+
+                separator.textContent = '–';
+
+                container.appendChild(
+                    separator
+                );
+            }
+        }
+    );
+}
+
+function resetProgressionState() {
+    activeProgressionSteps = [];
+    currentProgressionStepIndex = -1;
+    currentKeyRoot = null;
+
+    const container =
+        document.getElementById(
+            'progression-chords'
+        );
+
+    if (container) {
+        container.innerHTML = '';
     }
 
-    display.innerHTML = '';
-
-    progressionSteps.forEach((step, index) => {
-        const item = document.createElement('span');
-
-        item.textContent =
-            `${step.main.rootName}${step.main.row.suffix}`;
-
-        item.className =
-            'progression-chord';
-
-        if (index === progressionCurrentIndex) {
-            item.classList.add('active');
-        }
-
-        display.appendChild(item);
-    });
+    document
+        .querySelectorAll('.matrix-btn')
+        .forEach(btn => {
+            btn.classList.remove(
+                'progression-next'
+            );
+        });
 }
+
 // ============================================================
 // MATRIX UI
 // ============================================================
 
 function createMatrixUI() {
-    const matrix = document.getElementById('chord-matrix');
+    const container =
+        document.getElementById(
+            'chord-matrix'
+        );
 
-    if (!matrix) {
-        return;
-    }
+    if (!container) return;
 
-    matrix.innerHTML = '';
+    container.innerHTML = '';
 
     MATRIX_ROWS.forEach(row => {
-        const rowElement = document.createElement('div');
-        rowElement.className = 'matrix-row';
+        const rowContainer =
+            document.createElement('div');
 
-        const label = document.createElement('div');
-        label.className = 'matrix-row-label';
-        label.textContent = row.label;
+        rowContainer.className =
+            'matrix-row';
 
-        rowElement.appendChild(label);
+        const label =
+            document.createElement('div');
+
+        label.className =
+            'matrix-row-label';
+
+        label.textContent =
+            row.label;
+
+        rowContainer.appendChild(label);
+
+        const btnGrid =
+            document.createElement('div');
+
+        btnGrid.className =
+            'matrix-btn-grid';
 
         CIRCLE_OF_FIFTHS.forEach(root => {
-            const button = document.createElement('button');
+            const btn =
+                document.createElement('button');
+
+            btn.type = 'button';
+            btn.className =
+                `matrix-btn ${row.btnClass}`;
 
             const chordName =
                 `${root.name}${row.suffix}`;
 
-            button.type = 'button';
-            button.className = 'matrix-btn';
-            button.dataset.chord = chordName;
-            button.dataset.root = root.name;
-            button.dataset.rootMidi = root.midi;
-            button.dataset.row = row.id;
+            btn.dataset.chord =
+                chordName;
 
-            button.textContent = chordName;
+            btn.dataset.root =
+                root.name;
 
-            button.addEventListener(
-                'pointerdown',
-                (event) => {
-                    event.preventDefault();
+            btn.dataset.row =
+                row.id;
 
-                    selectChord(root, row);
+            btn.innerHTML = `
+                <span class="btn-chord-name">
+                    ${chordName}
+                </span>
+            `;
 
-                    if (
-                        typeof audio !== 'undefined' &&
-                        audio
-                    ) {
-                        audio.strumChord(
-                            currentStrumNotes
-                        );
-                    }
+            const led =
+                document.createElement('span');
+
+            led.className =
+                'btn-led';
+
+            btn.appendChild(led);
+
+            const handlePress = (e) => {
+                e.preventDefault();
+
+                if (audio.audioActive) {
+                    audio.init();
                 }
+
+                selectChord(
+                    root,
+                    row
+                );
+
+                audio.strumChord(
+                    currentStrumNotes
+                );
+            };
+
+            btn.addEventListener(
+                'pointerdown',
+                handlePress
             );
 
-            rowElement.appendChild(button);
+            btnGrid.appendChild(btn);
         });
 
-        matrix.appendChild(rowElement);
+        rowContainer.appendChild(
+            btnGrid
+        );
+
+        container.appendChild(
+            rowContainer
+        );
     });
+
+    document.getElementById(
+        'lbl-active-chord'
+    ).textContent = 'None';
 }
 
-
 // ============================================================
-// GENRES / STYLES UI
+// GENRES & STYLES UI
 // ============================================================
 
 function initGenresAndStylesUI() {
-    const genreSelect = document.getElementById('select-genre');
-    const styleSelect = document.getElementById('select-style');
-    const progressionLabel = document.getElementById('lbl-progression');
+    const genreSelect =
+        document.getElementById(
+            'select-genre'
+        );
 
-    if (!genreSelect || !styleSelect || !progressionLabel) return;
+    const styleSelect =
+        document.getElementById(
+            'select-style'
+        );
 
-    Object.keys(GENRES_DATA).forEach(genre => {
-        const opt = document.createElement('option');
-        opt.value = genre;
-        opt.textContent = genre;
-        genreSelect.appendChild(opt);
-    });
+    const progressionLabel =
+        document.getElementById(
+            'lbl-progression'
+        );
 
-    genreSelect.addEventListener('change', (e) => {
-        const selectedGenre = e.target.value;
-        resetProgressionState();
+    if (
+        !genreSelect ||
+        !styleSelect ||
+        !progressionLabel
+    ) {
+        return;
+    }
 
-        styleSelect.innerHTML = '<option value="">-- Select Style --</option>';
-        progressionLabel.textContent = 'Select a style';
+    Object.keys(GENRES_DATA).forEach(
+        genre => {
+            const opt =
+                document.createElement(
+                    'option'
+                );
 
-        if (selectedGenre && GENRES_DATA[selectedGenre]) {
-            styleSelect.disabled = false;
+            opt.value = genre;
+            opt.textContent = genre;
 
-            const stylesObj = GENRES_DATA[selectedGenre];
-
-            Object.keys(stylesObj).forEach(styleName => {
-                const opt = document.createElement('option');
-                opt.value = styleName;
-                opt.textContent = styleName;
-                styleSelect.appendChild(opt);
-            });
-        } else {
-            styleSelect.disabled = true;
-            styleSelect.innerHTML = '<option value="">-- Select a Genre First --</option>';
-            progressionLabel.textContent = 'Select a genre and style';
+            genreSelect.appendChild(opt);
         }
-    });
+    );
 
-    styleSelect.addEventListener('change', (e) => {
-        const selectedGenre = genreSelect.value;
-        const selectedStyle = e.target.value;
+    genreSelect.addEventListener(
+        'change',
+        (e) => {
+            const selectedGenre =
+                e.target.value;
 
-        resetProgressionState();
+            resetProgressionState();
 
-        if (
-            selectedGenre &&
-            selectedStyle &&
-            GENRES_DATA[selectedGenre][selectedStyle]
-        ) {
+            styleSelect.innerHTML =
+                '<option value="">-- Select Style --</option>';
+
             progressionLabel.textContent =
-                GENRES_DATA[selectedGenre][selectedStyle];
-        } else {
-            progressionLabel.textContent = 'Select a style';
+                'Select a style';
+
+            if (
+                selectedGenre &&
+                GENRES_DATA[selectedGenre]
+            ) {
+                styleSelect.disabled =
+                    false;
+
+                const stylesObj =
+                    GENRES_DATA[
+                        selectedGenre
+                    ];
+
+                Object.keys(stylesObj)
+                    .forEach(styleName => {
+                        const opt =
+                            document.createElement(
+                                'option'
+                            );
+
+                        opt.value =
+                            styleName;
+
+                        opt.textContent =
+                            styleName;
+
+                        styleSelect.appendChild(
+                            opt
+                        );
+                    });
+            } else {
+                styleSelect.disabled =
+                    true;
+
+                styleSelect.innerHTML =
+                    '<option value="">-- Select a Genre First --</option>';
+
+                progressionLabel.textContent =
+                    'Select a genre and style';
+            }
         }
-    });
+    );
+
+    styleSelect.addEventListener(
+        'change',
+        (e) => {
+            const selectedGenre =
+                genreSelect.value;
+
+            const selectedStyle =
+                e.target.value;
+
+            resetProgressionState();
+
+            if (
+                selectedGenre &&
+                selectedStyle &&
+                GENRES_DATA[selectedGenre][
+                    selectedStyle
+                ]
+            ) {
+                const pattern =
+                    GENRES_DATA[
+                        selectedGenre
+                    ][selectedStyle];
+
+                progressionLabel.textContent =
+                    pattern;
+
+                currentKeyRoot =
+                    deduceKeyFromFirstStep(
+                        pattern
+                    );
+
+                const tokens =
+                    parseProgressionPattern(
+                        pattern
+                    );
+
+                activeProgressionSteps =
+                    tokens
+                        .map(token =>
+                            parseDegreeToChord(
+                                token,
+                                currentKeyRoot
+                            )
+                        )
+                        .filter(Boolean)
+                        .map(chord => ({
+                            chordName:
+                                chord.chordName,
+                            rootName:
+                                chord.rootName,
+                            rootMidi:
+                                chord.rootMidi,
+                            rowObj:
+                                chord.rowObj
+                        }));
+
+                highlightNextStepOptions();
+                updateProgressionChordsDisplay();
+            } else {
+                progressionLabel.textContent =
+                    'Select a style';
+            }
+        }
+    );
 }
-
-
 // ============================================================
 // DOM INITIALIZATION
 // ============================================================
 
-document.addEventListener(
-    'DOMContentLoaded',
-    () => {
-        const canvas =
-            document.getElementById('adsr-canvas');
+window.addEventListener('DOMContentLoaded', () => {
+    createMatrixUI();
+    initGenresAndStylesUI();
 
-        const audio =
-            new WebAudioEngine();
-
-        window.audio = audio;
-
-        const adsrRenderer =
-            canvas
-                ? new AdsrCanvasRenderer(
-                    canvas,
-                    audio
-                )
-                : null;
-
-        if (adsrRenderer) {
-            adsrRenderer.start();
-        }
-
-
-        // ----------------------------------------------------
-        // POWER
-        // ----------------------------------------------------
-
-        const powerButton =
-            document.getElementById('power-button');
-
-        const powerLed =
-            document.getElementById('power-led');
-
-
-        if (powerButton) {
-            powerButton.addEventListener(
-                'click',
-                async () => {
-                    if (!audio.audioActive) {
-                        await audio.init();
-
-                        if (powerLed) {
-                            powerLed.classList.add(
-                                'active'
-                            );
-                        }
-
-                        powerButton.classList.add(
-                            'active'
-                        );
-                    } else {
-                        audio.stopAll();
-                        audio.audioActive = false;
-
-                        if (powerLed) {
-                            powerLed.classList.remove(
-                                'active'
-                            );
-                        }
-
-                        powerButton.classList.remove(
-                            'active'
-                        );
-                    }
-                }
-            );
-        }
-
-
-        // ----------------------------------------------------
-        // SMOOTH VOICE LEADING TOGGLE
-        // ----------------------------------------------------
-
-        const smoothVoicingToggle =
+    const adsrRenderer =
+        new AdsrCanvasRenderer(
             document.getElementById(
-                'toggle-smooth-voicing'
-            );
+                'adsr-canvas'
+            )
+        );
 
-        if (smoothVoicingToggle) {
-            smoothVoicingToggle.checked = false;
+    const audioToggle =
+        document.getElementById(
+            'toggle-audio'
+        );
 
-            smoothVoicingToggle.addEventListener(
-                'change',
-                (event) => {
-                    smoothVoicingEnabled =
-                        event.target.checked;
+    const audioStateLbl =
+        document.getElementById(
+            'lbl-audio-state'
+        );
 
-                    // Start a fresh voice-leading chain
-                    // whenever the mode changes.
-                    previousVoicing = null;
-                }
-            );
-        }
+    const powerLed =
+        document.getElementById(
+            'power-led'
+        );
 
+    // Smooth Voice Leading Toggle
+    const smoothVoicingToggle =
+        document.getElementById(
+            'toggle-smooth-voicing'
+        );
 
-        // ----------------------------------------------------
-        // MASTER VOLUME
-        // ----------------------------------------------------
+    if (smoothVoicingToggle) {
+        smoothVoicingToggle.checked = false;
 
-        const masterVolume =
-            document.getElementById(
-                'master-volume'
-            );
+        smoothVoicingToggle.addEventListener(
+            'change',
+            (e) => {
+                smoothVoicingEnabled =
+                    e.target.checked;
 
-        const masterVolumeValue =
-            document.getElementById(
-                'master-volume-value'
-            );
-
-        if (masterVolume) {
-            masterVolume.addEventListener(
-                'input',
-                (event) => {
-                    const value =
-                        Number(event.target.value);
-
-                    audio.setMasterVolume(value);
-
-                    if (masterVolumeValue) {
-                        masterVolumeValue.textContent =
-                            `${value}%`;
-                    }
-                }
-            );
-
-            audio.setMasterVolume(
-                Number(masterVolume.value)
-            );
-
-            if (masterVolumeValue) {
-                masterVolumeValue.textContent =
-                    `${masterVolume.value}%`;
+                // Start a fresh voice-leading
+                // chain when the mode changes.
+                previousVoicing = null;
             }
-        }
+        );
+    }
 
+    // ========================================================
+    // PERFORMANCE TOGGLES
+    // ========================================================
 
-        // ----------------------------------------------------
-        // SYNTH CONTROLS
-        // ----------------------------------------------------
+    const strumToggle =
+        document.getElementById(
+            'toggle-strum'
+        );
 
-        const osc1Select =
-            document.getElementById('osc1-type');
+    const arpToggle =
+        document.getElementById(
+            'toggle-arp'
+        );
 
-        const osc2Select =
-            document.getElementById('osc2-type');
+    const droneToggle =
+        document.getElementById(
+            'toggle-drone'
+        );
 
-        const filterTypeSelect =
-            document.getElementById(
-                'filter-type'
-            );
+    if (strumToggle) {
+        strumToggle.addEventListener(
+            'change',
+            e => {
+                audio.strumMode =
+                    e.target.checked;
 
-        const filterFreq =
-            document.getElementById(
-                'filter-frequency'
-            );
+                if (
+                    e.target.checked &&
+                    arpToggle
+                ) {
+                    arpToggle.checked =
+                        false;
 
-        const filterQ =
-            document.getElementById(
-                'filter-q'
-            );
-
-        const attackControl =
-            document.getElementById('attack');
-
-        const decayControl =
-            document.getElementById('decay');
-
-        const sustainControl =
-            document.getElementById('sustain');
-
-        const releaseControl =
-            document.getElementById('release');
-
-        const lfoRate =
-            document.getElementById('lfo-rate');
-
-        const lfoDepth =
-            document.getElementById('lfo-depth');
-
-
-        if (osc1Select) {
-            osc1Select.addEventListener(
-                'change',
-                () => {
-                    audio.osc1Type =
-                        osc1Select.value;
+                    audio.arpMode =
+                        false;
                 }
-            );
-        }
+            }
+        );
+    }
 
-        if (osc2Select) {
-            osc2Select.addEventListener(
-                'change',
-                () => {
-                    audio.osc2Type =
-                        osc2Select.value;
+    if (arpToggle) {
+        arpToggle.addEventListener(
+            'change',
+            e => {
+                audio.arpMode =
+                    e.target.checked;
+
+                if (
+                    e.target.checked &&
+                    strumToggle
+                ) {
+                    strumToggle.checked =
+                        false;
+
+                    audio.strumMode =
+                        false;
                 }
-            );
-        }
+            }
+        );
+    }
 
-        if (filterTypeSelect) {
-            filterTypeSelect.addEventListener(
-                'change',
-                () => {
-                    audio.filterType =
-                        filterTypeSelect.value;
+    if (droneToggle) {
+        droneToggle.addEventListener(
+            'change',
+            e => {
+                audio.droneMode =
+                    e.target.checked;
+            }
+        );
+    }
+
+    // ========================================================
+    // STRUM / ARPEGGIO SPEED
+    // ========================================================
+
+    const speedControl =
+        document.getElementById(
+            'control-speed'
+        );
+
+    const speedValue =
+        document.getElementById(
+            'value-speed'
+        );
+
+    if (speedControl) {
+        speedControl.addEventListener(
+            'input',
+            e => {
+                const value =
+                    Number(e.target.value);
+
+                audio.speedDelayMs =
+                    value;
+
+                if (speedValue) {
+                    speedValue.textContent =
+                        `${value} ms`;
                 }
-            );
-        }
-
-        if (filterFreq) {
-            filterFreq.addEventListener(
-                'input',
-                () => {
-                    audio.filterFreq =
-                        Number(filterFreq.value);
-                }
-            );
-        }
-
-        if (filterQ) {
-            filterQ.addEventListener(
-                'input',
-                () => {
-                    audio.filterQ =
-                        Number(filterQ.value);
-                }
-            );
-        }
-
-        if (attackControl) {
-            attackControl.addEventListener(
-                'input',
-                () => {
-                    audio.attack =
-                        Number(attackControl.value);
-                }
-            );
-        }
-
-        if (decayControl) {
-            decayControl.addEventListener(
-                'input',
-                () => {
-                    audio.decay =
-                        Number(decayControl.value);
-                }
-            );
-        }
-
-        if (sustainControl) {
-            sustainControl.addEventListener(
-                'input',
-                () => {
-                    audio.sustain =
-                        Number(sustainControl.value);
-                }
-            );
-        }
-
-        if (releaseControl) {
-            releaseControl.addEventListener(
-                'input',
-                () => {
-                    audio.release =
-                        Number(releaseControl.value);
-                }
-            );
-        }
-
-        if (lfoRate) {
-            lfoRate.addEventListener(
-                'input',
-                () => {
-                    audio.lfoRate =
-                        Number(lfoRate.value);
-                }
-            );
-        }
-
-        if (lfoDepth) {
-            lfoDepth.addEventListener(
-                'input',
-                () => {
-                    audio.lfoDepth =
-                        Number(lfoDepth.value);
-                }
-            );
-        }
-
-
-        // ----------------------------------------------------
-        // PRESETS
-        // ----------------------------------------------------
-
-        const presetButtons =
-            document.querySelectorAll(
-                '[data-preset]'
-            );
-
-        function applyPreset(name) {
-            const preset =
-                SYNTH_PRESETS[name];
-
-            if (!preset) {
-                return;
             }
+        );
+    }
 
-            audio.applyPreset(preset);
+    // ========================================================
+    // MASTER VOLUME
+    // ========================================================
 
-            if (osc1Select) {
-                osc1Select.value =
-                    preset.osc1;
-            }
+    const masterVolume =
+        document.getElementById(
+            'control-master-volume'
+        );
 
-            if (osc2Select) {
-                osc2Select.value =
-                    preset.osc2;
-            }
+    const masterVolumeValue =
+        document.getElementById(
+            'value-master-volume'
+        );
 
-            if (filterTypeSelect) {
-                filterTypeSelect.value =
-                    preset.filterType;
-            }
+    if (masterVolume) {
+        masterVolume.addEventListener(
+            'input',
+            e => {
+                const value =
+                    Number(e.target.value);
 
-            if (filterFreq) {
-                filterFreq.value =
-                    preset.filterFreq;
-            }
-
-            if (filterQ) {
-                filterQ.value =
-                    preset.filterQ;
-            }
-
-            if (attackControl) {
-                attackControl.value =
-                    preset.attack;
-            }
-
-            if (decayControl) {
-                decayControl.value =
-                    preset.decay;
-            }
-
-            if (sustainControl) {
-                sustainControl.value =
-                    preset.sustain;
-            }
-
-            if (releaseControl) {
-                releaseControl.value =
-                    preset.release;
-            }
-
-            if (lfoRate) {
-                lfoRate.value =
-                    preset.lfoRate;
-            }
-
-            if (lfoDepth) {
-                lfoDepth.value =
-                    preset.lfoDepth;
-            }
-
-            presetButtons.forEach(button => {
-                button.classList.toggle(
-                    'active',
-                    button.dataset.preset === name
+                audio.setMasterVolume(
+                    value
                 );
-            });
-        }
 
-        presetButtons.forEach(button => {
-            button.addEventListener(
-                'click',
-                () => {
-                    applyPreset(
-                        button.dataset.preset
+                if (masterVolumeValue) {
+                    masterVolumeValue.textContent =
+                        `${value}%`;
+                }
+            }
+        );
+    }
+
+    // ========================================================
+    // WAVEFORM
+    // ========================================================
+
+    const waveformControl =
+        document.getElementById(
+            'select-waveform'
+        );
+
+    if (waveformControl) {
+        waveformControl.addEventListener(
+            'change',
+            e => {
+                audio.waveform =
+                    e.target.value;
+            }
+        );
+    }
+
+    // ========================================================
+    // FILTER TYPE
+    // ========================================================
+
+    const filterTypeControl =
+        document.getElementById(
+            'select-filter-type'
+        );
+
+    if (filterTypeControl) {
+        filterTypeControl.addEventListener(
+            'change',
+            e => {
+                audio.filterType =
+                    e.target.value;
+            }
+        );
+    }
+
+    // ========================================================
+    // FILTER CUTOFF
+    // ========================================================
+
+    const cutoffControl =
+        document.getElementById(
+            'control-cutoff'
+        );
+
+    const cutoffValue =
+        document.getElementById(
+            'value-cutoff'
+        );
+
+    if (cutoffControl) {
+        cutoffControl.addEventListener(
+            'input',
+            e => {
+                const value =
+                    Number(e.target.value);
+
+                audio.cutoff =
+                    value;
+
+                if (cutoffValue) {
+                    cutoffValue.textContent =
+                        `${value} Hz`;
+                }
+            }
+        );
+    }
+
+    // ========================================================
+    // FILTER RESONANCE
+    // ========================================================
+
+    const resonanceControl =
+        document.getElementById(
+            'control-resonance'
+        );
+
+    const resonanceValue =
+        document.getElementById(
+            'value-resonance'
+        );
+
+    if (resonanceControl) {
+        resonanceControl.addEventListener(
+            'input',
+            e => {
+                const value =
+                    Number(e.target.value);
+
+                audio.resonance =
+                    value;
+
+                if (resonanceValue) {
+                    resonanceValue.textContent =
+                        value.toFixed(1);
+                }
+            }
+        );
+    }
+
+    // ========================================================
+    // ADSR
+    // ========================================================
+
+    const attackControl =
+        document.getElementById(
+            'control-attack'
+        );
+
+    const decayControl =
+        document.getElementById(
+            'control-decay'
+        );
+
+    const sustainControl =
+        document.getElementById(
+            'control-sustain'
+        );
+
+    const releaseControl =
+        document.getElementById(
+            'control-release'
+        );
+
+    const attackValue =
+        document.getElementById(
+            'value-attack'
+        );
+
+    const decayValue =
+        document.getElementById(
+            'value-decay'
+        );
+
+    const sustainValue =
+        document.getElementById(
+            'value-sustain'
+        );
+
+    const releaseValue =
+        document.getElementById(
+            'value-release'
+        );
+
+    if (attackControl) {
+        attackControl.addEventListener(
+            'input',
+            e => {
+                const value =
+                    Number(e.target.value);
+
+                audio.attack =
+                    value;
+
+                if (attackValue) {
+                    attackValue.textContent =
+                        `${value.toFixed(2)} s`;
+                }
+
+                adsrRenderer.update(
+                    audio.attack,
+                    audio.decay,
+                    audio.sustain,
+                    audio.release
+                );
+            }
+        );
+    }
+
+    if (decayControl) {
+        decayControl.addEventListener(
+            'input',
+            e => {
+                const value =
+                    Number(e.target.value);
+
+                audio.decay =
+                    value;
+
+                if (decayValue) {
+                    decayValue.textContent =
+                        `${value.toFixed(2)} s`;
+                }
+
+                adsrRenderer.update(
+                    audio.attack,
+                    audio.decay,
+                    audio.sustain,
+                    audio.release
+                );
+            }
+        );
+    }
+
+    if (sustainControl) {
+        sustainControl.addEventListener(
+            'input',
+            e => {
+                const value =
+                    Number(e.target.value);
+
+                audio.sustain =
+                    value;
+
+                if (sustainValue) {
+                    sustainValue.textContent =
+                        `${Math.round(value * 100)}%`;
+                }
+
+                adsrRenderer.update(
+                    audio.attack,
+                    audio.decay,
+                    audio.sustain,
+                    audio.release
+                );
+            }
+        );
+    }
+
+    if (releaseControl) {
+        releaseControl.addEventListener(
+            'input',
+            e => {
+                const value =
+                    Number(e.target.value);
+
+                audio.release =
+                    value;
+
+                if (releaseValue) {
+                    releaseValue.textContent =
+                        `${value.toFixed(2)} s`;
+                }
+
+                adsrRenderer.update(
+                    audio.attack,
+                    audio.decay,
+                    audio.sustain,
+                    audio.release
+                );
+            }
+        );
+    }
+
+    // ========================================================
+    // LFO
+    // ========================================================
+
+    const lfoRateControl =
+        document.getElementById(
+            'control-lfo-rate'
+        );
+
+    const lfoDepthControl =
+        document.getElementById(
+            'control-lfo-depth'
+        );
+
+    const lfoRateValue =
+        document.getElementById(
+            'value-lfo-rate'
+        );
+
+    const lfoDepthValue =
+        document.getElementById(
+            'value-lfo-depth'
+        );
+
+    const vibratoToggle =
+        document.getElementById(
+            'toggle-vibrato'
+        );
+
+    const tremoloToggle =
+        document.getElementById(
+            'toggle-tremolo'
+        );
+
+    if (lfoRateControl) {
+        lfoRateControl.addEventListener(
+            'input',
+            e => {
+                const value =
+                    Number(e.target.value);
+
+                audio.lfoRate =
+                    value;
+
+                if (lfoRateValue) {
+                    lfoRateValue.textContent =
+                        `${value.toFixed(1)} Hz`;
+                }
+            }
+        );
+    }
+
+    if (lfoDepthControl) {
+        lfoDepthControl.addEventListener(
+            'input',
+            e => {
+                const value =
+                    Number(e.target.value);
+
+                audio.lfoDepth =
+                    value;
+
+                if (lfoDepthValue) {
+                    lfoDepthValue.textContent =
+                        `${value}%`;
+                }
+            }
+        );
+    }
+
+    if (vibratoToggle) {
+        vibratoToggle.addEventListener(
+            'change',
+            e => {
+                audio.vibrato =
+                    e.target.checked;
+            }
+        );
+    }
+
+    if (tremoloToggle) {
+        tremoloToggle.addEventListener(
+            'change',
+            e => {
+                audio.tremolo =
+                    e.target.checked;
+            }
+        );
+    }
+
+    // ========================================================
+    // PRESETS
+    // ========================================================
+
+    const presetButtons =
+        document.querySelectorAll(
+            '[data-preset]'
+        );
+
+    presetButtons.forEach(button => {
+        button.addEventListener(
+            'click',
+            () => {
+                const presetName =
+                    button.dataset.preset;
+
+                if (
+                    SYNTH_PRESETS[
+                        presetName
+                    ]
+                ) {
+                    audio.applyPreset(
+                        SYNTH_PRESETS[
+                            presetName
+                        ]
+                    );
+
+                    presetButtons.forEach(
+                        btn => {
+                            btn.classList.remove(
+                                'active'
+                            );
+                        }
+                    );
+
+                    button.classList.add(
+                        'active'
+                    );
+
+                    updateControlsFromAudio(
+                        audio,
+                        adsrRenderer
                     );
                 }
-            );
-        });
+            }
+        );
+    });
 
-        applyPreset('PIANO');
+    // ========================================================
+    // AUDIO POWER
+    // ========================================================
 
+    if (audioToggle) {
+        audioToggle.addEventListener(
+            'change',
+            async e => {
+                if (e.target.checked) {
+                    await audio.init();
 
-        // ----------------------------------------------------
-        // STRUM / ARP / DRONE MODES
-        // ----------------------------------------------------
+                    audio.audioActive =
+                        true;
 
-        const strumToggle =
-            document.getElementById(
-                'toggle-strum'
-            );
-
-        const arpToggle =
-            document.getElementById(
-                'toggle-arp'
-            );
-
-        const droneToggle =
-            document.getElementById(
-                'toggle-drone'
-            );
-
-        const speedControl =
-            document.getElementById(
-                'strum-speed'
-            );
-
-
-        if (strumToggle) {
-            strumToggle.addEventListener(
-                'change',
-                event => {
-                    audio.strumMode =
-                        event.target.checked;
-
-                    if (
-                        audio.strumMode &&
-                        arpToggle
-                    ) {
-                        arpToggle.checked = false;
-                        audio.arpMode = false;
-                    }
-                }
-            );
-        }
-
-        if (arpToggle) {
-            arpToggle.addEventListener(
-                'change',
-                event => {
-                    audio.arpMode =
-                        event.target.checked;
-
-                    if (
-                        audio.arpMode &&
-                        strumToggle
-                    ) {
-                        strumToggle.checked = false;
-                        audio.strumMode = false;
-                    }
-                }
-            );
-        }
-
-        if (droneToggle) {
-            droneToggle.addEventListener(
-                'change',
-                event => {
-                    audio.droneMode =
-                        event.target.checked;
-                }
-            );
-        }
-
-        if (speedControl) {
-            speedControl.addEventListener(
-                'input',
-                event => {
-                    audio.speedDelayMs =
-                        Number(event.target.value);
-                }
-            );
-        }
-
-
-        // ----------------------------------------------------
-        // CHORD MATRIX
-        // ----------------------------------------------------
-
-        createMatrixUI();
-
-
-        // ----------------------------------------------------
-        // GENRES / PROGRESSIONS
-        // ----------------------------------------------------
-
-        initGenresAndStylesUI();
-
-
-        const progressionInput =
-            document.getElementById(
-                'progression-input'
-            );
-
-        const progressionLoadButton =
-            document.getElementById(
-                'load-progression'
-            );
-
-
-        if (progressionLoadButton) {
-            progressionLoadButton.addEventListener(
-                'click',
-                () => {
-                    const pattern =
-                        progressionInput
-                            ? progressionInput.value.trim()
-                            : '';
-
-                    if (!pattern) {
-                        progressionSteps = [];
-                        progressionCurrentIndex = 0;
-                        progressionKey = null;
-
-                        highlightNextStepOptions();
-                        updateProgressionChordsDisplay();
-
-                        return;
+                    if (audioStateLbl) {
+                        audioStateLbl.textContent =
+                            'ON';
                     }
 
-                    progressionKey =
-                        deduceKeyFromFirstStep(
-                            pattern
+                    if (powerLed) {
+                        powerLed.classList.add(
+                            'active'
                         );
+                    }
+                } else {
+                    audio.audioActive =
+                        false;
 
-                    progressionSteps =
-                        parseProgressionPattern(
-                            pattern,
-                            progressionKey
+                    audio.stopAll();
+
+                    if (audioStateLbl) {
+                        audioStateLbl.textContent =
+                            'OFF';
+                    }
+
+                    if (powerLed) {
+                        powerLed.classList.remove(
+                            'active'
                         );
-
-                    progressionCurrentIndex = 0;
-
-                    highlightNextStepOptions();
-                    updateProgressionChordsDisplay();
+                    }
                 }
-            );
-        }
-
-
-        // ----------------------------------------------------
-        // INITIAL STATE
-        // ----------------------------------------------------
-
-        if (progressionInput) {
-            progressionInput.value =
-                'I - V - vi - IV';
-        }
-
-        progressionKey = 60;
-
-        progressionSteps =
-            parseProgressionPattern(
-                'I - V - vi - IV',
-                progressionKey
-            );
-
-        progressionCurrentIndex = 0;
-
-        highlightNextStepOptions();
-        updateProgressionChordsDisplay();
+            }
+        );
     }
-);
+
+    // ========================================================
+    // INITIAL STATE
+    // ========================================================
+
+    const pianoPreset =
+        SYNTH_PRESETS.PIANO;
+
+    audio.applyPreset(
+        pianoPreset
+    );
+
+    updateControlsFromAudio(
+        audio,
+        adsrRenderer
+    );
+
+    if (masterVolume) {
+        const initialVolume =
+            Number(masterVolume.value);
+
+        audio.setMasterVolume(
+            initialVolume
+        );
+
+        if (masterVolumeValue) {
+            masterVolumeValue.textContent =
+                `${initialVolume}%`;
+        }
+    }
+});
+
+// ============================================================
+// UPDATE UI FROM SYNTH STATE
+// ============================================================
+
+function updateControlsFromAudio(
+    synth,
+    adsrRenderer
+) {
+    const waveformControl =
+        document.getElementById(
+            'select-waveform'
+        );
+
+    const filterTypeControl =
+        document.getElementById(
+            'select-filter-type'
+        );
+
+    const cutoffControl =
+        document.getElementById(
+            'control-cutoff'
+        );
+
+    const resonanceControl =
+        document.getElementById(
+            'control-resonance'
+        );
+
+    const attackControl =
+        document.getElementById(
+            'control-attack'
+        );
+
+    const decayControl =
+        document.getElementById(
+            'control-decay'
+        );
+
+    const sustainControl =
+        document.getElementById(
+            'control-sustain'
+        );
+
+    const releaseControl =
+        document.getElementById(
+            'control-release'
+        );
+
+    const lfoRateControl =
+        document.getElementById(
+            'control-lfo-rate'
+        );
+
+    const lfoDepthControl =
+        document.getElementById(
+            'control-lfo-depth'
+        );
+
+    const vibratoToggle =
+        document.getElementById(
+            'toggle-vibrato'
+        );
+
+    const tremoloToggle =
+        document.getElementById(
+            'toggle-tremolo'
+        );
+
+    if (waveformControl) {
+        waveformControl.value =
+            synth.waveform;
+    }
+
+    if (filterTypeControl) {
+        filterTypeControl.value =
+            synth.filterType;
+    }
+
+    if (cutoffControl) {
+        cutoffControl.value =
+            synth.cutoff;
+    }
+
+    if (resonanceControl) {
+        resonanceControl.value =
+            synth.resonance;
+    }
+
+    if (attackControl) {
+        attackControl.value =
+            synth.attack;
+    }
+
+    if (decayControl) {
+        decayControl.value =
+            synth.decay;
+    }
+
+    if (sustainControl) {
+        sustainControl.value =
+            synth.sustain;
+    }
+
+    if (releaseControl) {
+        releaseControl.value =
+            synth.release;
+    }
+
+    if (lfoRateControl) {
+        lfoRateControl.value =
+            synth.lfoRate;
+    }
+
+    if (lfoDepthControl) {
+        lfoDepthControl.value =
+            synth.lfoDepth;
+    }
+
+    if (vibratoToggle) {
+        vibratoToggle.checked =
+            synth.vibrato;
+    }
+
+    if (tremoloToggle) {
+        tremoloToggle.checked =
+            synth.tremolo;
+    }
+
+    const cutoffValue =
+        document.getElementById(
+            'value-cutoff'
+        );
+
+    const resonanceValue =
+        document.getElementById(
+            'value-resonance'
+        );
+
+    const attackValue =
+        document.getElementById(
+            'value-attack'
+        );
+
+    const decayValue =
+        document.getElementById(
+            'value-decay'
+        );
+
+    const sustainValue =
+        document.getElementById(
+            'value-sustain'
+        );
+
+    const releaseValue =
+        document.getElementById(
+            'value-release'
+        );
+
+    const lfoRateValue =
+        document.getElementById(
+            'value-lfo-rate'
+        );
+
+    const lfoDepthValue =
+        document.getElementById(
+            'value-lfo-depth'
+        );
+
+    if (cutoffValue) {
+        cutoffValue.textContent =
+            `${synth.cutoff} Hz`;
+    }
+
+    if (resonanceValue) {
+        resonanceValue.textContent =
+            synth.resonance.toFixed(1);
+    }
+
+    if (attackValue) {
+        attackValue.textContent =
+            `${synth.attack.toFixed(2)} s`;
+    }
+
+    if (decayValue) {
+        decayValue.textContent =
+            `${synth.decay.toFixed(2)} s`;
+    }
+
+    if (sustainValue) {
+        sustainValue.textContent =
+            `${Math.round(
+                synth.sustain * 100
+            )}%`;
+    }
+
+    if (releaseValue) {
+        releaseValue.textContent =
+            `${synth.release.toFixed(2)} s`;
+    }
+
+    if (lfoRateValue) {
+        lfoRateValue.textContent =
+            `${synth.lfoRate.toFixed(1)} Hz`;
+    }
+
+    if (lfoDepthValue) {
+        lfoDepthValue.textContent =
+            `${synth.lfoDepth}%`;
+    }
+
+    if (adsrRenderer) {
+        adsrRenderer.update(
+            synth.attack,
+            synth.decay,
+            synth.sustain,
+            synth.release
+        );
+    }
+}
