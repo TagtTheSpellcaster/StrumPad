@@ -1430,8 +1430,12 @@ window.addEventListener('DOMContentLoaded', () => {
     // Default Load PIANO Preset on Startup
     loadPreset('PIANO');
 
-    // Audio Power Switch
-    audioToggle.checked = false;
+    // Audio Power Switch (Inizializzato su ON)
+    audioToggle.checked = true;
+    audio.setAudioState(true);
+    audioStateLbl.textContent = "Audio ON";
+    powerLed.classList.replace('bg-red-600', 'bg-emerald-500');
+    powerLed.classList.replace('shadow-[0_0_8px_#dc2626]', 'shadow-[0_0_10px_#10b981]');
 
     audioToggle.addEventListener('change', (e) => {
         const isEnabled = e.target.checked;
