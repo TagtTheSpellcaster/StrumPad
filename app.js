@@ -5,7 +5,7 @@ class WebAudioEngine {
     constructor() {
         this.ctx = null;
         this.masterGain = null;
-        this.volume = Math.pow(0.8, 1.5); // Inizializzato al valore percepito di 80% (0.8^1.5)
+        this.volume = Math.pow(0.8, 1.5);
         this.cutoffFreq = 6025;
         this.resonanceQ = 1.2;
         this.filterType = 'lowpass';
@@ -16,13 +16,22 @@ class WebAudioEngine {
         this.droneMode = false;
         this.strumMode = false;
         this.arpMode = false;
-        this.speedDelayMs = 35;
+        this.speedDelayMs = 150;
+
+        // Arpeggiator Config
+        this.arpPattern = 'up'; // 'up', 'down', 'updown', 'downup', 'random'
+        this.arpOctaves = 2;    // 1, 2, 3, 4
+        this.arpRate = '4/4';   // '4/4', '3/4', '6/8'
+        this.arpCurrentStep = 0;
+        this.arpNotes = [];
+        this.arpTimer = null;
+        this.lastRandomNote = null;
 
         // Osc1 & Andrea's Osc2 Waveforms and Parameters
         this.waveform = 'sawtooth';
         this.osc2Waveform = 'sawtooth';
         this.osc2DetuneCents = 3;
-        this.osc2Mix = 0.6; // 60% mix
+        this.osc2Mix = 0.6;
 
         this.activeDroneNodes = [];
         this.scheduledTimeouts = [];
@@ -76,6 +85,7 @@ class WebAudioEngine {
     }
 
     stopAll() {
+        this.stopArp();
         this.scheduledTimeouts.forEach(t => clearTimeout(t));
         this.scheduledTimeouts = [];
 
@@ -119,6 +129,7 @@ class WebAudioEngine {
         if (enabled) {
             this.strumMode = false;
             this.arpMode = false;
+            this.stopArp();
             this.stopAll();
         }
     }
@@ -128,6 +139,7 @@ class WebAudioEngine {
         this.strumMode = enabled;
         if (enabled) {
             this.arpMode = false;
+            this.stopArp();
         }
     }
 
@@ -136,11 +148,24 @@ class WebAudioEngine {
         this.arpMode = enabled;
         if (enabled) {
             this.strumMode = false;
+            this.startArp();
+        } else {
+            this.stopArp();
         }
     }
 
     setSpeedDelay(ms) {
         this.speedDelayMs = ms;
+    }
+
+    setArpConfig(pattern, octaves, rate) {
+        if (pattern) this.arpPattern = pattern;
+        if (octaves) this.arpOctaves = parseInt(octaves, 10);
+        if (rate) this.arpRate = rate;
+
+        if (this.arpMode) {
+            this.updateArpNotes();
+        }
     }
 
     setWaveform(type) {
@@ -164,7 +189,7 @@ class WebAudioEngine {
         this.releaseTime = release;
     }
 
-    playNote(midiNote) {
+    playNote(midiNote, gainMultiplier = 1.0) {
         if (!this.audioActive || !this.ctx) return;
 
         const now = this.ctx.currentTime;
@@ -182,7 +207,7 @@ class WebAudioEngine {
 
             const voiceGain = this.ctx.createGain();
             voiceGain.gain.setValueAtTime(0.0001, now);
-            voiceGain.gain.linearRampToValueAtTime(0.3, now + Math.max(0.05, this.attackTime));
+            voiceGain.gain.linearRampToValueAtTime(0.3 * gainMultiplier, now + Math.max(0.05, this.attackTime));
 
             const filter = this.ctx.createBiquadFilter();
             filter.type = this.filterType;
@@ -212,16 +237,13 @@ class WebAudioEngine {
                 gain: voiceGain
             });
         } else {
-            // Osc1 (Main)
             const osc1 = this.ctx.createOscillator();
             osc1.type = this.waveform;
             osc1.frequency.setValueAtTime(freq, now);
 
-            // Andrea's Osc2 (With Detune and Mix)
             const osc2 = this.ctx.createOscillator();
             osc2.type = this.osc2Waveform;
             
-            // Frequenza con detune preciso espresso in Cents
             const detunedFreq = freq * Math.pow(2, this.osc2DetuneCents / 1200);
             osc2.frequency.setValueAtTime(detunedFreq, now);
 
@@ -244,7 +266,7 @@ class WebAudioEngine {
             }
 
             const voiceGain = this.ctx.createGain();
-            const peakGain = 0.4;
+            const peakGain = 0.4 * gainMultiplier;
             const sustainGain = Math.max(0.0001, peakGain * this.sustainLevel);
 
             voiceGain.gain.setValueAtTime(0.0001, now);
@@ -279,7 +301,6 @@ class WebAudioEngine {
             }
 
             osc1.connect(filter);
-            
             osc2.connect(osc2GainNode);
             osc2GainNode.connect(filter);
 
@@ -294,6 +315,106 @@ class WebAudioEngine {
         }
     }
 
+    // Cyclic Arpeggiator Engine
+    startArp() {
+        this.stopArp();
+        this.arpCurrentStep = 0;
+        this.updateArpNotes();
+        this.runArpCycle();
+    }
+
+    stopArp() {
+        if (this.arpTimer) {
+            clearTimeout(this.arpTimer);
+            this.arpTimer = null;
+        }
+        this.arpCurrentStep = 0;
+    }
+
+    updateArpNotes() {
+        if (!currentStrumNotes || !currentStrumNotes.length) return;
+
+        // Base voicing notes (4 notes standard or smooth voicing output)
+        const baseVoicing = currentStrumNotes.slice(0, 4);
+        let expanded = [];
+
+        for (let oct = 0; oct < this.arpOctaves; oct++) {
+            baseVoicing.forEach(n => expanded.push(n + (oct * 12)));
+        }
+
+        const sortedAsc = [...expanded].sort((a, b) => a - b);
+        const sortedDesc = [...sortedAsc].reverse();
+
+        switch (this.arpPattern) {
+            case 'up':
+                this.arpNotes = sortedAsc;
+                break;
+            case 'down':
+                this.arpNotes = sortedDesc;
+                break;
+            case 'updown':
+                if (sortedAsc.length <= 2) {
+                    this.arpNotes = sortedAsc;
+                } else {
+                    const middleAsc = sortedAsc.slice(1, -1);
+                    this.arpNotes = [...sortedAsc, ...middleAsc.reverse()];
+                }
+                break;
+            case 'downup':
+                if (sortedDesc.length <= 2) {
+                    this.arpNotes = sortedDesc;
+                } else {
+                    const middleDesc = sortedDesc.slice(1, -1);
+                    this.arpNotes = [...sortedDesc, ...middleDesc.reverse()];
+                }
+                break;
+            case 'random':
+                this.arpNotes = sortedAsc;
+                break;
+            default:
+                this.arpNotes = sortedAsc;
+        }
+    }
+
+    runArpCycle() {
+        if (!this.arpMode || !this.audioActive) return;
+
+        if (this.arpNotes && this.arpNotes.length > 0) {
+            let noteToPlay;
+
+            if (this.arpPattern === 'random') {
+                let candidates = this.arpNotes;
+                if (candidates.length > 1 && this.lastRandomNote !== null) {
+                    candidates = candidates.filter(n => n !== this.lastRandomNote);
+                }
+                noteToPlay = candidates[Math.floor(Math.random() * candidates.length)];
+                this.lastRandomNote = noteToPlay;
+            } else {
+                const noteIndex = this.arpCurrentStep % this.arpNotes.length;
+                noteToPlay = this.arpNotes[noteIndex];
+            }
+
+            // Metric Accent Gain Calculation
+            let accentMultiplier = 1.0;
+            if (this.arpRate === '4/4') {
+                if (this.arpCurrentStep % 4 === 0) accentMultiplier = 1.35;
+            } else if (this.arpRate === '3/4') {
+                if (this.arpCurrentStep % 3 === 0) accentMultiplier = 1.35;
+            } else if (this.arpRate === '6/8') {
+                const subStep = this.arpCurrentStep % 6;
+                if (subStep === 0) accentMultiplier = 1.40;
+                else if (subStep === 3) accentMultiplier = 1.20;
+            }
+
+            this.playNote(noteToPlay, accentMultiplier);
+            this.arpCurrentStep++;
+        }
+
+        this.arpTimer = setTimeout(() => {
+            this.runArpCycle();
+        }, this.speedDelayMs);
+    }
+
     strumChord(midiNotes) {
         if (!this.audioActive || !this.ctx) return;
 
@@ -301,8 +422,13 @@ class WebAudioEngine {
             this.stopAll();
             const chordNotes = midiNotes.slice(0, 4);
             chordNotes.forEach(note => this.playNote(note));
-        } else if (this.strumMode || this.arpMode) {
-            const notes = midiNotes.slice(0, this.arpMode ? 6 : 5);
+        } else if (this.arpMode) {
+            this.updateArpNotes();
+            if (!this.arpTimer) {
+                this.startArp();
+            }
+        } else if (this.strumMode) {
+            const notes = midiNotes.slice(0, 5);
             notes.forEach((note, idx) => {
                 const t = setTimeout(() => {
                     if (this.audioActive) {
@@ -319,7 +445,7 @@ class WebAudioEngine {
 }
 
 /**
- * Renderizzatore Grafico CRT Anni '70 del Monitor ADSR
+ * AdsrCanvasRenderer Class
  */
 class AdsrCanvasRenderer {
     constructor(canvas) {
@@ -330,7 +456,7 @@ class AdsrCanvasRenderer {
     }
 
     resize() {
-        if (!this.canvas.parentElement) return;
+        if (!this.canvas || !this.canvas.parentElement) return;
         const rect = this.canvas.parentElement.getBoundingClientRect();
         this.canvas.width = rect.width;
         this.canvas.height = rect.height;
@@ -426,7 +552,7 @@ class AdsrCanvasRenderer {
     }
 }
 
-// 8 Sound Presets Definitions mapped to UI/Synth Engine ranges
+// 8 Sound Presets Definitions
 const SYNTH_PRESETS = {
     PIANO: {
         waveform: 'triangle',
@@ -550,7 +676,7 @@ const SYNTH_PRESETS = {
     }
 };
 
-// Circle of Fifths order starting strictly from C (Do)
+// Circle of Fifths order
 const CIRCLE_OF_FIFTHS = [
     { name: 'C',  midi: 60 },
     { name: 'G',  midi: 67 },
@@ -566,10 +692,8 @@ const CIRCLE_OF_FIFTHS = [
     { name: 'F',  midi: 65 }
 ];
 
-// Chromatic Scale for intervals
 const CHROMATIC_SCALE = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 
-// 7 Matrix Rows (Inclusi Diminished e Diminished 7th)
 const MATRIX_ROWS = [
     { id: 'maj',  label: 'Major',          intervals: [0, 4, 7],    suffix: '',     btnClass: 'row-maj',  badgeStyle: 'bg-amber-200 text-amber-950 border-amber-300' },
     { id: 'min',  label: 'Minor',          intervals: [0, 3, 7],    suffix: 'm',    btnClass: 'row-min',  badgeStyle: 'bg-sky-200 text-sky-950 border-sky-300' },
@@ -580,7 +704,6 @@ const MATRIX_ROWS = [
     { id: 'dim7', label: 'Diminished 7th', intervals: [0, 3, 6, 9], suffix: 'dim7', btnClass: 'row-dim7', badgeStyle: 'bg-slate-200 text-slate-900 border-slate-300' }
 ];
 
-// Genres & Styles Table
 const GENRES_DATA = {
     "Classical & Traditional": {
         "Circle Progression": "I - vi (I / IV) - ii (IV) - V (bVII)",
@@ -590,7 +713,6 @@ const GENRES_DATA = {
         "Romanesca": "I - V (vi) - vi (IV) - III (I) - IV (ii) - I (vi) - IV (ii) - V (bVII)",
         "Andalusian Classical": "i - bVII (v) - bVI (iv) - V (bVII)"
     },
-
     "Jazz & Dixieland": {
         "Classic Jazz Cadence": "ii7 - V7 (bVII7) - Imaj7 (vi7 / iii7)",
         "Minor Jazz Cadence": "ii7 - V7 (bVII7) - i7 (bIIImaj7)",
@@ -601,7 +723,6 @@ const GENRES_DATA = {
         "Tritone Substitution": "ii7 - bII7 (V7) - Imaj7 (vi7)",
         "Diminished Passing Chord": "Imaj7 - vii°7 (V7) - ii7 (IVmaj7) - V7 (bVII7)"
     },
-
     "Pop & Rock": {
         "Golden Pop": "I - V (bVII) - vi (I) - IV (ii)",
         "Golden Fifties": "I - vi (IV) - IV (ii) - V (bVII)",
@@ -610,7 +731,6 @@ const GENRES_DATA = {
         "Rock Anthem": "I - bVII (V) - IV (ii) - I (vi)",
         "Descending Pop": "I - V (iii) - vi (IV) - IV (ii)"
     },
-
     "Country & Folk": {
         "Country Three-Chord": "I - IV (ii) - I (vi) - V (bVII)",
         "Twelve-Bar Country": "I7 - I7 (IV7) - IV7 (I7) - IV7 - I7 (vi7) - I7 - V7 (IV7) - IV7 (ii7) - I7 - V7 (bVII7)",
@@ -619,7 +739,6 @@ const GENRES_DATA = {
         "Bluegrass Breakdown": "I - IV (ii) - V (bVII) - I (vi)",
         "Folk Ballad": "I - V (vi) - IV (ii) - I (vi)"
     },
-
     "Blues": {
         "12-Bar Blues": "I7 - IV7 (ii7) - I7 (vi7) - I7 (V7) - IV7 (ii7) - IV7 (V7) - I7 (vi7) - I7 (IV7) - V7 (bVII7) - IV7 (ii7) - I7 (vi7) - V7 (bVII7)",
         "Quick Change Blues": "I7 - IV7 (ii7) - I7 - I7 - IV7 (ii7) - IV7 - I7 (vi7) - I7 - V7 (bVII7) - IV7 (ii7) - I7 - V7 (bVII7)",
@@ -628,7 +747,6 @@ const GENRES_DATA = {
         "Minor Blues": "i7 - i7 (iv7) - iv7 (bVI7) - iv7 - i7 (bVI7) - i7 - V7 (bVII7) - iv7 - i7 - iv7 (bVI7) - i7 - V7 (bVII7)",
         "Jazz Blues": "I7 - IV7 (ii7) - I7 (vi7) - VI7 (IV7) - ii7 - V7 (bVII7) - I7 (vi7) - VI7 - ii7 (IV7) - V7 (bVII7) - I7 - V7 (bVII7)"
     },
-
     "Funk & Disco": {
         "Classic Funk": "i7 - IV7 (bVIImaj7) - i7 - IV7",
         "Disco Vamp": "ii7 - V7 (bVII7) - Imaj7 (vi7) - V7",
@@ -637,7 +755,6 @@ const GENRES_DATA = {
         "Disco Four-Chord": "i7 - VI7 (bIII7) - iv7 (bVII7) - V7 (bVII7)",
         "Funk Dominant Groove": "I7 - IV7 (ii7) - I7 (vi7) - V7 (bVII7)"
     },
-
     "Heavy Metal & Hard Rock": {
         "Power Metal": "i - bVI (iv) - bVII (v) - i (v)",
         "Aeolian Metal": "i - bVII (iv) - bVI (ii7) - bVII (v)",
@@ -646,7 +763,6 @@ const GENRES_DATA = {
         "Doom Metal": "i - bVI (iv) - bVII (v) - i",
         "Heavy Rock": "i - bVII (iv) - IV (bVI) - i (v)"
     },
-
     "Gospel & Soul": {
         "Gospel Cascade": "I - I7 (v7) - IV (ii) - iv (bVII7)",
         "Soul Preacher": "I - vi7 (bIII7) - IVmaj7 (ii7) - V7 (bVII7)",
@@ -655,7 +771,6 @@ const GENRES_DATA = {
         "Soul Ballad": "Imaj7 - vi7 (IVmaj7) - IVmaj7 (ii7) - V7 (bVII7)",
         "Gospel Turnaround": "I - vi7 (IVmaj7) - ii7 (IV) - V7 (bVII7)"
     },
-
     "Latin & Salsa": {
         "Classic Montuno": "i - bVII (v) - bVI (iv) - V7 (bVII7)",
         "Salsa Clave": "ii7 - V7 (bVII7) - Imaj7 (vi7) - VI7 (bIII7)",
@@ -664,7 +779,6 @@ const GENRES_DATA = {
         "Samba Progression": "Imaj7 - VI7 (iii7) - ii7 (IVmaj7) - V7 (bVII7)",
         "Minor Latin Groove": "i7 - iv7 (bVImaj7) - bVII7 (bVI7) - bVImaj7 (iv7)"
     },
-
     "Other Styles": {
         "Reggae Groove": "I - IV (ii) - I (vi) - IV",
         "Neo-Soul": "IVmaj7 - III7 (bVII7) - vi7 (Imaj7) - v7 (I7)",
@@ -769,18 +883,11 @@ function selectChord(rootObj, rowObj) {
     selectedChordName = `${rootObj.name}${rowObj.suffix}`;
     
     if (smoothVoicingEnabled) {
-        let targetCount = 4;
-        if (audio.arpMode) {
-            targetCount = 6;
-        } else if (audio.strumMode) {
-            targetCount = 5;
-        }
-
         currentStrumNotes = calculateSmoothVoicing(
             rootObj.midi,
             rowObj.intervals,
             previousVoicing,
-            targetCount
+            4
         );
 
         previousVoicing = [...currentStrumNotes];
@@ -1206,6 +1313,10 @@ window.addEventListener('DOMContentLoaded', () => {
     const sliderSpeed = document.getElementById('slider-speed');
     const lblSpeed = document.getElementById('lbl-speed');
 
+    const selectArpPattern = document.getElementById('select-arp-pattern');
+    const selectArpOctaves = document.getElementById('select-arp-octaves');
+    const selectArpRate = document.getElementById('select-arp-rate');
+
     const smoothVoicingToggle = document.getElementById('toggle-smooth-voicing');
 
     if (smoothVoicingToggle) {
@@ -1218,20 +1329,6 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function updateSpeedLimits() {
-        if (arpToggle.checked) {
-            sliderSpeed.min = "100";
-            sliderSpeed.max = "500";
-            if (parseInt(sliderSpeed.value) < 100) sliderSpeed.value = "200";
-        } else {
-            sliderSpeed.min = "10";
-            sliderSpeed.max = "80";
-            if (parseInt(sliderSpeed.value) > 80) sliderSpeed.value = "35";
-        }
-        lblSpeed.textContent = `${sliderSpeed.value} ms`;
-        audio.setSpeedDelay(parseInt(sliderSpeed.value));
-    }
-
     droneToggle.addEventListener('change', (e) => {
         const enabled = e.target.checked;
         if (enabled) {
@@ -1239,7 +1336,6 @@ window.addEventListener('DOMContentLoaded', () => {
             arpToggle.checked = false;
         }
         audio.setDroneMode(enabled);
-        updateSpeedLimits();
     });
 
     strumToggle.addEventListener('change', (e) => {
@@ -1250,7 +1346,6 @@ window.addEventListener('DOMContentLoaded', () => {
             audio.setDroneMode(false);
         }
         audio.setStrumMode(enabled);
-        updateSpeedLimits();
     });
 
     arpToggle.addEventListener('change', (e) => {
@@ -1261,14 +1356,28 @@ window.addEventListener('DOMContentLoaded', () => {
             audio.setDroneMode(false);
         }
         audio.setArpMode(enabled);
-        updateSpeedLimits();
     });
 
     sliderSpeed.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value);
+        const val = parseInt(e.target.value, 10);
         lblSpeed.textContent = `${val} ms`;
         audio.setSpeedDelay(val);
     });
+
+    const updateArpSettings = () => {
+        audio.setArpConfig(
+            selectArpPattern ? selectArpPattern.value : 'up',
+            selectArpOctaves ? selectArpOctaves.value : 2,
+            selectArpRate ? selectArpRate.value : '4/4'
+        );
+    };
+
+    if (selectArpPattern) selectArpPattern.addEventListener('change', updateArpSettings);
+    if (selectArpOctaves) selectArpOctaves.addEventListener('change', updateArpSettings);
+    if (selectArpRate) selectArpRate.addEventListener('change', updateArpSettings);
+
+    // Initial Sync
+    updateArpSettings();
 
     // Vertical ADSR Fader Elements
     const slAttack = document.getElementById('slider-attack');
@@ -1386,44 +1495,37 @@ window.addEventListener('DOMContentLoaded', () => {
     toggleVibrato.addEventListener('change', updateLfo);
     toggleTremolo.addEventListener('change', updateLfo);
 
-    // Function to load a Preset and sync all Controls & Audio Engine
     function loadPreset(presetKey) {
         const preset = SYNTH_PRESETS[presetKey];
         if (!preset) return;
 
-        // Waveform
         const waveRadio = document.querySelector(`input[name="waveform"][value="${preset.waveform}"]`);
         if (waveRadio) waveRadio.checked = true;
         audio.setWaveform(preset.waveform);
 
-        // Filter
         const filterRadio = document.querySelector(`input[name="filter-type"][value="${preset.filterType}"]`);
         if (filterRadio) filterRadio.checked = true;
         sliderCutoff.value = preset.cutoff;
         sliderResonance.value = preset.resonance;
         
-        // Octave Offset
         const presetOctave = (preset.octaveOffset || 0) / 12;
         if (sliderOctave) sliderOctave.value = presetOctave;
         if (lblOctave) lblOctave.textContent = presetOctave > 0 ? `+${presetOctave}` : `${presetOctave}`;
         
         updateFilters();
 
-        // ADSR
         slAttack.value = preset.attack;
         slDecay.value = preset.decay;
         slSustain.value = preset.sustain;
         slRelease.value = preset.release;
         updateAdsr();
 
-        // LFO
         sliderLfoRate.value = preset.lfoRate;
         sliderLfoDepth.value = preset.lfoDepth;
         toggleVibrato.checked = preset.vibrato;
         toggleTremolo.checked = preset.tremolo;
         updateLfo();
 
-        // Visual Selection Highlight
         const presetButtons = document.querySelectorAll('.preset-btn');
         presetButtons.forEach(btn => {
             if (btn.dataset.preset === presetKey) {
@@ -1434,7 +1536,6 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Attach click events to Preset buttons
     document.querySelectorAll('.preset-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const key = btn.dataset.preset;
@@ -1442,11 +1543,9 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Default Load PIANO Preset on Startup
     loadPreset('PIANO');
     updateOsc2();
 
-    // Audio Power Switch (Inizializzato su ON)
     if (audioToggle) {
         audioToggle.checked = true;
         audio.setAudioState(true);
@@ -1476,7 +1575,6 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Master Volume Vertical High-Excursion Slider
     document.getElementById('slider-volume').addEventListener('input', (e) => {
         audio.setVolume(parseFloat(e.target.value));
         document.getElementById('lbl-volume').textContent = `${e.target.value}%`;
