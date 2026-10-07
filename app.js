@@ -18,9 +18,9 @@ class WebAudioEngine {
         this.arpMode = false;
         this.speedDelayMs = 150;
 
-        // Arpeggiator Config
+        // Arpeggiator Config (Default: 1 Octave)
         this.arpPattern = 'up'; // 'up', 'down', 'updown', 'downup', 'random'
-        this.arpOctaves = 2;    // 1, 2, 3, 4
+        this.arpOctaves = 1;    // 1, 2, 3, 4 (Default set to 1)
         this.arpRate = '4/4';   // '4/4', '3/4', '6/8'
         this.arpCurrentStep = 0;
         this.arpNotes = [];
@@ -146,12 +146,9 @@ class WebAudioEngine {
     setArpMode(enabled) {
         if (this.droneMode) return;
         this.arpMode = enabled;
-        if (enabled) {
-            this.strumMode = false;
-            this.startArp();
-        } else {
-            this.stopArp();
-        }
+        // Spegne sempre eventuali timer o note pendenti.
+        // L'arpeggiatore non parte subito: attende che l'utente prema un pulsante della Chord Matrix.
+        this.stopArp();
     }
 
     setSpeedDelay(ms) {
@@ -163,7 +160,7 @@ class WebAudioEngine {
         if (octaves) this.arpOctaves = parseInt(octaves, 10);
         if (rate) this.arpRate = rate;
 
-        if (this.arpMode) {
+        if (this.arpMode && this.arpTimer) {
             this.updateArpNotes();
         }
     }
@@ -423,10 +420,9 @@ class WebAudioEngine {
             const chordNotes = midiNotes.slice(0, 4);
             chordNotes.forEach(note => this.playNote(note));
         } else if (this.arpMode) {
+            // L'arpeggiatore parte (o si aggiorna con il nuovo accordo) QUI, alla pressione del tasto
             this.updateArpNotes();
-            if (!this.arpTimer) {
-                this.startArp();
-            }
+            this.startArp();
         } else if (this.strumMode) {
             const notes = midiNotes.slice(0, 5);
             notes.forEach((note, idx) => {
@@ -1367,7 +1363,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const updateArpSettings = () => {
         audio.setArpConfig(
             selectArpPattern ? selectArpPattern.value : 'up',
-            selectArpOctaves ? selectArpOctaves.value : 2,
+            selectArpOctaves ? selectArpOctaves.value : 1, // Predefinito 1 ottava
             selectArpRate ? selectArpRate.value : '4/4'
         );
     };
