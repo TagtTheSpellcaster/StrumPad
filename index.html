@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StrumPad v1.4.5 — Vintage Chord Machine</title>
-
+    
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -91,23 +91,57 @@
                     </label>
                 </div>
 
-                <div class="flex items-center justify-between py-0.5 border-t border-slate-300">
-                    <div class="flex flex-col">
+                <!-- Arpeggiator Settings Panel -->
+                <div class="pt-2 border-t border-slate-300 flex flex-col gap-2">
+                    <div class="flex items-center justify-between">
                         <span class="text-xs font-bold text-slate-700">Arpeggiator</span>
-                        <span class="text-[10px] text-slate-500">Sequential Notes</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggle-arp" class="sr-only peer">
+                            <div class="w-11 h-6 bg-chassisDark peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-700"></div>
+                        </label>
                     </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="toggle-arp" class="sr-only peer">
-                        <div class="w-11 h-6 bg-chassisDark peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-700"></div>
-                    </label>
-                </div>
 
-                <div class="pt-1.5 border-t border-slate-300 flex flex-col gap-1">
-                    <div class="flex justify-between text-xs font-semibold">
-                        <span>Strum / Arp Speed</span>
-                        <span id="lbl-speed" class="font-mono text-slate-700">35 ms</span>
+                    <!-- Pattern & Octaves -->
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[10px] font-bold text-slate-600 uppercase">Pattern</label>
+                            <select id="select-arp-pattern" class="bg-amber-50 border border-chassisDark rounded px-1.5 py-1 font-semibold text-slate-800 text-[11px] focus:outline-none">
+                                <option value="up">Up</option>
+                                <option value="down">Down</option>
+                                <option value="updown">Up & Down</option>
+                                <option value="downup">Down & Up</option>
+                                <option value="random">Random</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[10px] font-bold text-slate-600 uppercase">Octaves</label>
+                            <select id="select-arp-octaves" class="bg-amber-50 border border-chassisDark rounded px-1.5 py-1 font-semibold text-slate-800 text-[11px] focus:outline-none">
+                                <option value="1">1 Octave</option>
+                                <option value="2" selected>2 Octaves</option>
+                                <option value="3">3 Octaves</option>
+                                <option value="4">4 Octaves</option>
+                            </select>
+                        </div>
                     </div>
-                    <input type="range" id="slider-speed" min="10" max="80" value="35" class="w-full h-2 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
+
+                    <!-- Rate & Speed Controls -->
+                    <div class="grid grid-cols-2 gap-2 text-xs items-center">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[10px] font-bold text-slate-600 uppercase">Rate (Meter)</label>
+                            <select id="select-arp-rate" class="bg-amber-50 border border-chassisDark rounded px-1.5 py-1 font-semibold text-slate-800 text-[11px] focus:outline-none">
+                                <option value="4/4">4/4</option>
+                                <option value="3/4">3/4</option>
+                                <option value="6/8">6/8</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col gap-0.5">
+                            <div class="flex justify-between text-[10px] font-semibold">
+                                <span>Speed</span>
+                                <span id="lbl-speed" class="font-mono text-slate-700">150 ms</span>
+                            </div>
+                            <input type="range" id="slider-speed" min="50" max="400" value="150" class="w-full h-1.5 bg-chassisDark rounded cursor-pointer accent-amber-800">
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -138,7 +172,7 @@
                             <canvas id="adsr-canvas" class="w-full h-full absolute inset-0"></canvas>
                         </div>
 
-                        <!-- Vertical Faders ADSR (Distanza ridotta dal monitor) -->
+                        <!-- Vertical Faders ADSR -->
                         <div class="grid grid-cols-4 gap-1 pt-1.5 border-t border-slate-200">
                             <div class="vertical-slider-wrapper">
                                 <span class="text-[9px] font-bold font-mono text-slate-700">A</span>
@@ -163,7 +197,7 @@
                         </div>
                     </div>
 
-                    <!-- Synth Presets (Spostato in Colonna 1 sotto ADSR) -->
+                    <!-- Synth Presets -->
                     <div class="bg-amber-50/70 p-2 rounded-xl border-2 border-chassisDark flex flex-col gap-1">
                         <span class="text-[9px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-0.5">Synth Presets</span>
                         <div class="grid grid-cols-4 gap-1 pt-0.5">
@@ -244,7 +278,7 @@
                     </div>
                 </div>
 
-                <!-- COLUMN 3: Filter & LFO Modulation (Distribuiti con maggior respiro) -->
+                <!-- COLUMN 3: Filter & LFO Modulation -->
                 <div class="md:col-span-4 flex flex-col justify-between gap-3">
                     
                     <!-- Filter Panel -->
@@ -262,7 +296,6 @@
                             </label>
                         </div>
 
-                        <!-- Slider con etichette ben distanziate -->
                         <div class="flex flex-col gap-3 pt-1">
                             <div class="flex flex-col gap-1.5">
                                 <div class="flex justify-between text-[8px] font-semibold">
@@ -294,7 +327,6 @@
                     <div class="bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col gap-3 flex-1 justify-between">
                         <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">LFO Modulation</span>
                         
-                        <!-- Slider con etichette ben distanziate -->
                         <div class="flex flex-col gap-3 pt-1">
                             <div class="flex flex-col gap-1.5">
                                 <div class="flex justify-between text-[8px] font-semibold">
@@ -345,10 +377,10 @@
 
     </div>
 
-    <!-- Lower Deck: Asymmetric Layout (Matrix on Left + Progression Assistant Column on Right) -->
+    <!-- Lower Deck: Asymmetric Layout -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
         
-        <!-- Circle of Fifths Interactive Chord Matrix (Left Main Area) -->
+        <!-- Circle of Fifths Interactive Chord Matrix -->
         <div class="lg:col-span-8 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col gap-3 overflow-x-auto">
             <div class="flex justify-between items-center border-b border-slate-300 pb-1">
                 <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600">Chord Matrix — Circle of Fifths</h2>
@@ -359,7 +391,7 @@
             </div>
         </div>
 
-        <!-- Harmonic Progression Assistant (Right Side Column Panel) -->
+        <!-- Harmonic Progression Assistant -->
         <div class="lg:col-span-4 bg-panelBg p-4 rounded-2xl border-2 border-chassisDark flex flex-col justify-between gap-3">
             <div class="flex flex-col gap-3">
                 <h2 class="text-xs font-bold uppercase tracking-widest text-slate-600 border-b border-slate-300 pb-1">Progression Assistant</h2>
