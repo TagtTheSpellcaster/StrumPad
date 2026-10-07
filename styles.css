@@ -166,7 +166,7 @@
     writing-mode: vertical-lr;
     direction: rtl;
     width: 0.5rem;
-    height: 90px;
+    height: 80px;
     margin: 0;
     padding: 0;
     cursor: pointer;
@@ -177,7 +177,7 @@
     writing-mode: vertical-lr;
     direction: rtl;
     width: 0.65rem;
-    height: 180px;
+    height: 160px;
     margin: 0;
     padding: 0;
     cursor: pointer;
@@ -194,15 +194,15 @@
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    height: 120px;
+    height: 110px;
 }
 
 .vertical-slider-wrapper-master {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    height: 220px;
+    justify-content: center;
+    height: 100%;
 }
 
 
@@ -211,9 +211,9 @@
    ========================================== */
 
 .preset-btn {
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 700;
-    padding: 3px 2px;
+    padding: 2px 1px;
     border-radius: 4px;
     border: 1px solid #c2b8a3;
     background-color: #fffbeb;
