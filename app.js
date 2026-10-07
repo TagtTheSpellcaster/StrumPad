@@ -662,6 +662,7 @@ let currentStrumNotes = calculateNotes(CIRCLE_OF_FIFTHS[0].midi, MATRIX_ROWS[0].
 
 let smoothVoicingEnabled = false;
 let previousVoicing = null;
+let initialProgressionVoicing = null;
 
 let activeProgressionSteps = [];
 let currentProgressionStepIndex = -1;
@@ -682,10 +683,9 @@ function calculateSmoothVoicing(rootMidi, intervals, previousNotes) {
         .map(interval => rootMidi + interval)
         .sort((a, b) => a - b);
 
-    // Primo accordo, oppure cambio di tipo di accordo:
-    // usa la posizione fondamentale.
-    if (!previousNotes || previousNotes.length !== baseNotes.length) {
-        return baseNotes;
+    // Se non c'è un voicing precedente, usa la disposizione standard di calculateNotes
+    if (!previousNotes) {
+        return calculateNotes(rootMidi, intervals);
     }
 
     const candidates = [];
@@ -709,7 +709,7 @@ function calculateSmoothVoicing(rootMidi, intervals, previousNotes) {
             let totalMovement = 0;
             let stationaryVoices = 0;
 
-            for (let i = 0; i < voiceCount; i++) {
+            for (let i = 0; i < Math.min(voiceCount, previousNotes.length); i++) {
                 const movement =
                     Math.abs(
                         candidate[i] -
@@ -989,6 +989,9 @@ function handleProgressionStep(chordName, rootObj, rowObj) {
         activeProgressionSteps = candidateSteps;
         currentProgressionStepIndex = 0;
 
+        // Memorizza il voicing fondamentale del primo accordo
+        initialProgressionVoicing = [...currentStrumNotes];
+
         updateProgressionChordsDisplay();
         highlightNextStepOptions(1);
         return;
@@ -1001,10 +1004,9 @@ function handleProgressionStep(chordName, rootObj, rowObj) {
     const isNextSub = expectedStep.sub.includes(chordName);
 
     if (isNextMain || isNextSub) {
-        // Se la progressione completa il ciclo e torna al primo accordo (step 0),
-        // azzeriamo previousVoicing per ancorare nuovamente il primo accordo al registro fondamentale.
+        // Se la progressione è terminata e sta per ricominciare dallo step 0
         if (nextExpectedStepIndex === 0) {
-            previousVoicing = null;
+            previousVoicing = initialProgressionVoicing ? [...initialProgressionVoicing] : null;
         }
 
         currentProgressionStepIndex = nextExpectedStepIndex;
@@ -1017,6 +1019,10 @@ function handleProgressionStep(chordName, rootObj, rowObj) {
             currentKeyRoot = newDeducedKey;
             activeProgressionSteps = newCandidateSteps;
             currentProgressionStepIndex = 0;
+            
+            // Memorizza il nuovo voicing iniziale
+            initialProgressionVoicing = [...currentStrumNotes];
+
             updateProgressionChordsDisplay();
             highlightNextStepOptions(1);
         } else {
@@ -1063,6 +1069,7 @@ function resetProgressionState() {
     currentProgressionStepIndex = -1;
     currentKeyRoot = null;
     activeProgressionSteps = [];
+    initialProgressionVoicing = null;
     clearHighlights();
     const chordsLabel = document.getElementById('lbl-progression-chords');
     if (chordsLabel) chordsLabel.classList.add('hidden');
@@ -1218,6 +1225,7 @@ window.addEventListener('DOMContentLoaded', () => {
             // Quando si cambia modalità,
             // si ricomincia una nuova catena di voice leading.
             previousVoicing = null;
+            initialProgressionVoicing = null;
         });
     }
 
