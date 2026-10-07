@@ -6,8 +6,8 @@ class WebAudioEngine {
         this.ctx = null;
         this.masterGain = null;
         this.volume = Math.pow(0.8, 1.5); // Inizializzato al valore percepito di 80% (0.8^1.5)
-        this.cutoffFreq = 2200;
-        this.resonanceQ = 1.0;
+        this.cutoffFreq = 6025;
+        this.resonanceQ = 1.2;
         this.filterType = 'lowpass';
         this.initialized = false;
         this.audioActive = false;
@@ -34,7 +34,7 @@ class WebAudioEngine {
         this.releaseTime = 1.20;
 
         // LFO Parameters
-        this.lfoRate = 5.0;
+        this.lfoRate = 0.5;
         this.lfoDepth = 0.0;
         this.vibratoEnabled = false;
         this.tremoloEnabled = false;
@@ -330,6 +330,7 @@ class AdsrCanvasRenderer {
     }
 
     resize() {
+        if (!this.canvas.parentElement) return;
         const rect = this.canvas.parentElement.getBoundingClientRect();
         this.canvas.width = rect.width;
         this.canvas.height = rect.height;
@@ -362,7 +363,7 @@ class AdsrCanvasRenderer {
             ctx.stroke();
         }
 
-        const padding = 12;
+        const padding = 10;
         const drawW = width - (padding * 2);
         const drawH = height - (padding * 2);
 
@@ -410,15 +411,15 @@ class AdsrCanvasRenderer {
         ctx.lineTo(x4, y4);
 
         ctx.strokeStyle = '#00ff66';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 2.5;
         ctx.shadowColor = '#00ff66';
-        ctx.shadowBlur = 10;
+        ctx.shadowBlur = 8;
         ctx.stroke();
         ctx.shadowBlur = 0;
 
         [ {x: x1, y: y1}, {x: x2, y: y2}, {x: x3, y: y3} ].forEach(p => {
             ctx.beginPath();
-            ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+            ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
             ctx.fillStyle = '#ffffff';
             ctx.fill();
         });
@@ -1074,10 +1075,10 @@ function createMatrixUI() {
     container.innerHTML = '';
 
     const headerRowWrapper = document.createElement('div');
-    headerRowWrapper.className = 'flex items-center gap-3 mb-1';
+    headerRowWrapper.className = 'flex items-center gap-2 mb-1';
 
     const headerEmptyBox = document.createElement('div');
-    headerEmptyBox.className = 'w-36 text-right shrink-0 pr-2';
+    headerEmptyBox.className = 'w-32 text-right shrink-0 pr-2';
     headerRowWrapper.appendChild(headerEmptyBox);
 
     const headerBtnGrid = document.createElement('div');
@@ -1085,7 +1086,7 @@ function createMatrixUI() {
 
     CIRCLE_OF_FIFTHS.forEach(root => {
         const headerBox = document.createElement('div');
-        headerBox.className = 'w-[42px] h-[42px] flex items-center justify-center font-mono font-bold text-xs text-amber-950 bg-amber-100/80 border border-chassisDark rounded-lg shadow-inner';
+        headerBox.className = 'w-[42px] h-[36px] flex items-center justify-center font-mono font-bold text-xs text-amber-950 bg-amber-100/80 border border-chassisDark rounded-lg shadow-inner';
         headerBox.textContent = root.name;
         headerBtnGrid.appendChild(headerBox);
     });
@@ -1095,11 +1096,11 @@ function createMatrixUI() {
 
     MATRIX_ROWS.forEach(row => {
         const rowWrapper = document.createElement('div');
-        rowWrapper.className = 'flex items-center gap-3';
+        rowWrapper.className = 'flex items-center gap-2';
 
         const labelBox = document.createElement('div');
-        labelBox.className = 'w-36 text-right shrink-0 pr-2';
-        labelBox.innerHTML = `<span class="px-2.5 py-1 rounded-md text-xs font-bold border shadow-sm inline-block w-full ${row.badgeStyle}">${row.label}</span>`;
+        labelBox.className = 'w-32 text-right shrink-0 pr-2';
+        labelBox.innerHTML = `<span class="px-2 py-1 rounded-md text-[11px] font-bold border shadow-sm inline-block w-full ${row.badgeStyle}">${row.label}</span>`;
         rowWrapper.appendChild(labelBox);
 
         const btnGrid = document.createElement('div');
@@ -1155,7 +1156,7 @@ function initGenresAndStylesUI() {
         resetProgressionState();
 
         styleSelect.innerHTML = '<option value="">-- Select Style --</option>';
-        progressionLabel.textContent = 'Select a style';
+        progressionLabel.textContent = 'Select a genre and style';
 
         if (selectedGenre && GENRES_DATA[selectedGenre]) {
             styleSelect.disabled = false;
@@ -1269,7 +1270,7 @@ window.addEventListener('DOMContentLoaded', () => {
         audio.setSpeedDelay(val);
     });
 
-    // ADSR Sliders Elements
+    // Vertical ADSR Fader Elements
     const slAttack = document.getElementById('slider-attack');
     const slDecay = document.getElementById('slider-decay');
     const slSustain = document.getElementById('slider-sustain');
@@ -1475,7 +1476,7 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Master Volume Vertical Slider
+    // Master Volume Vertical High-Excursion Slider
     document.getElementById('slider-volume').addEventListener('input', (e) => {
         audio.setVolume(parseFloat(e.target.value));
         document.getElementById('lbl-volume').textContent = `${e.target.value}%`;
