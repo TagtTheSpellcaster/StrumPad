@@ -330,15 +330,17 @@ class WebAudioEngine {
     updateArpNotes() {
         if (!currentStrumNotes || !currentStrumNotes.length) return;
 
-        // Base voicing notes (4 notes standard or smooth voicing output)
+        // Note base dell'accordo (4 note fondamentali)
         const baseVoicing = currentStrumNotes.slice(0, 4);
         let expanded = [];
 
+        // Estensione sulle ottave selezionate
         for (let oct = 0; oct < this.arpOctaves; oct++) {
             baseVoicing.forEach(n => expanded.push(n + (oct * 12)));
         }
 
-        const sortedAsc = [...expanded].sort((a, b) => a - b);
+        // Ordinamento e RIMOZIONE DUPLICATI (es. Do5 ripetuto tra le ottave)
+        const sortedAsc = [...new Set(expanded)].sort((a, b) => a - b);
         const sortedDesc = [...sortedAsc].reverse();
 
         switch (this.arpPattern) {
