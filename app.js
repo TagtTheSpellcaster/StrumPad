@@ -1319,27 +1319,33 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Filter Controls
+    // Filter & Octave Controls
     const sliderCutoff = document.getElementById('slider-cutoff');
     const sliderResonance = document.getElementById('slider-resonance');
+    const sliderOctave = document.getElementById('slider-octave');
     const lblCutoff = document.getElementById('lbl-cutoff');
     const lblResonance = document.getElementById('lbl-resonance');
+    const lblOctave = document.getElementById('lbl-octave');
 
     function updateFilters() {
         const checkedRadio = document.querySelector('input[name="filter-type"]:checked');
         const filterType = checkedRadio ? checkedRadio.value : 'lowpass';
         const cutoff = parseFloat(sliderCutoff.value);
         const resonance = parseFloat(sliderResonance.value);
+        const octaveVal = parseInt(sliderOctave.value, 10);
 
         lblCutoff.textContent = `${cutoff} Hz`;
         lblResonance.textContent = resonance.toFixed(1);
+        lblOctave.textContent = octaveVal > 0 ? `+${octaveVal}` : `${octaveVal}`;
 
         audio.setFilter(filterType, cutoff, resonance);
+        audio.setOctaveOffset(octaveVal * 12);
     }
 
     document.querySelectorAll('input[name="filter-type"]').forEach(radio => radio.addEventListener('change', updateFilters));
     sliderCutoff.addEventListener('input', updateFilters);
     sliderResonance.addEventListener('input', updateFilters);
+    if (sliderOctave) sliderOctave.addEventListener('input', updateFilters);
 
     // LFO Controls
     const sliderLfoRate = document.getElementById('slider-lfo-rate');
@@ -1398,8 +1404,10 @@ window.addEventListener('DOMContentLoaded', () => {
         updateLfo();
 
         // Octave Offset
+        const presetOctave = (preset.octaveOffset || 0) / 12;
+        if (sliderOctave) sliderOctave.value = presetOctave;
+        if (lblOctave) lblOctave.textContent = presetOctave > 0 ? `+${presetOctave}` : `${presetOctave}`;
         audio.setOctaveOffset(preset.octaveOffset || 0);
-
         // Visual Selection Highlight
         const presetButtons = document.querySelectorAll('.preset-btn');
         presetButtons.forEach(btn => {
