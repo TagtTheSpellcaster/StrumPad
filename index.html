@@ -173,13 +173,13 @@
                         </div>
                     </div>
 
-                    <!-- Andrea's Osc2 Panel -->
-                    <div class="bg-amber-50/70 p-2 rounded-xl border-2 border-chassisDark flex flex-col gap-1 justify-between">
-                        <div class="flex justify-between items-center border-b border-slate-300 pb-0.5">
+                    <!-- Andrea's Osc2 Panel (Aumentata altezza e spaziatura verticale) -->
+                    <div class="bg-amber-50/70 p-2.5 rounded-xl border-2 border-chassisDark flex flex-col gap-2 flex-1">
+                        <div class="flex justify-between items-center border-b border-slate-300 pb-1">
                             <span class="text-[10px] font-bold uppercase text-slate-700">Andrea's Osc2</span>
                             <span id="lbl-osc2-detune" class="font-mono text-[8px] font-bold text-slate-600">+3 Cents</span>
                         </div>
-                        <div class="grid grid-cols-2 gap-x-1.5 gap-y-1 pt-0.5">
+                        <div class="grid grid-cols-2 gap-x-1.5 gap-y-1 py-0.5">
                             <label class="inline-flex items-center justify-between cursor-pointer text-[9px] font-semibold text-slate-800">
                                 <span class="inline-flex items-center gap-0.5"><input type="radio" name="osc2-waveform" value="sawtooth" checked class="accent-amber-800 cursor-pointer">Sawtooth</span>
                                 <span class="font-mono text-[10px]">∿</span>
@@ -197,12 +197,12 @@
                                 <span class="font-mono text-[10px]">〜</span>
                             </label>
                         </div>
-                        <div class="flex flex-col gap-0.5 mt-0.5 border-t border-slate-200 pt-1">
-                            <div>
+                        <div class="flex flex-col gap-1.5 border-t border-slate-200 pt-2 mt-auto">
+                            <div class="flex flex-col gap-0.5">
                                 <div class="flex justify-between text-[8px] font-semibold"><span>Detune</span><span id="val-osc2-detune" class="font-mono text-slate-700">+3</span></div>
                                 <input type="range" id="slider-osc2-detune" min="-50" max="50" value="3" step="1" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                             </div>
-                            <div>
+                            <div class="flex flex-col gap-0.5">
                                 <div class="flex justify-between text-[8px] font-semibold"><span>Osc2 Mix</span><span id="lbl-osc2-mix" class="font-mono text-slate-700">60%</span></div>
                                 <input type="range" id="slider-osc2-mix" min="0" max="100" value="60" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                             </div>
