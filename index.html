@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StrumPad v1.4.2 — Vintage Chord Machine</title>
+    <title>StrumPad v1.4.5 — Vintage Chord Machine</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -30,7 +34,7 @@
     <!-- Header Panel -->
     <header class="bg-panelBg border-2 border-chassisDark rounded-2xl p-3 flex flex-wrap items-center justify-between gap-3 shadow-inner">
         <div class="flex items-center gap-3">
-            <h1 class="text-xl sm:text-2xl font-black uppercase tracking-widest text-amber-950 font-mono">StrumPad <span class="text-xs text-amber-800 font-sans tracking-normal">v1.4.2</span></h1>
+            <h1 class="text-xl sm:text-2xl font-black uppercase tracking-widest text-amber-950 font-mono">StrumPad <span class="text-xs text-amber-800 font-sans tracking-normal">v1.4.5</span></h1>
             <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-amber-200/80 text-amber-950 border border-amber-400/60 px-2 py-0.5 rounded-md shadow-sm">Vintage Chord Machine</span>
         </div>
 
@@ -122,38 +126,58 @@
 
             <div class="grid grid-cols-1 md:grid-cols-12 gap-2.5 flex-1 items-stretch">
 
-                <!-- COLUMN 1: ADSR Display & Vertical Sliders Panel -->
-                <div class="md:col-span-4 bg-amber-50/60 p-2.5 rounded-xl border-2 border-chassisDark flex flex-col justify-between">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1">ADSR Envelope Generator</span>
+                <!-- COLUMN 1: ADSR Panel + Presets Panel -->
+                <div class="md:col-span-4 flex flex-col justify-between gap-2.5">
                     
-                    <div class="bg-black/90 p-2 rounded-xl border-2 border-chassisDark h-20 relative overflow-hidden shadow-inner flex flex-col justify-between my-1">
-                        <span class="text-[8px] font-mono font-bold uppercase tracking-widest text-emerald-500/80 z-10">CRT Monitor</span>
-                        <canvas id="adsr-canvas" class="w-full h-full absolute inset-0"></canvas>
+                    <!-- ADSR Envelope Generator -->
+                    <div class="bg-amber-50/60 p-2.5 rounded-xl border-2 border-chassisDark flex flex-col gap-2">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1">ADSR Envelope Generator</span>
+                        
+                        <div class="bg-black/90 p-2 rounded-xl border-2 border-chassisDark h-20 relative overflow-hidden shadow-inner flex flex-col justify-between my-0.5">
+                            <span class="text-[8px] font-mono font-bold uppercase tracking-widest text-emerald-500/80 z-10">CRT Monitor</span>
+                            <canvas id="adsr-canvas" class="w-full h-full absolute inset-0"></canvas>
+                        </div>
+
+                        <!-- Vertical Faders ADSR (Distanza ridotta dal monitor) -->
+                        <div class="grid grid-cols-4 gap-1 pt-1.5 border-t border-slate-200">
+                            <div class="vertical-slider-wrapper">
+                                <span class="text-[9px] font-bold font-mono text-slate-700">A</span>
+                                <input type="range" id="slider-attack" min="0.01" max="2.0" step="0.01" value="0.10" class="v-range">
+                                <span id="lbl-attack" class="text-[8px] font-mono text-slate-700">0.10s</span>
+                            </div>
+                            <div class="vertical-slider-wrapper">
+                                <span class="text-[9px] font-bold font-mono text-slate-700">D</span>
+                                <input type="range" id="slider-decay" min="0.05" max="3.0" step="0.05" value="0.50" class="v-range">
+                                <span id="lbl-decay" class="text-[8px] font-mono text-slate-700">0.50s</span>
+                            </div>
+                            <div class="vertical-slider-wrapper">
+                                <span class="text-[9px] font-bold font-mono text-slate-700">S</span>
+                                <input type="range" id="slider-sustain" min="0.0" max="1.0" step="0.05" value="0.60" class="v-range">
+                                <span id="lbl-sustain" class="text-[8px] font-mono text-slate-700">60%</span>
+                            </div>
+                            <div class="vertical-slider-wrapper">
+                                <span class="text-[9px] font-bold font-mono text-slate-700">R</span>
+                                <input type="range" id="slider-release" min="0.05" max="5.0" step="0.05" value="1.20" class="v-range">
+                                <span id="lbl-release" class="text-[8px] font-mono text-slate-700">1.20s</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Vertical Faders ADSR -->
-                    <div class="grid grid-cols-4 gap-1 pt-1 border-t border-slate-200 flex-1 items-end">
-                        <div class="vertical-slider-wrapper">
-                            <span class="text-[9px] font-bold font-mono text-slate-700">A</span>
-                            <input type="range" id="slider-attack" min="0.01" max="2.0" step="0.01" value="0.10" class="v-range">
-                            <span id="lbl-attack" class="text-[8px] font-mono text-slate-700">0.10s</span>
-                        </div>
-                        <div class="vertical-slider-wrapper">
-                            <span class="text-[9px] font-bold font-mono text-slate-700">D</span>
-                            <input type="range" id="slider-decay" min="0.05" max="3.0" step="0.05" value="0.50" class="v-range">
-                            <span id="lbl-decay" class="text-[8px] font-mono text-slate-700">0.50s</span>
-                        </div>
-                        <div class="vertical-slider-wrapper">
-                            <span class="text-[9px] font-bold font-mono text-slate-700">S</span>
-                            <input type="range" id="slider-sustain" min="0.0" max="1.0" step="0.05" value="0.60" class="v-range">
-                            <span id="lbl-sustain" class="text-[8px] font-mono text-slate-700">60%</span>
-                        </div>
-                        <div class="vertical-slider-wrapper">
-                            <span class="text-[9px] font-bold font-mono text-slate-700">R</span>
-                            <input type="range" id="slider-release" min="0.05" max="5.0" step="0.05" value="1.20" class="v-range">
-                            <span id="lbl-release" class="text-[8px] font-mono text-slate-700">1.20s</span>
+                    <!-- Synth Presets (Spostato in Colonna 1 sotto ADSR) -->
+                    <div class="bg-amber-50/70 p-2 rounded-xl border-2 border-chassisDark flex flex-col gap-1">
+                        <span class="text-[9px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-0.5">Synth Presets</span>
+                        <div class="grid grid-cols-4 gap-1 pt-0.5">
+                            <button data-preset="PIANO" class="preset-btn py-1 rounded border border-chassisDark bg-panelBg hover:bg-amber-200 transition">PIANO</button>
+                            <button data-preset="GUITAR" class="preset-btn py-1 rounded border border-chassisDark bg-panelBg hover:bg-amber-200 transition">GUITAR</button>
+                            <button data-preset="BASS" class="preset-btn py-1 rounded border border-chassisDark bg-panelBg hover:bg-amber-200 transition">BASS</button>
+                            <button data-preset="ORGAN" class="preset-btn py-1 rounded border border-chassisDark bg-panelBg hover:bg-amber-200 transition">ORGAN</button>
+                            <button data-preset="STRINGS" class="preset-btn py-1 rounded border border-chassisDark bg-panelBg hover:bg-amber-200 transition">STRINGS</button>
+                            <button data-preset="BRASS" class="preset-btn py-1 rounded border border-chassisDark bg-panelBg hover:bg-amber-200 transition">BRASS</button>
+                            <button data-preset="PAD" class="preset-btn py-1 rounded border border-chassisDark bg-panelBg hover:bg-amber-200 transition">PAD</button>
+                            <button data-preset="LEAD" class="preset-btn py-1 rounded border border-chassisDark bg-panelBg hover:bg-amber-200 transition">LEAD</button>
                         </div>
                     </div>
+
                 </div>
 
                 <!-- COLUMN 2: Waveforms (Osc1 & Andrea's Osc2) -->
@@ -220,10 +244,11 @@
                     </div>
                 </div>
 
-                <!-- COLUMN 3: Filter, LFO & Presets -->
-                <div class="md:col-span-4 flex flex-col justify-between gap-2.5">
+                <!-- COLUMN 3: Filter & LFO Modulation (Distribuiti con maggior respiro) -->
+                <div class="md:col-span-4 flex flex-col justify-between gap-3">
+                    
                     <!-- Filter Panel -->
-                    <div class="bg-amber-50/70 p-2.5 rounded-xl border-2 border-chassisDark flex flex-col gap-2">
+                    <div class="bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col gap-3 flex-1 justify-between">
                         <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">Filter</span>
                         
                         <div class="flex items-center justify-between gap-1 py-0.5">
@@ -237,25 +262,26 @@
                             </label>
                         </div>
 
-                        <div class="flex flex-col gap-2 pt-0.5">
-                            <div class="flex flex-col gap-0.5">
-                                <div class="flex justify-between text-[8px] font-semibold mb-0.5">
+                        <!-- Slider con etichette ben distanziate -->
+                        <div class="flex flex-col gap-3 pt-1">
+                            <div class="flex flex-col gap-1.5">
+                                <div class="flex justify-between text-[8px] font-semibold">
                                     <span>Cutoff</span>
                                     <span id="lbl-cutoff" class="font-mono text-slate-700">6025 Hz</span>
                                 </div>
                                 <input type="range" id="slider-cutoff" min="100" max="8000" value="6025" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                             </div>
 
-                            <div class="flex flex-col gap-0.5">
-                                <div class="flex justify-between text-[8px] font-semibold mb-0.5">
+                            <div class="flex flex-col gap-1.5">
+                                <div class="flex justify-between text-[8px] font-semibold">
                                     <span>Resonance</span>
                                     <span id="lbl-resonance" class="font-mono text-slate-700">1.2</span>
                                 </div>
                                 <input type="range" id="slider-resonance" min="0.1" max="15.0" step="0.1" value="1.2" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                             </div>
 
-                            <div class="flex flex-col gap-0.5">
-                                <div class="flex justify-between text-[8px] font-semibold mb-0.5">
+                            <div class="flex flex-col gap-1.5">
+                                <div class="flex justify-between text-[8px] font-semibold">
                                     <span>Octave Offset</span>
                                     <span id="lbl-octave" class="font-mono text-slate-700">0</span>
                                 </div>
@@ -265,20 +291,21 @@
                     </div>
 
                     <!-- LFO Module Panel -->
-                    <div class="bg-amber-50/70 p-2.5 rounded-xl border-2 border-chassisDark flex flex-col gap-2">
+                    <div class="bg-amber-50/70 p-3 rounded-xl border-2 border-chassisDark flex flex-col gap-3 flex-1 justify-between">
                         <span class="text-[10px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-1">LFO Modulation</span>
                         
-                        <div class="flex flex-col gap-2 pt-0.5">
-                            <div class="flex flex-col gap-0.5">
-                                <div class="flex justify-between text-[8px] font-semibold mb-0.5">
+                        <!-- Slider con etichette ben distanziate -->
+                        <div class="flex flex-col gap-3 pt-1">
+                            <div class="flex flex-col gap-1.5">
+                                <div class="flex justify-between text-[8px] font-semibold">
                                     <span>Rate</span>
                                     <span id="lbl-lfo-rate" class="font-mono text-slate-700">0.5 Hz</span>
                                 </div>
                                 <input type="range" id="slider-lfo-rate" min="0.1" max="12.0" step="0.1" value="0.5" class="w-full h-1 bg-chassisDark rounded-lg cursor-pointer accent-amber-800">
                             </div>
 
-                            <div class="flex flex-col gap-0.5">
-                                <div class="flex justify-between text-[8px] font-semibold mb-0.5">
+                            <div class="flex flex-col gap-1.5">
+                                <div class="flex justify-between text-[8px] font-semibold">
                                     <span>Depth</span>
                                     <span id="lbl-lfo-depth" class="font-mono text-slate-700">0%</span>
                                 </div>
@@ -298,20 +325,6 @@
                         </div>
                     </div>
 
-                    <!-- Synth Presets -->
-                    <div class="bg-amber-50/70 p-2 rounded-xl border-2 border-chassisDark flex flex-col gap-1">
-                        <span class="text-[9px] font-bold uppercase text-slate-700 border-b border-slate-300 pb-0.5">Synth Presets</span>
-                        <div class="grid grid-cols-4 gap-1 pt-0.5">
-                            <button data-preset="PIANO" class="preset-btn py-1 rounded border border-chassisDark bg-panelBg hover:bg-amber-200 transition">PIANO</button>
-                            <button data-preset="GUITAR" class="preset-btn py-1 rounded border border-chassisDark bg-panelBg hover:bg-amber-200 transition">GUITAR</button>
-                            <button data-preset="BASS" class="preset-btn py-1 rounded border border-chassisDark bg-panelBg hover:bg-amber-200 transition">BASS</button>
-                            <button data-preset="ORGAN" class="preset-btn py-1 rounded border border-chassisDark bg-panelBg hover:bg-amber-200 transition">ORGAN</button>
-                            <button data-preset="STRINGS" class="preset-btn py-1 rounded border border-chassisDark bg-panelBg hover:bg-amber-200 transition">STRINGS</button>
-                            <button data-preset="BRASS" class="preset-btn py-1 rounded border border-chassisDark bg-panelBg hover:bg-amber-200 transition">BRASS</button>
-                            <button data-preset="PAD" class="preset-btn py-1 rounded border border-chassisDark bg-panelBg hover:bg-amber-200 transition">PAD</button>
-                            <button data-preset="LEAD" class="preset-btn py-1 rounded border border-chassisDark bg-panelBg hover:bg-amber-200 transition">LEAD</button>
-                        </div>
-                    </div>
                 </div>
 
             </div>
@@ -383,6 +396,6 @@
 
 </div>
 
-<script src="app.js?v=1.4.2"></script>
+<script src="app.js?v=1.4.5"></script>
 </body>
 </html>
