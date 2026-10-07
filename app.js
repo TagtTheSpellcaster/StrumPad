@@ -146,8 +146,7 @@ class WebAudioEngine {
     setArpMode(enabled) {
         if (this.droneMode) return;
         this.arpMode = enabled;
-        // Spegne sempre eventuali timer o note pendenti.
-        // L'arpeggiatore non parte subito: attende che l'utente prema un pulsante della Chord Matrix.
+        // Spegne i timer e il ciclo: resta in attesa del primo bottone accordo
         this.stopArp();
     }
 
@@ -420,9 +419,14 @@ class WebAudioEngine {
             const chordNotes = midiNotes.slice(0, 4);
             chordNotes.forEach(note => this.playNote(note));
         } else if (this.arpMode) {
-            // L'arpeggiatore parte (o si aggiorna con il nuovo accordo) QUI, alla pressione del tasto
+            // Aggiorna le note dell'arpeggio per il nuovo accordo selezionato
             this.updateArpNotes();
-            this.startArp();
+            
+            // Fa partire il ciclo continuo SOLO se non è già in esecuzione!
+            // Se è già in esecuzione, continua indefinitamente con le nuove note aggiornate.
+            if (!this.arpTimer) {
+                this.startArp();
+            }
         } else if (this.strumMode) {
             const notes = midiNotes.slice(0, 5);
             notes.forEach((note, idx) => {
