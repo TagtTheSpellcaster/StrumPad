@@ -1,6 +1,6 @@
 # StrumPad
 
-[![Version](https://img.shields.io/badge/version-1.5.2-blue.svg)](https://github.com/TagtTheSpellcaster/StrumPad)
+[![Version](https://img.shields.io/badge/version-1.5.3-blue.svg)](https://github.com/TagtTheSpellcaster/StrumPad)
 [![License](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Web Audio API](https://img.shields.io/badge/Web%20Audio%20API-Native-8B5CF6.svg)](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
@@ -8,7 +8,7 @@
 
 **▶ [Launch StrumPad](https://tagtthespellcaster.github.io/StrumPad/)**
 
-**StrumPad v1.5.2** is a browser-based, vintage-style **chord machine and analog-modeled synthesizer** designed for playing chords, exploring harmonic progressions, and experimenting with sound.
+**StrumPad v1.5.3** is a browser-based, vintage-style **chord machine and analog-modeled synthesizer** designed for playing chords, exploring harmonic progressions, and experimenting with sound.
 
 Its main purpose is harmonic exploration: select a musical style, choose a progression, establish the key by playing its first chord, and then follow the visual guidance provided by the **Harmonic Progression Assistant**.
 
@@ -73,7 +73,7 @@ When playing through a harmonic progression with **Smooth Voice Leading** enable
 
 ### Configurable Cyclic Arpeggiator Engine
 
-StrumPad v1.5.2 features a dedicated, continuous **Arpeggiator Engine** that transforms chord voicings into dynamic, repeating pitch patterns.
+StrumPad v1.5.3 features a dedicated, continuous **Arpeggiator Engine** that transforms chord voicings into dynamic, repeating pitch patterns.
 
 Key parameters include:
 
