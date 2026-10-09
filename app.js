@@ -134,9 +134,12 @@ class WebAudioEngine {
             this.arpMode = false;
             this.stopArp();
             this.stopAll();
+        } else {
+            // Interrompe immediatamente l'audio quando il drone viene disattivato
+            this.stopAll();
         }
     }
-
+    
     setStrumMode(enabled) {
         if (this.droneMode) return;
         this.strumMode = enabled;
